@@ -1,10 +1,19 @@
 import { fetchAllUsersAPI } from '@/services/api.service';
+import { dateRangeValidate } from '@/services/helper';
 import { DeleteOutlined, EditOutlined, PlusOutlined, ReadOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
-import { ProTable, TableDropdown } from '@ant-design/pro-components';
-import { Button, Space, Tag } from 'antd';
+import { ProTable } from '@ant-design/pro-components';
+import { Button, Space } from 'antd';
 import { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+
+type TSearch = {
+    fullName: string;
+    email: string;
+    phone: string;
+    createdAt: string;
+    createdAtRange: string;
+}
 
 const columns: ProColumns<IUserTable>[] = [
     {
@@ -21,16 +30,6 @@ const columns: ProColumns<IUserTable>[] = [
                 <Link to={"#"}>{entity.id}</Link>
             )
         },
-        // ellipsis: true,
-        // tooltip: '标题过长会自动收缩',
-        // formItemProps: {
-        //     rules: [
-        //         {
-        //             required: true,
-        //             message: '此项为必填项',
-        //         },
-        //     ],
-        // },
     },
     {
         title: 'Full Name',
@@ -48,6 +47,15 @@ const columns: ProColumns<IUserTable>[] = [
     {
         title: 'Created At',
         dataIndex: 'createdAt',
+        valueType: 'date',
+        hideInSearch: true,
+        sorter: true,
+    },
+    {
+        title: 'Created At',
+        dataIndex: 'createdAtRange',
+        valueType: 'dateRange',
+        hideInTable: true,
     },
     {
         title: 'Action',
@@ -64,101 +72,10 @@ const columns: ProColumns<IUserTable>[] = [
             )
         },
     },
-    // {
-    //     disable: true,
-    //     title: '状态',
-    //     dataIndex: 'state',
-    //     filters: true,
-    //     onFilter: true,
-    //     ellipsis: true,
-    //     valueType: 'select',
-    //     valueEnum: {
-    //         all: { text: '超长'.repeat(50) },
-    //         open: {
-    //             text: '未解决',
-    //             status: 'Error',
-    //         },
-    //         closed: {
-    //             text: '已解决',
-    //             status: 'Success',
-    //             disabled: true,
-    //         },
-    //         processing: {
-    //             text: '解决中',
-    //             status: 'Processing',
-    //         },
-    //     },
-    // },
-    // {
-    //     disable: true,
-    //     title: '标签',
-    //     dataIndex: 'labels',
-    //     search: false,
-    //     renderFormItem: (_, { defaultRender }) => {
-    //         return defaultRender(_);
-    //     },
-    //     render: (_, record) => (
-    //         <Space>
-    //             {record.labels.map(({ name, color }) => (
-    //                 <Tag color={color} key={name}>
-    //                     {name}
-    //                 </Tag>
-    //             ))}
-    //         </Space>
-    //     ),
-    // },
-    // {
-    //     title: '创建时间',
-    //     key: 'showTime',
-    //     dataIndex: 'created_at',
-    //     valueType: 'date',
-    //     sorter: true,
-    //     hideInSearch: true,
-    // },
-    // {
-    //     title: '创建时间',
-    //     dataIndex: 'created_at',
-    //     valueType: 'dateRange',
-    //     hideInTable: true,
-    //     search: {
-    //         transform: (value) => {
-    //             return {
-    //                 startTime: value[0],
-    //                 endTime: value[1],
-    //             };
-    //         },
-    //     },
-    // },
-    // {
-    //     title: '操作',
-    //     valueType: 'option',
-    //     key: 'option',
-    //     render: (text, record, _, action) => [
-    //         <a
-    //             key="editable"
-    //             onClick={() => {
-    //                 action?.startEditable?.(record.id);
-    //             }}
-    //         >
-    //             编辑
-    //         </a>,
-    //         <a href={record.url} target="_blank" rel="noopener noreferrer" key="view">
-    //             查看
-    //         </a>,
-    //         <TableDropdown
-    //             key="actionGroup"
-    //             onSelect={() => action?.reload()}
-    //             menus={[
-    //                 { key: 'copy', name: '复制' },
-    //                 { key: 'delete', name: '删除' },
-    //             ]}
-    //         />,
-    //     ],
-    // },
 ];
 
 const TableUser = () => {
-    const actionRef = useRef<ActionType>();
+    const actionRef = useRef<ActionType | null>(null);
     const [meta, setMeta] = useState({
         current: 1,
         pageSize: 5,
@@ -168,7 +85,7 @@ const TableUser = () => {
 
     return (
         <>
-            <ProTable<IUserTable>
+            <ProTable<IUserTable, TSearch>
                 columns={columns}
                 actionRef={actionRef}
                 cardBordered
@@ -176,18 +93,43 @@ const TableUser = () => {
                     console.log(params, sort, filter);
                     await new Promise((resolve) => setTimeout(resolve, 1000));
 
-                    const fetchAllUsersResponse = await fetchAllUsersAPI(params?.current ?? 1, params?.pageSize ?? 5);
+                    let query = `page=${params.current}&size=${params.pageSize}`;
+                    let filterConditions = [];
+
+                    if (params.fullName) {
+                        filterConditions.push(`fullName~'${params.fullName}'`);
+                    }
+                    if (params.email) {
+                        filterConditions.push(`email='${params.email}'`);
+                    }
+                    if (params.phone) {
+                        filterConditions.push(`phone~'${params.phone}'`);
+                    }
+                    if (params.createdAtRange && params.createdAtRange[0] && params.createdAtRange[1]) {
+                        const dateRangeResult = dateRangeValidate(params.createdAtRange);
+                        if (dateRangeResult) {
+                            const [startDate, endDate] = dateRangeResult;
+                            filterConditions.push(`createdAt>='${startDate}'`);
+                            filterConditions.push(`createdAt<='${endDate}'`);
+                        }
+                    }
+
+                    if (filterConditions.length > 0) {
+                        query += `&filter=${filterConditions.join(' and ')}`;
+                    }
+
+                    console.log("Query sent:", query);
+                    const fetchAllUsersResponse = await fetchAllUsersAPI(query);
                     if (fetchAllUsersResponse.data) {
                         setMeta(fetchAllUsersResponse.data.meta);
                     }
 
-                    // const data = await (await fetch('https://proapi.azurewebsites.net/github/issues')).json()
                     return {
                         data: fetchAllUsersResponse.data?.result,
-                        page: 1,
+                        page: params.current,
                         success: true,
                         total: fetchAllUsersResponse.data?.meta.total,
-                    }
+                    };
                 }}
                 editable={{
                     type: 'multiple',
@@ -212,7 +154,6 @@ const TableUser = () => {
                     },
                 }}
                 form={{
-                    // 由于配置了 transform，提交的参数与定义的不同这里需要转化一下
                     syncToUrl: (values, type) => {
                         if (type === 'get') {
                             return {

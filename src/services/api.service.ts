@@ -9,8 +9,14 @@ export const createUserAPI = () => {
   return null;
 };
 
-export const fetchAllUsersAPI = (current: number, pageSize: number) => {
-  const ENDPOINT_FETCH_ALL_USERS = `/api/v1/users?page=${current}&size=${pageSize}`;
+// export const fetchAllUsersAPI = (current: number, pageSize: number) => {
+//   const ENDPOINT_FETCH_ALL_USERS = `/api/v1/users?page=${current}&size=${pageSize}`;
+//   return axios.get<IBackendRes<IModelPaginate<IUserTable>>>(
+//     ENDPOINT_FETCH_ALL_USERS
+//   );
+// };
+export const fetchAllUsersAPI = (query: string) => {
+  const ENDPOINT_FETCH_ALL_USERS = `/api/v1/users?${query}`;
   return axios.get<IBackendRes<IModelPaginate<IUserTable>>>(
     ENDPOINT_FETCH_ALL_USERS
   );
