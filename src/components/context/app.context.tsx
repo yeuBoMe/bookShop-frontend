@@ -1,0 +1,98 @@
+import { getAccountInfoAPI } from "@/services/api.service";
+import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+import BarLoader from "react-spinners/BarLoader";
+import "styles/spinner.scss";
+
+interface CurrentUserContextType {
+    isAuthenticated: boolean;
+    setIsAuthenticated: (v: boolean) => void;
+    isAppLoading: boolean;
+    setIsAppLoading: (v: boolean) => void;
+    user: IUser | null;
+    setUser: (v: IUser) => void;
+}
+
+const CurrentUserContext = createContext<CurrentUserContextType | null>(null);
+
+type IProps = {
+    children: React.ReactNode
+}
+
+export const AuthProvider = (props: IProps) => {
+    const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+    const [isAppLoading, setIsAppLoading] = useState<boolean>(true);
+    const [user, setUser] = useState<IUser | null>(null);
+
+    useEffect(() => {
+        fetchUserInfoWithAccessTokenRequest()
+    }, []);
+
+    const delayTime = (milSeconds: number) => {
+        return new Promise<void>((resolve) => {
+            setTimeout(() => {
+                resolve();
+            }, milSeconds);
+        });
+    }
+
+    const fetchUserInfoWithAccessTokenRequest = async () => {
+        try {
+            const getAccountInfoResponse = await getAccountInfoAPI();
+            await delayTime(400);
+
+            if (getAccountInfoResponse?.data) {
+                await new Promise((resolve) => setTimeout(resolve, 400));
+
+                const mappedIAccountToIUser: IUser = {
+                    id: getAccountInfoResponse.data.user.id,
+                    fullName: getAccountInfoResponse.data.user.name,
+                    email: getAccountInfoResponse.data.user.email,
+                    avatar: getAccountInfoResponse.data.user.avatar || "",
+                    phone: getAccountInfoResponse.data.user.phone || "",
+                    role: getAccountInfoResponse.data.user.role,
+                }
+
+                setUser(mappedIAccountToIUser);
+                setIsAuthenticated(true);
+            }
+        } catch (error: any) {
+            console.log("Check error fetching user info >>> ", error)
+            setIsAuthenticated(false);
+        } finally {
+            setIsAppLoading(false);
+        }
+    }
+
+    const value = useMemo(() => ({
+        isAuthenticated, setIsAuthenticated,
+        isAppLoading, setIsAppLoading,
+        user, setUser
+    }), [isAuthenticated, isAppLoading, user]);
+
+    return (
+        <>
+            {isAppLoading === true ? (
+                <div className="app-spinner">
+                    <BarLoader width={100} color="#00FFC8" loading={true} />
+                </div>
+            ) : (
+                <CurrentUserContext.Provider value={value}>
+                    {props.children}
+                    {/* children: all components are wrapped in AuthProvider */}
+                </CurrentUserContext.Provider>
+            )}
+        </>
+    );
+};
+
+export const useCurrentApp = () => {
+    const currentUserContext = useContext(CurrentUserContext);
+
+    if (!currentUserContext) {
+        throw new Error(
+            "useCurrentApp has to be used within <CurrentUserContext.Provider>"
+        );
+    }
+
+    return currentUserContext;
+};

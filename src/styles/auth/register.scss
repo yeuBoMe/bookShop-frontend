@@ -1,0 +1,45 @@
+.register-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.register-fieldset {
+  padding: 20px;
+  margin: 10px;
+  border: 1px solid #f3f3f3;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.register-legend {
+  font-weight: bold;
+  font-size: clamp(18px, 5vw, 22px);
+  text-align: center;
+  padding: 0 10px;
+}
+
+.register-button {
+  text-align: center;
+}
+
+.register-login-link {
+  text-align: center;
+  font-size: clamp(14px, 4vw, 16px);
+}
+
+@media (max-width: 576px) {
+  .register-fieldset {
+    padding: 15px;
+    margin: 5px;
+  }
+}
+
+@media (min-width: 768px) {
+  .register-fieldset {
+    padding: 25px;
+  }
+}
