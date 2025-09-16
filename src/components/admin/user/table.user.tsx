@@ -7,6 +7,7 @@ import { Button, Space } from 'antd';
 import { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import DetailUserDrawer from './detail.user.drawer';
+import CreateUserModal from './create.user.modal';
 
 type TSearch = {
     fullName: string;
@@ -24,6 +25,12 @@ const TableUser = () => {
         pages: 0,
         total: 0
     });
+
+    const refreshTable = () => {
+        actionRef.current?.reload;
+    }
+
+    const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
     const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
     const [dataDetail, setDataDetail] = useState<IUserView | null>(null);
@@ -218,14 +225,17 @@ const TableUser = () => {
                     <Button
                         key="button"
                         icon={<PlusOutlined />}
-                        onClick={() => {
-                            actionRef.current?.reload();
-                        }}
+                        onClick={() => setIsModalOpen(true)}
                         type="primary"
                     >
                         Add new
                     </Button>
                 ]}
+            />
+            <CreateUserModal
+                isModalOpen={isModalOpen}
+                setIsModalOpen={setIsModalOpen}
+                refreshTable={refreshTable}
             />
             <DetailUserDrawer
                 isDrawerOpen={isDrawerOpen}

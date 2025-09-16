@@ -37,9 +37,9 @@ const AdminLayout = () => {
 
                 localStorage.removeItem("access_token");
                 message.success("Đăng xuất thành công!");
-                
+
                 navigate("/login");
-            } 
+            }
         } catch (error: any) {
             notification.error({
                 message: "Error",
@@ -87,10 +87,14 @@ const AdminLayout = () => {
 
     const itemsDropdown = [
         {
-            label: <label
-                style={{ cursor: 'pointer' }}
-                onClick={() => alert("me")}
-            >Quản lý tài khoản</label>,
+            label: (
+                <label
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => alert("me")}
+                >
+                    Quản lý tài khoản
+                </label>
+            ),
             key: 'account',
         },
         {
@@ -98,10 +102,13 @@ const AdminLayout = () => {
             key: 'home',
         },
         {
-            label: <label
-                style={{ cursor: 'pointer' }}
-                onClick={() => handleLogoutRequest()}
-            >Đăng xuất</label>,
+            label: (
+                <label
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => handleLogoutRequest()}
+                >
+                    Đăng xuất
+                </label>),
             key: 'logout',
         },
     ];

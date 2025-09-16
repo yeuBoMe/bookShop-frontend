@@ -1,12 +1,21 @@
 import axios from "services/axios.customize";
 
-// api module users
-const ENDPOINT_CREATE_USER = "/api/v1/users";
-
 const ENDPOINT_GET_REFRESH_TOKEN = "/api/v1/auth/refresh";
 
-export const createUserAPI = () => {
-  return null;
+export const createUserAPI = (
+  fullName: string,
+  email: string,
+  password: string,
+  phone: string
+) => {
+  const ENDPOINT_CREATE_USER = "/api/v1/users";
+  const data = {
+    fullName: fullName,
+    email: email,
+    password: password,
+    phone: phone,
+  };
+  return axios.post<IBackendRes<IUser>>(ENDPOINT_CREATE_USER, data);
 };
 
 // export const fetchAllUsersAPI = (current: number, pageSize: number) => {

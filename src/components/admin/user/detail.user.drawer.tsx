@@ -1,5 +1,6 @@
-import { Badge, Descriptions, Drawer } from "antd";
+import { Avatar, Badge, Descriptions, Drawer } from "antd";
 import type { DescriptionsProps } from "antd/lib";
+import dayjs from "dayjs";
 
 interface DrawerUserProps {
     isDrawerOpen: boolean;
@@ -10,6 +11,11 @@ interface DrawerUserProps {
 
 const DetailUserDrawer = (props: DrawerUserProps) => {
     const { isDrawerOpen, setIsDrawerOpen, dataDetail, setDataDetail } = props;
+    const urlAvatar = `${import.meta.env.VITE_BACKEND_URL}/upload/avatar/${dataDetail?.avatar}`
+
+    const formatDateTime = (value?: string | Date) => {
+        return value ? dayjs(value).format("YYYY-MM-DD HH:mm:ss") : "N/A";
+    }
 
     const items: DescriptionsProps['items'] = [
         ...(dataDetail ? [
@@ -35,21 +41,32 @@ const DetailUserDrawer = (props: DrawerUserProps) => {
             },
             {
                 key: '5',
-                label: 'Created At',
-                children: <p>{dataDetail.createdAt.toString()}</p>,
+                label: 'Role',
+                children: (
+                    <Badge
+                        status="processing"
+                        text={dataDetail.role?.name ? dataDetail.role.name : "USER"}
+                    />
+                ),
             },
             {
                 key: '6',
-                label: 'Updated At',
-                children: <p>{dataDetail.updatedAt.toString()}</p>,
+                label: 'Avatar',
+                children: (
+                    <Avatar 
+                        src={dataDetail.avatar ? urlAvatar : "user"}
+                    />
+                ),
             },
             {
                 key: '7',
-                label: 'Role',
-                children: <Badge
-                    status="processing"
-                    text={dataDetail.role?.name ? dataDetail.role.name : "USER"}
-                />,
+                label: 'Created At',
+                children: <p>{formatDateTime(dataDetail?.createdAt)}</p>,
+            },
+            {
+                key: '8',
+                label: 'Updated At',
+                children: <p>{formatDateTime(dataDetail?.updatedAt)}</p>,
             },
         ] : [])
     ];
@@ -62,9 +79,9 @@ const DetailUserDrawer = (props: DrawerUserProps) => {
     return (
         <>
             <Drawer
-                title="User information"
+                title="User Detail"
                 placement={"right"}
-                width={500}
+                width={"50vw"}
                 open={isDrawerOpen}
                 onClose={handleClearDataAndCloseDrawer}
             >
@@ -73,8 +90,7 @@ const DetailUserDrawer = (props: DrawerUserProps) => {
                     items={items}
                     bordered
                     size="small"
-                    layout="horizontal"
-                    column={3}
+                    column={2}
                 />
             </Drawer>
         </>
