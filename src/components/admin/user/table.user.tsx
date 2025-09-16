@@ -6,6 +6,7 @@ import { ProTable } from '@ant-design/pro-components';
 import { Button, Space } from 'antd';
 import { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import DetailUserDrawer from './detail.user.drawer';
 
 type TSearch = {
     fullName: string;
@@ -15,69 +16,6 @@ type TSearch = {
     createdAtRange: string;
 }
 
-const columns: ProColumns<IUserTable>[] = [
-    {
-        dataIndex: 'index',
-        valueType: 'indexBorder',
-        width: 48,
-    },
-    {
-        title: 'Id',
-        dataIndex: 'id',
-        hideInSearch: true,
-        sorter: true,
-        render(dom, entity, index, action, schema) {
-            return (
-                <Link to={"#"}>{entity.id}</Link>
-            )
-        },
-    },
-    {
-        title: 'Full Name',
-        dataIndex: 'fullName',
-        sorter: true,
-    },
-    {
-        title: 'Email',
-        dataIndex: 'email',
-        copyable: true,
-        sorter: true,
-    },
-    {
-        title: 'Phone',
-        dataIndex: 'phone',
-        sorter: true,
-    },
-    {
-        title: 'Created At',
-        dataIndex: 'createdAt',
-        valueType: 'date',
-        hideInSearch: true,
-        sorter: true,
-    },
-    {
-        title: 'Created At',
-        dataIndex: 'createdAtRange',
-        valueType: 'dateRange',
-        hideInTable: true,
-    },
-    {
-        title: 'Action',
-        hideInSearch: true,
-        render(dom, entity, index, action, schema) {
-            return (
-                <>
-                    <Space size={'middle'}>
-                        <ReadOutlined style={{ cursor: "pointer", color: "green" }} />
-                        <EditOutlined style={{ cursor: "pointer", color: "orange" }} />
-                        <DeleteOutlined style={{ cursor: "pointer", color: "red" }} />
-                    </Space>
-                </>
-            )
-        },
-    },
-];
-
 const TableUser = () => {
     const actionRef = useRef<ActionType | null>(null);
     const [meta, setMeta] = useState({
@@ -86,6 +24,86 @@ const TableUser = () => {
         pages: 0,
         total: 0
     });
+
+    const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
+    const [dataDetail, setDataDetail] = useState<IUserView | null>(null);
+
+    const columns: ProColumns<IUserTable>[] = [
+        {
+            dataIndex: 'index',
+            valueType: 'indexBorder',
+            width: 48,
+        },
+        {
+            title: 'Id',
+            dataIndex: 'id',
+            hideInSearch: true,
+            sorter: true,
+            render(_, entity) {
+                return (
+                    <Link
+                        to={"#"}
+                        onClick={(e) => {
+                            e.preventDefault(); // Chặn reload
+                            setDataDetail(entity); // Lưu dữ liệu chi tiết
+                            setIsDrawerOpen(true); // Mở drawer
+                        }}>
+                        {entity.id}
+                    </Link>
+                )
+            },
+        },
+        {
+            title: 'Full Name',
+            dataIndex: 'fullName',
+            sorter: true,
+        },
+        {
+            title: 'Email',
+            dataIndex: 'email',
+            copyable: true,
+            sorter: true,
+        },
+        {
+            title: 'Phone',
+            dataIndex: 'phone',
+            sorter: true,
+        },
+        {
+            title: 'Created At',
+            dataIndex: 'createdAt',
+            valueType: 'date',
+            hideInSearch: true,
+            sorter: true,
+        },
+        {
+            title: 'Created At',
+            dataIndex: 'createdAtRange',
+            valueType: 'dateRange',
+            hideInTable: true,
+        },
+        {
+            title: 'Action',
+            hideInSearch: true,
+            render(_, entity) {
+                return (
+                    <>
+                        <Space size={'middle'}>
+                            <ReadOutlined
+                                style={{ cursor: "pointer", color: "green" }}
+                                onClick={() => {
+                                    setDataDetail(entity);
+                                    setIsDrawerOpen(true);
+                                }}
+                            />
+                            <EditOutlined style={{ cursor: "pointer", color: "orange" }} />
+                            <DeleteOutlined style={{ cursor: "pointer", color: "red" }} />
+                        </Space>
+                    </>
+                )
+            },
+        },
+    ];
 
     return (
         <>
@@ -208,6 +226,12 @@ const TableUser = () => {
                         Add new
                     </Button>
                 ]}
+            />
+            <DetailUserDrawer
+                isDrawerOpen={isDrawerOpen}
+                setIsDrawerOpen={setIsDrawerOpen}
+                dataDetail={dataDetail}
+                setDataDetail={setDataDetail}
             />
         </>
     );

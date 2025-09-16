@@ -48,10 +48,6 @@ const RegisterPage = () => {
     }
   };
 
-  // const onFinishFailed: FormProps<RegisterValues>['onFinishFailed'] = (errorInfo) => {
-  //   console.log('Failed:', errorInfo);
-  // };
-
   return (
     <Row justify="center" className="register-page">
       <Col xs={24} md={16} lg={8}>
@@ -65,7 +61,6 @@ const RegisterPage = () => {
             layout="vertical"
             form={form}
             onFinish={handleRegisterRequest}
-            // onFinishFailed={onFinishFailed}
             autoComplete="off"
           >
             <Form.Item<RegisterValues>

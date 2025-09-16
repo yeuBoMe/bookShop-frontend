@@ -9,7 +9,7 @@ interface CurrentUserContextType {
     isAppLoading: boolean;
     setIsAppLoading: (v: boolean) => void;
     user: IUser | null;
-    setUser: (v: IUser) => void;
+    setUser: (v: IUser | null) => void;
 }
 
 const CurrentUserContext = createContext<CurrentUserContextType | null>(null);

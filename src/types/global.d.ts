@@ -102,4 +102,20 @@ declare global {
       name: string;
     };
   }
+
+  interface IUserView {
+    id: number;
+    fullName: string;
+    email: string;
+    avatar?: string;
+    phone: string;
+    createdAt: Date;
+    createdBy: string;
+    updatedAt: Date;
+    updatedBy: string;
+    role?: {
+      id: number;
+      name: string;
+    };
+  }
 }

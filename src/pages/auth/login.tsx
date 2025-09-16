@@ -58,14 +58,11 @@ const LoginPage = () => {
         duration: 5,
         placement: 'topRight'
       });
+      setIsAuthenticated(false);
     } finally {
       setIsLoading(false);
     }
   };
-
-  // const onFinishFailed: FormProps<LoginValues>['onFinishFailed'] = (errorInfo) => {
-  //   console.log('Failed:', errorInfo);
-  // };
 
   return (
     <Row justify={"center"} className="login-page">
@@ -80,7 +77,6 @@ const LoginPage = () => {
             layout="vertical"
             form={form}
             onFinish={handleLoginRequest}
-            // onFinishFailed={onFinishFailed}
             autoComplete="off"
           >
             <Form.Item<LoginValues>

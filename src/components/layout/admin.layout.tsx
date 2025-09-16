@@ -32,22 +32,12 @@ const AdminLayout = () => {
         try {
             const logoutResponse = await logoutAPI();
             if (logoutResponse) {
-                setUser({
-                    id: 0,
-                    fullName: "",
-                    email: "",
-                    avatar: "",
-                    phone: "",
-                    role: {
-                        id: 0,
-                        name: "",
-                    },
-                });
-
+                setUser(null);
                 setIsAuthenticated(false);
-                localStorage.removeItem("access_token");
 
+                localStorage.removeItem("access_token");
                 message.success("Đăng xuất thành công!");
+                
                 navigate("/login");
             } 
         } catch (error: any) {
