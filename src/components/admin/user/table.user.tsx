@@ -25,6 +25,7 @@ const columns: ProColumns<IUserTable>[] = [
         title: 'Id',
         dataIndex: 'id',
         hideInSearch: true,
+        sorter: true,
         render(dom, entity, index, action, schema) {
             return (
                 <Link to={"#"}>{entity.id}</Link>
@@ -34,15 +35,18 @@ const columns: ProColumns<IUserTable>[] = [
     {
         title: 'Full Name',
         dataIndex: 'fullName',
+        sorter: true,
     },
     {
         title: 'Email',
         dataIndex: 'email',
         copyable: true,
+        sorter: true,
     },
     {
         title: 'Phone',
         dataIndex: 'phone',
+        sorter: true,
     },
     {
         title: 'Created At',
@@ -118,6 +122,17 @@ const TableUser = () => {
                         query += `&filter=${filterConditions.join(' and ')}`;
                     }
 
+                    // Thêm sắp xếp vào query
+                    if (sort) {
+                        const sortFields = Object.keys(sort).map((field) => {
+                            const order = sort[field] === 'ascend' ? 'asc' : 'desc';
+                            return `${field},${order}`;
+                        });
+                        if (sortFields.length > 0) {
+                            query += `&sort=${sortFields.join(',')}`;
+                        }
+                    }
+
                     console.log("Query sent:", query);
                     const fetchAllUsersResponse = await fetchAllUsersAPI(query);
                     if (fetchAllUsersResponse.data) {
@@ -152,6 +167,7 @@ const TableUser = () => {
                     setting: {
                         listsHeight: 400,
                     },
+                    reload: true,
                 }}
                 form={{
                     syncToUrl: (values, type) => {
@@ -163,6 +179,7 @@ const TableUser = () => {
                         }
                         return values;
                     },
+                    syncToInitialValues: true, // Khôi phục trạng thái từ URL khi tải lại
                 }}
                 pagination={{
                     current: meta.current,

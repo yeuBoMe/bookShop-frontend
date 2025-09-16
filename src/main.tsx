@@ -69,35 +69,19 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: (
-          <ProtectedRoute>
-            <DashBoardPage />
-          </ProtectedRoute>
-        ),
+        element: <DashBoardPage />,
       },
       {
         path: "book",
-        element: (
-          <ProtectedRoute>
-            <ManageBookPage />
-          </ProtectedRoute>
-        ),
+        element: <ManageBookPage />,
       },
       {
         path: "order",
-        element: (
-          <ProtectedRoute>
-            <ManageOrderPage />
-          </ProtectedRoute>
-        ),
+        element: <ManageOrderPage />,
       },
       {
         path: "user",
-        element: (
-          <ProtectedRoute>
-            <ManageUserPage />
-          </ProtectedRoute>
-        ),
+        element: <ManageUserPage />,
       },
     ]
   },
