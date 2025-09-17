@@ -10,14 +10,13 @@ interface UserCreateValues {
 }
 
 interface CreateUserProps {
-    isModalOpen: boolean;
-    setIsModalOpen: (v: boolean) => void;
+    isModalCreateOpen: boolean;
+    setIsModalCreateOpen: (v: boolean) => void;
     refreshTable: () => void;
 }
 
 const CreateUserModal = (props: CreateUserProps) => {
-    const { isModalOpen, setIsModalOpen, refreshTable } = props;
-
+    const { isModalCreateOpen, setIsModalCreateOpen, refreshTable } = props;
     const [form] = Form.useForm<UserCreateValues>();
     const { notification, message } = App.useApp();
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -34,12 +33,11 @@ const CreateUserModal = (props: CreateUserProps) => {
                 message.success("Tạo tài khoản thành công!");
                 refreshTable();
             }
-
         } catch (error: any) {
             notification.error({
                 message: "Error",
                 description: error?.message,
-                duration: 3,
+                duration: 5,
                 placement: "topRight"
             });
         } finally {
@@ -49,7 +47,7 @@ const CreateUserModal = (props: CreateUserProps) => {
 
     const handleClearDataAndCloseModal = () => {
         form.resetFields();
-        setIsModalOpen(false);
+        setIsModalCreateOpen(false);
     }
 
     return (
@@ -59,7 +57,7 @@ const CreateUserModal = (props: CreateUserProps) => {
                 okText="Create"
                 maskClosable={false}
                 closable={false}
-                open={isModalOpen}
+                open={isModalCreateOpen}
                 onOk={() => form.submit()}
                 onCancel={handleClearDataAndCloseModal}
                 loading={isLoading}
@@ -75,7 +73,7 @@ const CreateUserModal = (props: CreateUserProps) => {
                             autoComplete="off"
                         >
                             <Form.Item<UserCreateValues>
-                                label="Họ và tên:"
+                                label="Full Name:"
                                 name="fullName"
                                 rules={[
                                     { required: true, message: 'Name is required' },

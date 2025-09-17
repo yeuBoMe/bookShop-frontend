@@ -1,13 +1,15 @@
-import { fetchAllUsersAPI } from '@/services/api.service';
+import { deleteUserAPI, fetchAllUsersAPI } from '@/services/api.service';
 import { dateRangeValidate } from '@/services/helper';
-import { DeleteOutlined, EditOutlined, PlusOutlined, ReadOutlined } from '@ant-design/icons';
+import { CloudDownloadOutlined, DeleteOutlined, EditOutlined, ExportOutlined, PlusOutlined, ReadOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
-import { Button, Space } from 'antd';
+import { App, Button, Popconfirm, Space } from 'antd';
 import { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import DetailUserDrawer from './detail.user.drawer';
-import CreateUserModal from './create.user.modal';
+import DetailUserDrawer from 'components/admin/user/detail.user.drawer';
+import CreateUserModal from 'components/admin/user/create.user.modal';
+import UpdateUserModal from 'components/admin/user/update.user.modal';
+import ImportUserModal from './import.user.modal';
 
 type TSearch = {
     fullName: string;
@@ -19,6 +21,7 @@ type TSearch = {
 
 const TableUser = () => {
     const actionRef = useRef<ActionType | null>(null);
+    const { notification, message } = App.useApp();
     const [meta, setMeta] = useState({
         current: 1,
         pageSize: 5,
@@ -26,14 +29,35 @@ const TableUser = () => {
         total: 0
     });
 
-    const refreshTable = () => {
-        actionRef.current?.reload;
-    }
-
-    const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+    const [isModalImportOpen, setIsModalImportOpen] = useState<boolean>(false);
+    const [isModalCreateOpen, setIsModalCreateOpen] = useState<boolean>(false);
 
     const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
     const [dataDetail, setDataDetail] = useState<IUserView | null>(null);
+
+    const [isModalUpdateOpen, setIsModalUpdateOpen] = useState<boolean>(false);
+    const [dataUpdate, setDataUpdate] = useState<IUserView | null>(null);
+
+    const refreshTable = () => {
+        actionRef.current?.reload();
+    }
+
+    const handleDeleteUser = async (id: number) => {
+        try {
+            const deleteUserResponse = await deleteUserAPI(id);
+            if (deleteUserResponse.data) {
+                message.success("Delete user successfully!");
+                refreshTable();
+            }
+        } catch (error: any) {
+            notification.error({
+                message: "Error",
+                description: error?.message,
+                duration: 5,
+                placement: "topRight",
+            });
+        }
+    }
 
     const columns: ProColumns<IUserTable>[] = [
         {
@@ -52,8 +76,8 @@ const TableUser = () => {
                         to={"#"}
                         onClick={(e) => {
                             e.preventDefault(); // Chặn reload
-                            setDataDetail(entity); // Lưu dữ liệu chi tiết
-                            setIsDrawerOpen(true); // Mở drawer
+                            setDataDetail(entity);
+                            setIsDrawerOpen(true);
                         }}>
                         {entity.id}
                     </Link>
@@ -103,8 +127,23 @@ const TableUser = () => {
                                     setIsDrawerOpen(true);
                                 }}
                             />
-                            <EditOutlined style={{ cursor: "pointer", color: "orange" }} />
-                            <DeleteOutlined style={{ cursor: "pointer", color: "red" }} />
+                            <EditOutlined
+                                style={{ cursor: "pointer", color: "orange" }}
+                                onClick={() => {
+                                    setDataUpdate(entity);
+                                    setIsModalUpdateOpen(true);
+                                }}
+                            />
+                            <Popconfirm
+                                placement="topLeft"
+                                title={"Delete user"}
+                                description={"Are you sure to delete this user?"}
+                                okText="Yes"
+                                cancelText="No"
+                                onConfirm={() => handleDeleteUser(entity.id)}
+                            >
+                                <DeleteOutlined style={{ cursor: "pointer", color: "red" }} />
+                            </Popconfirm>
                         </Space>
                     </>
                 )
@@ -222,19 +261,41 @@ const TableUser = () => {
                 dateFormatter="string"
                 headerTitle="Table user"
                 toolBarRender={() => [
-                    <Button
-                        key="button"
-                        icon={<PlusOutlined />}
-                        onClick={() => setIsModalOpen(true)}
-                        type="primary"
-                    >
-                        Add new
-                    </Button>
+                    <>
+                        <Button
+                            key="button"
+                            icon={<ExportOutlined />}
+                            onClick={() => setIsModalCreateOpen(true)}
+                            type="primary"
+                        >
+                            Export
+                        </Button>
+                        <Button
+                            key="button"
+                            icon={<CloudDownloadOutlined />}
+                            onClick={() => setIsModalImportOpen(true)}
+                            type="primary"
+                        >
+                            Import
+                        </Button>
+                        <Button
+                            key="button"
+                            icon={<PlusOutlined />}
+                            onClick={() => setIsModalCreateOpen(true)}
+                            type="primary"
+                        >
+                            Add new
+                        </Button>
+                    </>
                 ]}
             />
+            <ImportUserModal 
+                isModalImportOpen={isModalImportOpen}
+                setIsModalImportOpen={setIsModalImportOpen}
+            />
             <CreateUserModal
-                isModalOpen={isModalOpen}
-                setIsModalOpen={setIsModalOpen}
+                isModalCreateOpen={isModalCreateOpen}
+                setIsModalCreateOpen={setIsModalCreateOpen}
                 refreshTable={refreshTable}
             />
             <DetailUserDrawer
@@ -242,6 +303,13 @@ const TableUser = () => {
                 setIsDrawerOpen={setIsDrawerOpen}
                 dataDetail={dataDetail}
                 setDataDetail={setDataDetail}
+            />
+            <UpdateUserModal
+                isModalUpdateOpen={isModalUpdateOpen}
+                setIsModalUpdateOpen={setIsModalUpdateOpen}
+                dataUpdate={dataUpdate}
+                setDataUpdate={setDataUpdate}
+                refreshTable={refreshTable}
             />
         </>
     );

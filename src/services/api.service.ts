@@ -18,6 +18,21 @@ export const createUserAPI = (
   return axios.post<IBackendRes<IUser>>(ENDPOINT_CREATE_USER, data);
 };
 
+export const updateUserAPI = (id: number, fullName: string, phone: string) => {
+  const ENDPOINT_UPDATE_USER = `/api/v1/users/${id}`;
+  const data = {
+    id: id,
+    fullName: fullName,
+    phone: phone,
+  };
+  return axios.put<IBackendRes<IUser>>(ENDPOINT_UPDATE_USER, data);
+};
+
+export const deleteUserAPI = (id: number) => {
+  const ENDPOINT_DELETE_USER = `/api/v1/users/${id}`;
+  return axios.delete<IBackendRes<IUser>>(ENDPOINT_DELETE_USER);
+}
+
 // export const fetchAllUsersAPI = (current: number, pageSize: number) => {
 //   const ENDPOINT_FETCH_ALL_USERS = `/api/v1/users?page=${current}&size=${pageSize}`;
 //   return axios.get<IBackendRes<IModelPaginate<IUserTable>>>(
