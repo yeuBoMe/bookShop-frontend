@@ -3,7 +3,8 @@ import { App, Modal, Table, type TableProps, type UploadProps } from "antd";
 import { Upload } from 'antd';
 import { useState } from "react";
 import Exceljs from "exceljs";
-import { Buffer } from "buffer";
+import { importListUsersFromFileAPI } from "@/services/api.service";
+// import { Buffer } from "buffer";
 
 const { Dragger } = Upload;
 
@@ -16,12 +17,13 @@ interface UserImportValues {
 interface UserImportProps {
     isModalImportOpen: boolean;
     setIsModalImportOpen: (v: boolean) => void;
+    refreshTable: () => void;
 }
 
 const ImportUserModal = (props: UserImportProps) => {
-    const { isModalImportOpen, setIsModalImportOpen } = props;
-    const { message } = App.useApp();
-    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const { isModalImportOpen, setIsModalImportOpen, refreshTable } = props;
+    const { notification, message } = App.useApp();
+    const [isSubmit, setIsSubmit] = useState<boolean>(false);
     const [dataImport, setDataImport] = useState<UserImportValues[]>([]);
 
     const propsImport: UploadProps = {
@@ -41,7 +43,7 @@ const ImportUserModal = (props: UserImportProps) => {
                 console.log(info.file, info.fileList);
             }
             if (status === 'done') {
-                console.log(info)
+                console.log(info);
                 message.success(`${info.file.name} file uploaded successfully.`);
                 if (info.fileList && info.fileList.length > 0) {
                     const file = info.fileList[0].originFileObj!;
@@ -83,6 +85,47 @@ const ImportUserModal = (props: UserImportProps) => {
         },
     };
 
+    const handleImport = async () => {
+        setIsSubmit(true);
+
+        try {
+            // const dataSubmit = dataImport.map(item => ({
+            //     ...item
+            // }));
+            const dataSubmit = dataImport.map(item => ({
+                fullName: item.fullName?.toString()?.trim() || '',
+                email: item.email?.toString()?.trim() || '',
+                phone: item.phone?.toString()?.trim() || ''
+            }));
+
+            console.log("Check data list >>> ", dataSubmit);
+
+            const importUsersFromFileResponse = await importListUsersFromFileAPI(dataSubmit);
+
+            if (importUsersFromFileResponse.data) {
+                console.log("Checkout list >>> ", importUsersFromFileResponse.data);
+                handleClearDataAndCloseModal();
+                notification.success({
+                    message: "Success",
+                    description: `Success = ${importUsersFromFileResponse.data.countSuccess}. Error = ${importUsersFromFileResponse.data.countError}`,
+                    duration: 5,
+                    placement: "topRight",
+                });
+                refreshTable();
+            }
+        } catch (error: any) {
+            notification.error({
+                message: "Error",
+                description: "All users import wrong valid, please check info again!",
+                duration: 5,
+                placement: "topRight",
+            });
+            console.log("Check error >>> ", error);
+        } finally {
+            setIsSubmit(false);
+        }
+    }
+
     const handleClearDataAndCloseModal = () => {
         setDataImport([]);
         setIsModalImportOpen(false);
@@ -115,10 +158,12 @@ const ImportUserModal = (props: UserImportProps) => {
                 maskClosable={false}
                 closable={false}
                 open={isModalImportOpen}
-                onOk={() => setIsModalImportOpen(false)}
+                onOk={handleImport}
                 onCancel={handleClearDataAndCloseModal}
-                okButtonProps={{ disabled: true }}
-                loading={isLoading}
+                okButtonProps={{
+                    disabled: dataImport.length > 0 ? false : true,
+                    loading: isSubmit
+                }}
             >
                 <Dragger {...propsImport}>
                     <p className="ant-upload-drag-icon">

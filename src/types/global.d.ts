@@ -118,4 +118,41 @@ declare global {
       name: string;
     };
   }
+
+  interface IResponseImportUsers<T> {
+    countSuccess: number;
+    countError: number;
+    detail?: T;
+    users?: {
+      id: number;
+      fullName: string;
+      email: string;
+      avatar?: string;
+      phone: string;
+      createdAt: Date;
+      createdBy: string;
+      role?: {
+        id: number;
+        name: string;
+      };
+    }[];
+  }
+
+  interface IUserListImportInfo {
+    index: number;
+    errorMessage: string;
+    user: {
+      id?: number;
+      fullName: string;
+      email: string;
+      avatar?: string;
+      phone: string;
+      createdAt?: Date;
+      createdBy?: string;
+      role?: {
+        id: number;
+        name: string;
+      };
+    };
+  }
 }

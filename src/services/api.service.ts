@@ -31,7 +31,7 @@ export const updateUserAPI = (id: number, fullName: string, phone: string) => {
 export const deleteUserAPI = (id: number) => {
   const ENDPOINT_DELETE_USER = `/api/v1/users/${id}`;
   return axios.delete<IBackendRes<IUser>>(ENDPOINT_DELETE_USER);
-}
+};
 
 // export const fetchAllUsersAPI = (current: number, pageSize: number) => {
 //   const ENDPOINT_FETCH_ALL_USERS = `/api/v1/users?page=${current}&size=${pageSize}`;
@@ -43,6 +43,20 @@ export const fetchAllUsersAPI = (query: string) => {
   const ENDPOINT_FETCH_ALL_USERS = `/api/v1/users?${query}`;
   return axios.get<IBackendRes<IModelPaginate<IUserTable>>>(
     ENDPOINT_FETCH_ALL_USERS
+  );
+};
+
+export const importListUsersFromFileAPI = (
+  data: {
+    fullName: string;
+    email: string;
+    phone: string;
+  }[]
+) => {
+  const ENDPOINT_IMPORT_USERS_FROM_FILE = "/api/v1/users/import";
+  return axios.post<IBackendRes<IResponseImportUsers<IUserListImportInfo>>>(
+    ENDPOINT_IMPORT_USERS_FROM_FILE,
+    data
   );
 };
 

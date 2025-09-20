@@ -263,7 +263,7 @@ const TableUser = () => {
                 toolBarRender={() => [
                     <>
                         <Button
-                            key="button"
+                            key="export"
                             icon={<ExportOutlined />}
                             onClick={() => setIsModalCreateOpen(true)}
                             type="primary"
@@ -271,7 +271,7 @@ const TableUser = () => {
                             Export
                         </Button>
                         <Button
-                            key="button"
+                            key="import"
                             icon={<CloudDownloadOutlined />}
                             onClick={() => setIsModalImportOpen(true)}
                             type="primary"
@@ -279,7 +279,7 @@ const TableUser = () => {
                             Import
                         </Button>
                         <Button
-                            key="button"
+                            key="add"
                             icon={<PlusOutlined />}
                             onClick={() => setIsModalCreateOpen(true)}
                             type="primary"
@@ -292,6 +292,7 @@ const TableUser = () => {
             <ImportUserModal 
                 isModalImportOpen={isModalImportOpen}
                 setIsModalImportOpen={setIsModalImportOpen}
+                refreshTable={refreshTable}
             />
             <CreateUserModal
                 isModalCreateOpen={isModalCreateOpen}

@@ -17,7 +17,13 @@ interface UpdateUserProps {
 }
 
 const UpdateUserModal = (props: UpdateUserProps) => {
-    const { isModalUpdateOpen, setIsModalUpdateOpen, dataUpdate, setDataUpdate, refreshTable } = props;
+    const {
+        isModalUpdateOpen,
+        setIsModalUpdateOpen,
+        dataUpdate,
+        setDataUpdate,
+        refreshTable
+    } = props;
     const [form] = Form.useForm<UserUpdateValues>();
     const { notification, message } = App.useApp();
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -33,9 +39,10 @@ const UpdateUserModal = (props: UpdateUserProps) => {
     }, [dataUpdate]);
 
     const handleUpdateUser: FormProps<UserUpdateValues>['onFinish'] = async (values) => {
+        setIsLoading(true);
+        
         if (dataUpdate) {
             try {
-                setIsLoading(true);
                 const { fullName, phone } = values;
                 const updateUserResponse = await updateUserAPI(dataUpdate?.id, fullName, phone);
                 if (updateUserResponse.data) {

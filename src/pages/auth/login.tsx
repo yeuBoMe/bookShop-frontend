@@ -19,9 +19,9 @@ const LoginPage = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const handleLoginRequest: FormProps<LoginValues>['onFinish'] = async (values) => {
-    try {
-      setIsLoading(true);
+    setIsLoading(true);
 
+    try {
       const loginResponse = await loginAPI(values.username, values.password);
 
       if (loginResponse?.data) {
@@ -36,7 +36,7 @@ const LoginPage = () => {
           role: loginResponse.data.user.role,
         };
         console.log(">>>>", mappedILoginToIUser)
-        
+
         setUser(mappedILoginToIUser);
         setIsAuthenticated(true);
 

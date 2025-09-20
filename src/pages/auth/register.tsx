@@ -19,9 +19,9 @@ const RegisterPage = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const handleRegisterRequest: FormProps<RegisterValues>['onFinish'] = async (values) => {
-    try {
-      setIsLoading(true);
+    setIsLoading(true);
 
+    try {
       const { fullName, email, password, phone } = values;
       const registerResponse = await registerAPI(fullName, email, password, phone);
 

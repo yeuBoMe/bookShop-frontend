@@ -22,9 +22,9 @@ const CreateUserModal = (props: CreateUserProps) => {
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const handleCreateUser: FormProps<UserCreateValues>['onFinish'] = async (values) => {
-        try {
-            setIsLoading(true);
+        setIsLoading(true);
 
+        try {
             const { fullName, email, password, phone } = values;
             const createUserResponse = await createUserAPI(fullName, email, password, phone);
 
