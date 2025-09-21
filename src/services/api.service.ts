@@ -41,7 +41,7 @@ export const deleteUserAPI = (id: number) => {
 // };
 export const fetchAllUsersAPI = (query: string) => {
   const ENDPOINT_FETCH_ALL_USERS = `/api/v1/users?${query}`;
-  return axios.get<IBackendRes<IModelPaginate<IUserTable>>>(
+  return axios.get<IBackendRes<IModelPaginate<IUserView>>>(
     ENDPOINT_FETCH_ALL_USERS
   );
 };

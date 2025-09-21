@@ -4,6 +4,7 @@ import { Upload } from 'antd';
 import { useState } from "react";
 import Exceljs from "exceljs";
 import { importListUsersFromFileAPI } from "@/services/api.service";
+import templateFile from "assets/template/users_import.xlsx?url";
 // import { Buffer } from "buffer";
 
 const { Dragger } = Upload;
@@ -73,6 +74,10 @@ const ImportUserModal = (props: UserImportProps) => {
                         })
                     });
 
+                    jsonData = jsonData.map((item, index) => {
+                        return { ...item, id: index + 1 }
+                    })
+
                     setDataImport(jsonData);
                     console.log("Check data import >>>", jsonData)
                 }
@@ -106,7 +111,7 @@ const ImportUserModal = (props: UserImportProps) => {
                 console.log("Checkout list >>> ", importUsersFromFileResponse.data);
                 handleClearDataAndCloseModal();
                 notification.success({
-                    message: "Success",
+                    message: "Import users from file",
                     description: `Success = ${importUsersFromFileResponse.data.countSuccess}. Error = ${importUsersFromFileResponse.data.countError}`,
                     duration: 5,
                     placement: "topRight",
@@ -172,9 +177,18 @@ const ImportUserModal = (props: UserImportProps) => {
                     <p className="ant-upload-text">Click or drag file to this area to upload</p>
                     <p className="ant-upload-hint">
                         Support for a single or bulk upload. Only accept .csv, .xls, .xlsx.
+                        &nbsp;
+                        <a
+                            onClick={e => e.stopPropagation()}
+                            download
+                            href={templateFile}
+                        >
+                            Download Sample File
+                        </a>
                     </p>
                 </Dragger>
                 <Table<UserImportValues>
+                    rowKey={"id"}
                     style={{ marginTop: "15px" }}
                     title={() => <p style={{ fontWeight: "500" }}>Data upload:</p>}
                     columns={columns}

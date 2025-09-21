@@ -16,7 +16,7 @@ interface CreateUserProps {
 }
 
 const CreateUserModal = (props: CreateUserProps) => {
-    const { isModalCreateOpen, setIsModalCreateOpen, refreshTable } = props;
+    const { isModalCreateOpen, setIsModalCreateOpen, refreshTable } = props; 
     const [form] = Form.useForm<UserCreateValues>();
     const { notification, message } = App.useApp();
     const [isLoading, setIsLoading] = useState<boolean>(false);

@@ -81,26 +81,7 @@ declare global {
     email: string;
     avatar?: string;
     phone: string;
-    role?: {
-      id: number;
-      name: string;
-    };
-  }
-
-  interface IUserTable {
-    id: number;
-    fullName: string;
-    email: string;
-    avatar?: string;
-    phone: string;
-    createdAt: Date;
-    createdBy: string;
-    updatedAt: Date;
-    updatedBy: string;
-    role?: {
-      id: number;
-      name: string;
-    };
+    role?: { id: number; name: string };
   }
 
   interface IUserView {
@@ -113,10 +94,7 @@ declare global {
     createdBy: string;
     updatedAt: Date;
     updatedBy: string;
-    role?: {
-      id: number;
-      name: string;
-    };
+    role?: { id: number; name: string };
   }
 
   interface IResponseImportUsers<T> {

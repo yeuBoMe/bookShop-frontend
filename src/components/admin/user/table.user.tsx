@@ -10,6 +10,7 @@ import DetailUserDrawer from 'components/admin/user/detail.user.drawer';
 import CreateUserModal from 'components/admin/user/create.user.modal';
 import UpdateUserModal from 'components/admin/user/update.user.modal';
 import ImportUserModal from './import.user.modal';
+import { CSVLink } from 'react-csv';
 
 type TSearch = {
     fullName: string;
@@ -38,6 +39,8 @@ const TableUser = () => {
     const [isModalUpdateOpen, setIsModalUpdateOpen] = useState<boolean>(false);
     const [dataUpdate, setDataUpdate] = useState<IUserView | null>(null);
 
+    const [currentDataTable, setCurrentDataTable] = useState<IUserView[]>([]);
+
     const refreshTable = () => {
         actionRef.current?.reload();
     }
@@ -59,7 +62,7 @@ const TableUser = () => {
         }
     }
 
-    const columns: ProColumns<IUserTable>[] = [
+    const columns: ProColumns<IUserView>[] = [
         {
             dataIndex: 'index',
             valueType: 'indexBorder',
@@ -153,7 +156,7 @@ const TableUser = () => {
 
     return (
         <>
-            <ProTable<IUserTable, TSearch>
+            <ProTable<IUserView, TSearch>
                 columns={columns}
                 actionRef={actionRef}
                 cardBordered
@@ -201,6 +204,7 @@ const TableUser = () => {
                     const fetchAllUsersResponse = await fetchAllUsersAPI(query);
                     if (fetchAllUsersResponse.data) {
                         setMeta(fetchAllUsersResponse.data.meta);
+                        setCurrentDataTable(fetchAllUsersResponse.data.result ?? []);
                     }
 
                     return {
@@ -265,10 +269,14 @@ const TableUser = () => {
                         <Button
                             key="export"
                             icon={<ExportOutlined />}
-                            onClick={() => setIsModalCreateOpen(true)}
                             type="primary"
                         >
-                            Export
+                            <CSVLink
+                                data={currentDataTable}
+                                filename='export-user.csv'
+                            >
+                                Export
+                            </CSVLink>
                         </Button>
                         <Button
                             key="import"
@@ -289,7 +297,7 @@ const TableUser = () => {
                     </>
                 ]}
             />
-            <ImportUserModal 
+            <ImportUserModal
                 isModalImportOpen={isModalImportOpen}
                 setIsModalImportOpen={setIsModalImportOpen}
                 refreshTable={refreshTable}

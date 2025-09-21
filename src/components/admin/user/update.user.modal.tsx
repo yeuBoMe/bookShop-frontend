@@ -40,7 +40,7 @@ const UpdateUserModal = (props: UpdateUserProps) => {
 
     const handleUpdateUser: FormProps<UserUpdateValues>['onFinish'] = async (values) => {
         setIsLoading(true);
-        
+
         if (dataUpdate) {
             try {
                 const { fullName, phone } = values;
