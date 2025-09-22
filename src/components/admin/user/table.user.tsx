@@ -39,16 +39,22 @@ const TableUser = () => {
     const [isModalUpdateOpen, setIsModalUpdateOpen] = useState<boolean>(false);
     const [dataUpdate, setDataUpdate] = useState<IUserView | null>(null);
 
+    const [isDeleteUser, setIsDeleteUser] = useState<boolean>(false);
+
     const [currentDataTable, setCurrentDataTable] = useState<IUserView[]>([]);
 
     const refreshTable = () => {
         actionRef.current?.reload();
+
     }
 
     const handleDeleteUser = async (id: number) => {
+        setIsDeleteUser(true);
         try {
             const deleteUserResponse = await deleteUserAPI(id);
-            if (deleteUserResponse.data) {
+            console.log("Check data delete >>> ", deleteUserResponse);
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+            if (deleteUserResponse) {
                 message.success("Delete user successfully!");
                 refreshTable();
             }
@@ -59,6 +65,8 @@ const TableUser = () => {
                 duration: 5,
                 placement: "topRight",
             });
+        } finally {
+            setIsDeleteUser(false);
         }
     }
 
@@ -144,6 +152,7 @@ const TableUser = () => {
                                 okText="Yes"
                                 cancelText="No"
                                 onConfirm={() => handleDeleteUser(entity.id)}
+                                okButtonProps={{ loading: isDeleteUser }}
                             >
                                 <DeleteOutlined style={{ cursor: "pointer", color: "red" }} />
                             </Popconfirm>
@@ -190,7 +199,7 @@ const TableUser = () => {
                     }
 
                     // Thêm sắp xếp vào query
-                    if (sort) {
+                    if (sort && Object.keys(sort).length > 0) {
                         const sortFields = Object.keys(sort).map((field) => {
                             const order = sort[field] === 'ascend' ? 'asc' : 'desc';
                             return `${field},${order}`;
@@ -198,6 +207,8 @@ const TableUser = () => {
                         if (sortFields.length > 0) {
                             query += `&sort=${sortFields.join(',')}`;
                         }
+                    } else {
+                        query += `&sort=createdAt,desc`;
                     }
 
                     console.log("Query sent:", query);

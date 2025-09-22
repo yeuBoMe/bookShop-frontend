@@ -12,6 +12,7 @@ interface DrawerUserProps {
 const DetailUserDrawer = (props: DrawerUserProps) => {
     const { isDrawerOpen, setIsDrawerOpen, dataDetail, setDataDetail } = props;
     const urlAvatar = `${import.meta.env.VITE_BACKEND_URL}/upload/avatar/${dataDetail?.avatar}`
+    console.log("Check user avatar >>> ", urlAvatar)
 
     const formatDateTime = (value?: string | Date) => {
         return value ? dayjs(value).format("YYYY-MM-DD HH:mm:ss") : "N/A";

@@ -38,7 +38,7 @@ const ImportUserModal = (props: UserImportProps) => {
                 if (onSuccess) onSuccess("ok");
             }, 1000);
         },
-        async onChange(info) {
+        async onChange(info) {  
             const { status } = info.file;
             if (status !== 'uploading') {
                 console.log(info.file, info.fileList);
