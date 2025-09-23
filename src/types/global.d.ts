@@ -133,4 +133,18 @@ declare global {
       };
     };
   }
+
+  interface IBook {
+    id: number;
+    name: string;
+    category: string;
+    price: number;
+    quantity: number;
+    image: string;
+    author: string;
+    createdAt?: Date;
+    updatedAt?: Date;
+    createdBy?: string;
+    updatedBy?: string;
+  }
 }

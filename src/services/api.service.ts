@@ -2,6 +2,7 @@ import axios from "services/axios.customize";
 
 const ENDPOINT_GET_REFRESH_TOKEN = "/api/v1/auth/refresh";
 
+// Module user
 export const createUserAPI = (
   fullName: string,
   email: string,
@@ -60,6 +61,15 @@ export const importListUsersFromFileAPI = (
   );
 };
 
+// Module book
+export const fetchAllBooksAPI = (query: string) => {
+  const ENDPOINT_FETCH_ALL_BOOKS = `/api/v1/books?${query}`;
+  return axios.get<IBackendRes<IModelPaginate<IBook>>>(ENDPOINT_FETCH_ALL_BOOKS);
+}
+
+
+
+// Module auth
 export const loginAPI = (email: string, password: string) => {
   const ENDPOINT_LOGIN = "/api/v1/auth/login";
   const data = {

@@ -45,7 +45,6 @@ const TableUser = () => {
 
     const refreshTable = () => {
         actionRef.current?.reload();
-
     }
 
     const handleDeleteUser = async (id: number) => {
@@ -171,7 +170,7 @@ const TableUser = () => {
                 cardBordered
                 request={async (params, sort, filter) => {
                     console.log(params, sort, filter);
-                    await new Promise((resolve) => setTimeout(resolve, 1000));
+                    await new Promise((resolve) => setTimeout(resolve, 500));
 
                     let query = `page=${params.current}&size=${params.pageSize}`;
                     let filterConditions = [];
@@ -183,7 +182,7 @@ const TableUser = () => {
                         filterConditions.push(`email='${params.email}'`);
                     }
                     if (params.phone) {
-                        filterConditions.push(`phone~'${params.phone}'`);
+                        filterConditions.push(`phone='${params.phone}'`);
                     }
                     if (params.createdAtRange && params.createdAtRange[0] && params.createdAtRange[1]) {
                         const dateRangeResult = dateRangeValidate(params.createdAtRange);
@@ -213,6 +212,7 @@ const TableUser = () => {
 
                     console.log("Query sent:", query);
                     const fetchAllUsersResponse = await fetchAllUsersAPI(query);
+
                     if (fetchAllUsersResponse.data) {
                         setMeta(fetchAllUsersResponse.data.meta);
                         setCurrentDataTable(fetchAllUsersResponse.data.result ?? []);
