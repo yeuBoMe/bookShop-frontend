@@ -64,10 +64,70 @@ export const importListUsersFromFileAPI = (
 // Module book
 export const fetchAllBooksAPI = (query: string) => {
   const ENDPOINT_FETCH_ALL_BOOKS = `/api/v1/books?${query}`;
-  return axios.get<IBackendRes<IModelPaginate<IBook>>>(ENDPOINT_FETCH_ALL_BOOKS);
-}
+  return axios.get<IBackendRes<IModelPaginate<IBook>>>(
+    ENDPOINT_FETCH_ALL_BOOKS
+  );
+};
 
+export const createBookAPI = (
+  name: string,
+  author: string,
+  price: number,
+  quantity: number,
+  category: { id: number }
+) => {
+  const data = {
+    name: name,
+    author: author,
+    price: price,
+    quantity: quantity,
+    category: category,
+  };
+  const ENDPOINT_CREATE_BOOK = "/api/v1/books";
+  return axios.post<IBackendRes<IBook>>(ENDPOINT_CREATE_BOOK, data);
+};
 
+export const updateBookSingleImage = (id: number, file: File) => {
+  let config = {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  };
+
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const ENDPOINT_UPDATE_BOOK_SINGLE_IMAGE = `/api/v1/books/${id}/image`;
+
+  return axios.patch<IBackendRes<IBook>>(
+    ENDPOINT_UPDATE_BOOK_SINGLE_IMAGE,
+    formData,
+    config
+  );
+};
+
+export const updateBookMultipleImages = (id: number, files: File[]) => {
+  const ENDPOINT_UPDATE_BOOK_MULTIPLE_IMAGES = `/api/v1/books/${id}/multiple-images`;
+
+  const formData = new FormData();
+  files.forEach((file) => formData.append("files", file));
+
+  return axios.patch<IBackendRes<IBook>>(
+    ENDPOINT_UPDATE_BOOK_MULTIPLE_IMAGES,
+    formData,
+    {
+      headers: { "Content-Type": "multipart/form-data" },
+    }
+  );
+};
+
+// Module category
+export const fetchAllCategoriesAPI = () => {
+  const ENDPOINT_FETCH_ALL_CATEGORIES = `/api/v1/categories`;
+  return axios.get<IBackendRes<IModelPaginate<ICategory>>>(
+    ENDPOINT_FETCH_ALL_CATEGORIES
+  );
+};
 
 // Module auth
 export const loginAPI = (email: string, password: string) => {

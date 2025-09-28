@@ -54,7 +54,7 @@ const DetailUserDrawer = (props: DrawerUserProps) => {
                 key: '6',
                 label: 'Avatar',
                 children: (
-                    <Avatar 
+                    <Avatar
                         src={dataDetail.avatar ? urlAvatar : "user"}
                     />
                 ),

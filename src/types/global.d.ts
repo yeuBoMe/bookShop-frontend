@@ -137,11 +137,23 @@ declare global {
   interface IBook {
     id: number;
     name: string;
-    category: string;
+    category: {
+      id: number;
+      name: string;
+    };
     price: number;
     quantity: number;
-    image: string;
+    images: string[];
     author: string;
+    createdAt?: Date;
+    updatedAt?: Date;
+    createdBy?: string;
+    updatedBy?: string;
+  }
+
+  interface ICategory {
+    id: number;
+    name: string;
     createdAt?: Date;
     updatedAt?: Date;
     createdBy?: string;
