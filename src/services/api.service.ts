@@ -107,7 +107,7 @@ export const updateBookAPI = (
   return axios.patch<IBackendRes<IBook>>(ENDPOINT_UPDATE_BOOK, data);
 };
 
-export const updateBookSingleImage = (id: number, file: File) => {
+export const updateBookSingleImageAPI = (id: number, file: File) => {
   let config = {
     headers: {
       "Content-Type": "multipart/form-data",
@@ -126,7 +126,7 @@ export const updateBookSingleImage = (id: number, file: File) => {
   );
 };
 
-export const updateBookMultipleImages = (id: number, files: File[]) => {
+export const updateBookMultipleImagesAPI = (id: number, files: File[]) => {
   const ENDPOINT_UPDATE_BOOK_MULTIPLE_IMAGES = `/api/v1/books/${id}/multiple-images`;
 
   const formData = new FormData();
@@ -141,10 +141,28 @@ export const updateBookMultipleImages = (id: number, files: File[]) => {
   );
 };
 
+export const deleteBookSingleImageAPI = (id: number, imageName: string) => {
+  return axios.delete<IBackendRes<IBook>>(`/api/v1/books/${id}/image`, {
+    params: { imageName },
+  });
+};
+
+export const deleteBookMultipleImagesAPI = (
+  id: number,
+  imageNames: string[]
+) => {
+  return axios.delete<IBackendRes<IBook>>(
+    `/api/v1/books/${id}/multiple-images`,
+    {
+      data: imageNames,
+    }
+  );
+};
+
 export const deleteBookAPI = (id: number) => {
   const ENDPOINT_DELETE_BOOK = `/api/v1/books/${id}`;
   return axios.delete<IBackendRes<IBook>>(ENDPOINT_DELETE_BOOK);
-}
+};
 
 // Module category
 export const fetchAllCategoriesAPI = () => {

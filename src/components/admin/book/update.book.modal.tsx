@@ -1,4 +1,9 @@
-import { fetchAllCategoriesAPI, updateBookAPI, updateBookMultipleImages } from "@/services/api.service";
+import { 
+    fetchAllCategoriesAPI, 
+    updateBookAPI, 
+    updateBookMultipleImagesAPI, 
+    deleteBookMultipleImagesAPI 
+} from "@/services/api.service";
 import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
 import {
     App,
@@ -74,6 +79,8 @@ const UpdateBookModal = (props: UpdateBookProps) => {
     const [imageLoading, setImageLoading] = useState<boolean>(false);
     const [fileList, setFileList] = useState<UploadFile[]>([]);
 
+    const [deletedImages, setDeletedImages] = useState<string[]>([]);
+
     const [categories, setCategories] = useState<{ value: number, label: string }[]>([]);
 
     useEffect(() => {
@@ -89,7 +96,7 @@ const UpdateBookModal = (props: UpdateBookProps) => {
                     setCategories(categoriesSelect);
                 }
             } catch {
-                message.error("Cannot fetch categories list");
+                message.error("Cannot load list categories!");
             }
         };
         fetchAllCategories();
@@ -107,6 +114,7 @@ const UpdateBookModal = (props: UpdateBookProps) => {
                 }));
             }
             setFileList(imgFiles);
+            setDeletedImages([]); // Reset deletedImages
 
             const selectedCategory = categories.find(cat => cat.label === dataUpdate.category);
             form.setFieldsValue({
@@ -119,6 +127,7 @@ const UpdateBookModal = (props: UpdateBookProps) => {
             });
         } else {
             setFileList([]);
+            setDeletedImages([]);
         }
     }, [dataUpdate])
 
@@ -134,17 +143,29 @@ const UpdateBookModal = (props: UpdateBookProps) => {
     const beforeUpload = (file: FileType) => {
         const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
         if (!isJpgOrPng) {
-            message.error('You can only upload JPG/PNG file!');
+            message.error('Chỉ cho phép upload file JPG/PNG!');
         }
         const isLt2M = file.size / 1024 / 1024 < 2;
         if (!isLt2M) {
-            message.error('Image must smaller than 2MB!');
+            message.error('Kích thước ảnh phải nhỏ hơn 2MB!');
         }
         return isJpgOrPng && isLt2M || Upload.LIST_IGNORE;
     };
 
     const handleChange: UploadProps['onChange'] = ({ fileList: newFileList }) =>
         setFileList(newFileList);
+
+    const handleRemove = (file: UploadFile) => {
+        // if old images hav url and name, add to deletedImages
+        if (file.url && file.name) {
+            setDeletedImages(prev => [...prev, file.name]);
+            console.log('Đã đánh dấu xóa ảnh:', file.name);
+        }
+
+        // Delete file from fileList UI
+        setFileList(prevList => prevList.filter(item => item.uid !== file.uid));
+        return true;
+    };
 
     const handleSelectChange = (value: number) => {
         console.log(`selected ${value}`);
@@ -159,23 +180,48 @@ const UpdateBookModal = (props: UpdateBookProps) => {
     };
 
     const handleUpdateBook: FormProps<BookUpdateValues>['onFinish'] = async (values) => {
-        console.log('Success:', values);
+        console.log('Form values:', values);
+        console.log('Images removed >>> ', deletedImages);
 
         setIsLoading(true);
         try {
             if (dataUpdate) {
                 const { name, author, price, quantity, category } = values;
-                const updateBookResponse = await updateBookAPI(dataUpdate.id, name, author, price, quantity, category);
-                if (updateBookResponse.data) {
-                    if (fileList.length > 0) {
-                        const files = fileList
-                            .filter(file => file.originFileObj)
-                            .map(file => file.originFileObj as File);
-                            if (files.length > 0) {
-                                setImageLoading(true);
-                                await updateBookMultipleImages(dataUpdate.id, files);
-                            }
+
+                // Step 1: Delete all removed images at client and in db server 
+                if (deletedImages.length > 0) {
+                    setImageLoading(true);
+                    try {
+                        await deleteBookMultipleImagesAPI(dataUpdate.id, deletedImages);
+                        console.log(`Deleted ${deletedImages.length} images`);
+                    } catch (error: any) {
+                        console.error('Check error delete image >>> ', error);
+                        message.warning('Cannot delete images!');
+                        // Continue update
                     }
+                }
+
+                // Step 2: Upload images
+                const newFiles = fileList
+                    .filter(file => file.originFileObj)
+                    .map(file => file.originFileObj as File);
+
+                if (newFiles.length > 0) {
+                    setImageLoading(true);
+                    try {
+                        await updateBookMultipleImagesAPI(dataUpdate.id, newFiles);
+                        console.log(`Uploaded ${newFiles.length} images`);
+                    } catch (error: any) {
+                        console.error('Check error update image >>> ', error);
+                        message.error('Cannot upload new images');
+                        throw error; // Stop if upload fail
+                    }
+                }
+
+                // Step 3: Update book
+                const updateBookResponse = await updateBookAPI(dataUpdate.id, name, author, price, quantity, category);
+
+                if (updateBookResponse.data) {
                     handleClearDataAndCloseModal();
                     message.success("Update book successfully!");
                     refreshTable();
@@ -183,8 +229,8 @@ const UpdateBookModal = (props: UpdateBookProps) => {
             }
         } catch (error: any) {
             notification.error({
-                message: "Error",
-                description: error?.message,
+                message: "Lỗi",
+                description: error?.message || "An error happens when updating book",
                 duration: 5,
                 placement: "topRight",
             });
@@ -200,20 +246,21 @@ const UpdateBookModal = (props: UpdateBookProps) => {
         setImageLoading(false);
         setIsModalUpdateOpen(false);
         setFileList([]);
+        setDeletedImages([]);
         setDataUpdate(null);
     }
 
     return (
         <>
             <Modal
-                title="Update book"
+                title="Cập nhật sách"
                 closable={false}
                 maskClosable={false}
                 open={isModalUpdateOpen}
                 onOk={() => form.submit()}
                 onCancel={handleClearDataAndCloseModal}
                 loading={isLoading}
-                okText="Update"
+                okText="Cập nhật"
                 width={"50vw"}
             >
                 <Row justify={"center"}>
@@ -229,14 +276,14 @@ const UpdateBookModal = (props: UpdateBookProps) => {
                             <Row gutter={16}>
                                 <Col span={12}>
                                     <Form.Item<BookUpdateValues>
-                                        label="Name:"
+                                        label="Tên sách:"
                                         name="name"
                                         rules={[
-                                            { required: true, message: "Book's name is required" },
-                                            { max: 100, message: "Name must be less than 100 characters" },
+                                            { required: true, message: "Tên sách là bắt buộc" },
+                                            { max: 100, message: "Tên sách phải nhỏ hơn 100 ký tự" },
                                             {
                                                 pattern: /^[A-Za-zÀ-ỹà-ỹ0-9'\-.:\s]{1,100}$/,
-                                                message: "Invalid name format",
+                                                message: "Định dạng tên không hợp lệ",
                                             },
                                         ]}
                                     >
@@ -246,14 +293,14 @@ const UpdateBookModal = (props: UpdateBookProps) => {
 
                                 <Col span={12}>
                                     <Form.Item<BookUpdateValues>
-                                        label="Author:"
+                                        label="Tác giả:"
                                         name="author"
                                         rules={[
-                                            { required: true, message: "Author is required" },
-                                            { max: 100, message: "Author must be less than 100 characters" },
+                                            { required: true, message: "Tác giả là bắt buộc" },
+                                            { max: 100, message: "Tên tác giả phải nhỏ hơn 100 ký tự" },
                                             {
                                                 pattern: /^[A-Za-zÀ-ỹà-ỹ'\-.\s]{1,100}$/,
-                                                message: "Invalid author format",
+                                                message: "Định dạng tên tác giả không hợp lệ",
                                             },
                                         ]}
                                     >
@@ -265,11 +312,11 @@ const UpdateBookModal = (props: UpdateBookProps) => {
                             <Row gutter={16}>
                                 <Col span={8}>
                                     <Form.Item<BookUpdateValues>
-                                        label="Price:"
+                                        label="Giá:"
                                         name="price"
                                         rules={[
-                                            { required: true, message: "Price is required" },
-                                            { type: "number", min: 0, message: "Price must be a positive number" },
+                                            { required: true, message: "Giá là bắt buộc" },
+                                            { type: "number", min: 0, message: "Giá phải là số dương" },
                                         ]}
                                     >
                                         <InputNumber
@@ -278,7 +325,6 @@ const UpdateBookModal = (props: UpdateBookProps) => {
                                             formatter={(value) =>
                                                 `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                                             }
-                                            // khi gửi form thì bỏ dấu phẩy
                                             parser={(value) => value!.replace(/\$\s?|(,*)/g, "")}
                                         />
                                     </Form.Item>
@@ -286,11 +332,11 @@ const UpdateBookModal = (props: UpdateBookProps) => {
 
                                 <Col span={8}>
                                     <Form.Item<BookUpdateValues>
-                                        label="Quantity:"
+                                        label="Số lượng:"
                                         name="quantity"
                                         rules={[
-                                            { required: true, message: "Quantity is required" },
-                                            { type: "number", min: 1, max: 1000, message: "Quantity must be between 1 and 1000" },
+                                            { required: true, message: "Số lượng là bắt buộc" },
+                                            { type: "number", min: 1, max: 1000, message: "Số lượng phải từ 1 đến 1000" },
                                         ]}
                                     >
                                         <InputNumber style={{ width: "100%" }} />
@@ -299,12 +345,12 @@ const UpdateBookModal = (props: UpdateBookProps) => {
 
                                 <Col span={8}>
                                     <Form.Item<BookUpdateValues>
-                                        label="Category:"
+                                        label="Thể loại:"
                                         name={["category", "id"]}
-                                        rules={[{ required: true, message: "Category is required" }]}
+                                        rules={[{ required: true, message: "Thể loại là bắt buộc" }]}
                                     >
                                         <Select
-                                            placeholder="Select a category"
+                                            placeholder="Chọn thể loại"
                                             onChange={handleSelectChange}
                                             options={categories}
                                         />
@@ -313,7 +359,7 @@ const UpdateBookModal = (props: UpdateBookProps) => {
                             </Row>
 
                             <Form.Item<BookUpdateValues>
-                                label="Image:"
+                                label="Ảnh:"
                                 name="images"
                                 valuePropName="fileList"
                                 getValueFromEvent={normFile}
@@ -324,6 +370,7 @@ const UpdateBookModal = (props: UpdateBookProps) => {
                                     fileList={fileList}
                                     onPreview={handlePreview}
                                     onChange={handleChange}
+                                    onRemove={handleRemove}
                                     beforeUpload={beforeUpload}
                                     multiple
                                 >

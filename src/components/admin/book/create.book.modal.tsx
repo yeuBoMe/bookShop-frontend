@@ -1,4 +1,4 @@
-import { createBookAPI, fetchAllCategoriesAPI, updateBookMultipleImages } from "@/services/api.service";
+import { createBookAPI, fetchAllCategoriesAPI, updateBookMultipleImagesAPI } from "@/services/api.service";
 import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
 import {
     App,
@@ -135,9 +135,8 @@ const CreateBookModal = (props: CreateBookProps) => {
                         .map(file => file.originFileObj as File); // chuyển từng file trong Upload tm đk sang File 
                     if (files.length > 0) {
                         setImageLoading(true);
-                        await updateBookMultipleImages(createBookResponse.data.id, files);
+                        await updateBookMultipleImagesAPI(createBookResponse.data.id, files);
                     }
-                    console.log("Check image >>> ", updateBookMultipleImages)
                 }
 
                 handleClearDataAndCloseModal();
