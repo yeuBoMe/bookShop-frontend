@@ -1,4 +1,14 @@
-import { Badge, Descriptions, Drawer, Image, Upload, type DescriptionsProps, type GetProp, type UploadFile, type UploadProps } from "antd";
+import {
+    Badge,
+    Descriptions,
+    Drawer,
+    Image,
+    Upload,
+    type DescriptionsProps,
+    type GetProp,
+    type UploadFile,
+    type UploadProps
+} from "antd";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from 'uuid';
@@ -100,7 +110,7 @@ const DetailBookDrawer = (props: DrawerBookProps) => {
                 children: (
                     <Badge
                         status="processing"
-                        text={dataDetail.category ? dataDetail.category.name : "null"}
+                        text={dataDetail.category}
                     />
                 ),
             },

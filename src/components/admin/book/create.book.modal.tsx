@@ -1,5 +1,5 @@
 import { createBookAPI, fetchAllCategoriesAPI, updateBookMultipleImages } from "@/services/api.service";
-import { PlusOutlined } from "@ant-design/icons";
+import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
 import {
     App,
     Col,
@@ -58,7 +58,10 @@ const CreateBookModal = (props: CreateBookProps) => {
 
     const [previewOpen, setPreviewOpen] = useState<boolean>(false);
     const [previewImage, setPreviewImage] = useState('');
+
+    const [imageLoading, setImageLoading] = useState<boolean>(false);
     const [fileList, setFileList] = useState<UploadFile[]>([]);
+
     const [categories, setCategories] = useState<{ value: number, label: string }[]>([]);
 
     useEffect(() => {
@@ -98,7 +101,7 @@ const CreateBookModal = (props: CreateBookProps) => {
         if (!isLt2M) {
             message.error('Image must smaller than 2MB!');
         }
-        return isJpgOrPng && isLt2M;
+        return isJpgOrPng && isLt2M || Upload.LIST_IGNORE;
     };
 
     const handleChange: UploadProps['onChange'] = ({ fileList: newFileList }) =>
@@ -107,6 +110,13 @@ const CreateBookModal = (props: CreateBookProps) => {
     const handleSelectChange = (value: number) => {
         console.log(`selected ${value}`);
         form.setFieldsValue({ category: { id: value } });
+    };
+
+    const normFile = (e: any) => {
+        if (Array.isArray(e)) {
+            return e;
+        }
+        return e && e.fileList;
     };
 
     const handleCreateBook: FormProps<BookCreateValues>['onFinish'] = async (values) => {
@@ -123,9 +133,13 @@ const CreateBookModal = (props: CreateBookProps) => {
                     const files = fileList
                         .filter(file => file.originFileObj) // lọc các pt trong fileList, giữ lai file có thuộc tính originFileObj
                         .map(file => file.originFileObj as File); // chuyển từng file trong Upload tm đk sang File 
-                    await updateBookMultipleImages(createBookResponse.data.id, files);
+                    if (files.length > 0) {
+                        setImageLoading(true);
+                        await updateBookMultipleImages(createBookResponse.data.id, files);
+                    }
                     console.log("Check image >>> ", updateBookMultipleImages)
                 }
+
                 handleClearDataAndCloseModal();
                 message.success("Create book successfully!");
                 refreshTable();
@@ -140,11 +154,14 @@ const CreateBookModal = (props: CreateBookProps) => {
             console.log("Check error create book >>> ", error.message)
         } finally {
             setIsLoading(false);
+            setImageLoading(false);
         }
     };
 
     const handleClearDataAndCloseModal = () => {
         form.resetFields();
+        setImageLoading(false);
+        setFileList([]);
         setIsModalCreateOpen(false);
     }
 
@@ -260,6 +277,8 @@ const CreateBookModal = (props: CreateBookProps) => {
                             <Form.Item<BookCreateValues>
                                 label="Image:"
                                 name="images"
+                                valuePropName="fileList"
+                                getValueFromEvent={normFile}
                             >
                                 <Upload
                                     action="https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload"
@@ -270,10 +289,15 @@ const CreateBookModal = (props: CreateBookProps) => {
                                     beforeUpload={beforeUpload}
                                     multiple
                                 >
-                                    <button style={{ border: 0, background: 'none' }} type="button">
-                                        <PlusOutlined />
-                                        <div style={{ marginTop: 8 }}>Upload</div>
-                                    </button>
+                                    {imageLoading ? (
+                                        <LoadingOutlined />
+                                    )
+                                        : (
+                                            <button style={{ border: 0, background: 'none' }} type="button">
+                                                <PlusOutlined />
+                                                <div style={{ marginTop: 8 }}>Upload</div>
+                                            </button>
+                                        )}
                                 </Upload>
                             </Form.Item>
                             {previewImage && (

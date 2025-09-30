@@ -1,4 +1,4 @@
-import { fetchAllBooksAPI } from '@/services/api.service';
+import { deleteBookAPI, fetchAllBooksAPI } from '@/services/api.service';
 import { dateRangeValidate } from '@/services/helper';
 import { CloudDownloadOutlined, DeleteOutlined, EditOutlined, ExportOutlined, PlusOutlined, ReadOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
@@ -30,7 +30,6 @@ const TableBook = () => {
         total: 0
     })
 
-
     const [isModalImportOpen, setIsModalImportOpen] = useState<boolean>(false);
     const [isModalCreateOpen, setIsModalCreateOpen] = useState<boolean>(false);
 
@@ -40,12 +39,31 @@ const TableBook = () => {
     const [dataUpdate, setDataUpdate] = useState<IBook | null>(null);
     const [isModalUpdateOpen, setIsModalUpdateOpen] = useState<boolean>(false);
 
-    const [isDeleteUser, setIsDeleteUser] = useState<boolean>(false);
+    const [isDeleteBook, setIsDeleteBook] = useState<boolean>(false);
 
     const [currentDataTable, setCurrentDataTable] = useState<IBook[]>([]);
 
-    const handleDeleteBook = (id: number) => {
+    const handleDeleteBook = async (id: number) => {
+        setIsDeleteBook(true);
 
+        try {
+            const deleteBookResponse = await deleteBookAPI(id);
+            await new Promise<void>((resolve) => setTimeout(resolve, 400));
+            if (deleteBookResponse) {
+                message.success("Delete book successfully!");
+                refreshTable();
+                console.log("Check response >>> ", deleteBookResponse);
+            }
+        } catch (error: any) {
+            notification.error({
+                message: "Error",
+                description: error?.message,
+                duration: 5,
+                placement: "topRight"
+            });
+        } finally {
+            setIsDeleteBook(false);
+        }
     }
 
     const refreshTable = () => {
@@ -148,7 +166,7 @@ const TableBook = () => {
                                 okText="Yes"
                                 cancelText="No"
                                 onConfirm={() => handleDeleteBook(entity.id)}
-                                okButtonProps={{ loading: isDeleteUser }}
+                                okButtonProps={{ loading: isDeleteBook }}
                             >
                                 <DeleteOutlined
                                     style={{ color: "red", cursor: "pointer" }}

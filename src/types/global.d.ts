@@ -137,10 +137,7 @@ declare global {
   interface IBook {
     id: number;
     name: string;
-    category: {
-      id: number;
-      name: string;
-    };
+    category: string;
     price: number;
     quantity: number;
     images: string[];

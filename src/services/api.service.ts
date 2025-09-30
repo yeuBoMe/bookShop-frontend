@@ -87,6 +87,26 @@ export const createBookAPI = (
   return axios.post<IBackendRes<IBook>>(ENDPOINT_CREATE_BOOK, data);
 };
 
+export const updateBookAPI = (
+  id: number,
+  name: string,
+  author: string,
+  price: number,
+  quantity: number,
+  category: { id: number }
+) => {
+  const data = {
+    id: id,
+    name: name,
+    author: author,
+    price: price,
+    quantity: quantity,
+    category: category,
+  };
+  const ENDPOINT_UPDATE_BOOK = `/api/v1/books/${id}`;
+  return axios.patch<IBackendRes<IBook>>(ENDPOINT_UPDATE_BOOK, data);
+};
+
 export const updateBookSingleImage = (id: number, file: File) => {
   let config = {
     headers: {
@@ -120,6 +140,11 @@ export const updateBookMultipleImages = (id: number, files: File[]) => {
     }
   );
 };
+
+export const deleteBookAPI = (id: number) => {
+  const ENDPOINT_DELETE_BOOK = `/api/v1/books/${id}`;
+  return axios.delete<IBackendRes<IBook>>(ENDPOINT_DELETE_BOOK);
+}
 
 // Module category
 export const fetchAllCategoriesAPI = () => {
