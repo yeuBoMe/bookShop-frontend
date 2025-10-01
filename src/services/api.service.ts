@@ -55,10 +55,9 @@ export const importListUsersFromFileAPI = (
   }[]
 ) => {
   const ENDPOINT_IMPORT_USERS_FROM_FILE = "/api/v1/users/import";
-  return axios.post<IBackendRes<IResponseImportUsers<IUserListImportInfo>>>(
-    ENDPOINT_IMPORT_USERS_FROM_FILE,
-    data
-  );
+  return axios.post<
+    IBackendRes<IResponseImportData<IDetailFaultInfo<IUserView>>>
+  >(ENDPOINT_IMPORT_USERS_FROM_FILE, data);
 };
 
 // Module book
@@ -162,6 +161,21 @@ export const deleteBookMultipleImagesAPI = (
 export const deleteBookAPI = (id: number) => {
   const ENDPOINT_DELETE_BOOK = `/api/v1/books/${id}`;
   return axios.delete<IBackendRes<IBook>>(ENDPOINT_DELETE_BOOK);
+};
+
+export const importListBooksFromFileAPI = (
+  data: {
+    name: string;
+    author: string;
+    price: number;
+    quantity: number;
+  }[]
+) => {
+  const ENDPOINT_IMPORT_BOOKS_FROM_FILE = "/api/v1/books/import";
+  return axios.post<IBackendRes<IResponseImportData<IDetailFaultInfo<IBook>>>>(
+    ENDPOINT_IMPORT_BOOKS_FROM_FILE,
+    data
+  );
 };
 
 // Module category

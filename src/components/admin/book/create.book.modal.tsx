@@ -125,14 +125,17 @@ const CreateBookModal = (props: CreateBookProps) => {
 
         try {
             const { name, author, price, quantity, category } = values;
+
             const finalCategory = category && category.id !== undefined ? category : null;
             const createBookResponse = await createBookAPI(name, author, price, quantity, finalCategory);
+
             if (createBookResponse.data) {
                 // Xử lý upload ảnh nếu có
                 if (fileList.length > 0) {
                     const files = fileList
                         .filter(file => file.originFileObj) // lọc các pt trong fileList, giữ lai file có thuộc tính originFileObj
                         .map(file => file.originFileObj as File); // chuyển từng file trong Upload tm đk sang File 
+                        
                     if (files.length > 0) {
                         setImageLoading(true);
                         await updateBookMultipleImagesAPI(createBookResponse.data.id, files);

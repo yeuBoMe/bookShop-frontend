@@ -97,41 +97,17 @@ declare global {
     role?: { id: number; name: string };
   }
 
-  interface IResponseImportUsers<T> {
+  interface IResponseImportData<T> {
     countSuccess: number;
     countError: number;
-    detail?: T;
-    users?: {
-      id: number;
-      fullName: string;
-      email: string;
-      avatar?: string;
-      phone: string;
-      createdAt: Date;
-      createdBy: string;
-      role?: {
-        id: number;
-        name: string;
-      };
-    }[];
+    detail: any;
+    items: T[];
   }
 
-  interface IUserListImportInfo {
+  interface IDetailFaultInfo<T> {
     index: number;
-    errorMessage: string;
-    user: {
-      id?: number;
-      fullName: string;
-      email: string;
-      avatar?: string;
-      phone: string;
-      createdAt?: Date;
-      createdBy?: string;
-      role?: {
-        id: number;
-        name: string;
-      };
-    };
+    errorMessage: any;
+    item: T;
   }
 
   interface IBook {

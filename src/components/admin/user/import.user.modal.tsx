@@ -48,7 +48,7 @@ const ImportUserModal = (props: UserImportProps) => {
                 message.success(`${info.file.name} file uploaded successfully.`);
                 if (info.fileList && info.fileList.length > 0) {
                     const file = info.fileList[0].originFileObj!;
-
+                    
                     // load file to array buffer
                     const workbook = new Exceljs.Workbook();
                     const arrayBuffer = await file.arrayBuffer(); // lấy dữ liệu nhị phân của file
