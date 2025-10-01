@@ -74,7 +74,7 @@ export const createBookAPI = (
   author: string,
   price: number,
   quantity: number,
-  category: { id: number }
+  category: { id: number } | null
 ) => {
   const data = {
     name: name,
@@ -93,7 +93,7 @@ export const updateBookAPI = (
   author: string,
   price: number,
   quantity: number,
-  category: { id: number }
+  category: { id: number } | null
 ) => {
   const data = {
     id: id,

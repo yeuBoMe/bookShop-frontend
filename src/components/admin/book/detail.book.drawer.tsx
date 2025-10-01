@@ -110,7 +110,7 @@ const DetailBookDrawer = (props: DrawerBookProps) => {
                 children: (
                     <Badge
                         status="processing"
-                        text={dataDetail.category}
+                        text={dataDetail.category ? dataDetail.category : "NULL"}
                     />
                 ),
             },

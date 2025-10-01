@@ -24,9 +24,9 @@ interface BookCreateValues {
     price: number,
     category: {
         id: number
-    },
+    } | null,
     quantity: number,
-    images: string[];
+    images: UploadFile[];
 }
 
 interface CategorySelectValues {
@@ -109,7 +109,7 @@ const CreateBookModal = (props: CreateBookProps) => {
 
     const handleSelectChange = (value: number) => {
         console.log(`selected ${value}`);
-        form.setFieldsValue({ category: { id: value } });
+        form.setFieldsValue({ category: value !== null ? { id: value } : null });
     };
 
     const normFile = (e: any) => {
@@ -125,8 +125,8 @@ const CreateBookModal = (props: CreateBookProps) => {
 
         try {
             const { name, author, price, quantity, category } = values;
-            const createBookResponse = await createBookAPI(name, author, price, quantity, category);
-
+            const finalCategory = category && category.id !== undefined ? category : null;
+            const createBookResponse = await createBookAPI(name, author, price, quantity, finalCategory);
             if (createBookResponse.data) {
                 // Xử lý upload ảnh nếu có
                 if (fileList.length > 0) {
@@ -150,7 +150,7 @@ const CreateBookModal = (props: CreateBookProps) => {
                 duration: 5,
                 placement: "topRight"
             });
-            console.log("Check error create book >>> ", error.message)
+            console.log("Check error create book >>> ", error)
         } finally {
             setIsLoading(false);
             setImageLoading(false);
@@ -262,9 +262,10 @@ const CreateBookModal = (props: CreateBookProps) => {
                                     <Form.Item<BookCreateValues>
                                         label="Category:"
                                         name={["category", "id"]}
-                                        rules={[{ required: true, message: "Category is required" }]}
+                                    // rules={[{ required: true, message: "Category is required" }]}
                                     >
                                         <Select
+                                            allowClear
                                             placeholder="Select a category"
                                             onChange={handleSelectChange}
                                             options={categories}

@@ -1,8 +1,8 @@
-import { 
-    fetchAllCategoriesAPI, 
-    updateBookAPI, 
-    updateBookMultipleImagesAPI, 
-    deleteBookMultipleImagesAPI 
+import {
+    fetchAllCategoriesAPI,
+    updateBookAPI,
+    updateBookMultipleImagesAPI,
+    deleteBookMultipleImagesAPI
 } from "@/services/api.service";
 import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
 import {
@@ -30,7 +30,7 @@ interface BookUpdateValues {
     price: number,
     category: {
         id: number
-    },
+    } | null,
     quantity: number,
     images: UploadFile[];
 }
@@ -116,12 +116,16 @@ const UpdateBookModal = (props: UpdateBookProps) => {
             setFileList(imgFiles);
             setDeletedImages([]); // Reset deletedImages
 
-            const selectedCategory = categories.find(cat => cat.label === dataUpdate.category);
+            // const selectedCategory = categories.find(cat => cat.label === dataUpdate.category);
+            const initialCategory = dataUpdate.category
+                ? { id: categories.find(cat => cat.label === dataUpdate.category)?.value }
+                : null;
             form.setFieldsValue({
                 name: dataUpdate.name,
                 author: dataUpdate.author,
                 price: dataUpdate.price,
-                category: selectedCategory ? { id: selectedCategory.value } : { id: 0 },
+                // category: selectedCategory ? { id: selectedCategory.value } : { id: null },
+                category: initialCategory,
                 quantity: dataUpdate.quantity,
                 images: imgFiles,
             });
@@ -167,9 +171,9 @@ const UpdateBookModal = (props: UpdateBookProps) => {
         return true;
     };
 
-    const handleSelectChange = (value: number) => {
+    const handleSelectChange = (value: number | null) => {
         console.log(`selected ${value}`);
-        form.setFieldsValue({ category: { id: value } });
+        form.setFieldsValue({ category: value !== null ? { id: value } : null });
     };
 
     const normFile = (e: any) => {
@@ -197,7 +201,7 @@ const UpdateBookModal = (props: UpdateBookProps) => {
                     } catch (error: any) {
                         console.error('Check error delete image >>> ', error);
                         message.warning('Cannot delete images!');
-                        // Continue update
+                        // Continue update      
                     }
                 }
 
@@ -219,7 +223,8 @@ const UpdateBookModal = (props: UpdateBookProps) => {
                 }
 
                 // Step 3: Update book
-                const updateBookResponse = await updateBookAPI(dataUpdate.id, name, author, price, quantity, category);
+                const finalCategory = category && category.id !== undefined ? category : null;
+                const updateBookResponse = await updateBookAPI(dataUpdate.id, name, author, price, quantity, finalCategory);
 
                 if (updateBookResponse.data) {
                     handleClearDataAndCloseModal();
@@ -229,7 +234,7 @@ const UpdateBookModal = (props: UpdateBookProps) => {
             }
         } catch (error: any) {
             notification.error({
-                message: "Lỗi",
+                message: "Error",
                 description: error?.message || "An error happens when updating book",
                 duration: 5,
                 placement: "topRight",
@@ -253,14 +258,14 @@ const UpdateBookModal = (props: UpdateBookProps) => {
     return (
         <>
             <Modal
-                title="Cập nhật sách"
+                title="Update book"
                 closable={false}
                 maskClosable={false}
                 open={isModalUpdateOpen}
                 onOk={() => form.submit()}
                 onCancel={handleClearDataAndCloseModal}
                 loading={isLoading}
-                okText="Cập nhật"
+                okText="Update"
                 width={"50vw"}
             >
                 <Row justify={"center"}>
@@ -276,14 +281,14 @@ const UpdateBookModal = (props: UpdateBookProps) => {
                             <Row gutter={16}>
                                 <Col span={12}>
                                     <Form.Item<BookUpdateValues>
-                                        label="Tên sách:"
+                                        label="Name:"
                                         name="name"
                                         rules={[
-                                            { required: true, message: "Tên sách là bắt buộc" },
-                                            { max: 100, message: "Tên sách phải nhỏ hơn 100 ký tự" },
+                                            { required: true, message: "Book's name is required" },
+                                            { max: 100, message: "Name must be less than 100 characters" },
                                             {
                                                 pattern: /^[A-Za-zÀ-ỹà-ỹ0-9'\-.:\s]{1,100}$/,
-                                                message: "Định dạng tên không hợp lệ",
+                                                message: "Invalid name format",
                                             },
                                         ]}
                                     >
@@ -293,14 +298,14 @@ const UpdateBookModal = (props: UpdateBookProps) => {
 
                                 <Col span={12}>
                                     <Form.Item<BookUpdateValues>
-                                        label="Tác giả:"
+                                        label="Author:"
                                         name="author"
                                         rules={[
-                                            { required: true, message: "Tác giả là bắt buộc" },
-                                            { max: 100, message: "Tên tác giả phải nhỏ hơn 100 ký tự" },
+                                            { required: true, message: "Author is required" },
+                                            { max: 100, message: "Author must be less than 100 characters" },
                                             {
                                                 pattern: /^[A-Za-zÀ-ỹà-ỹ'\-.\s]{1,100}$/,
-                                                message: "Định dạng tên tác giả không hợp lệ",
+                                                message: "Invalid author format",
                                             },
                                         ]}
                                     >
@@ -312,11 +317,11 @@ const UpdateBookModal = (props: UpdateBookProps) => {
                             <Row gutter={16}>
                                 <Col span={8}>
                                     <Form.Item<BookUpdateValues>
-                                        label="Giá:"
+                                        label="Price:"
                                         name="price"
                                         rules={[
-                                            { required: true, message: "Giá là bắt buộc" },
-                                            { type: "number", min: 0, message: "Giá phải là số dương" },
+                                            { required: true, message: "Price is required" },
+                                            { type: "number", min: 0, message: "Price must be a positive number" },
                                         ]}
                                     >
                                         <InputNumber
@@ -325,6 +330,7 @@ const UpdateBookModal = (props: UpdateBookProps) => {
                                             formatter={(value) =>
                                                 `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                                             }
+                                            // khi gửi form thì bỏ dấu phẩy
                                             parser={(value) => value!.replace(/\$\s?|(,*)/g, "")}
                                         />
                                     </Form.Item>
@@ -332,11 +338,11 @@ const UpdateBookModal = (props: UpdateBookProps) => {
 
                                 <Col span={8}>
                                     <Form.Item<BookUpdateValues>
-                                        label="Số lượng:"
+                                        label="Quantity:"
                                         name="quantity"
                                         rules={[
-                                            { required: true, message: "Số lượng là bắt buộc" },
-                                            { type: "number", min: 1, max: 1000, message: "Số lượng phải từ 1 đến 1000" },
+                                            { required: true, message: "Quantity is required" },
+                                            { type: "number", min: 1, max: 1000, message: "Quantity must be between 1 and 1000" },
                                         ]}
                                     >
                                         <InputNumber style={{ width: "100%" }} />
@@ -345,12 +351,13 @@ const UpdateBookModal = (props: UpdateBookProps) => {
 
                                 <Col span={8}>
                                     <Form.Item<BookUpdateValues>
-                                        label="Thể loại:"
+                                        label="Category:"
                                         name={["category", "id"]}
-                                        rules={[{ required: true, message: "Thể loại là bắt buộc" }]}
+                                    // rules={[{ required: true, message: "Category is required" }]}
                                     >
                                         <Select
-                                            placeholder="Chọn thể loại"
+                                            allowClear
+                                            placeholder="Select a category"
                                             onChange={handleSelectChange}
                                             options={categories}
                                         />
@@ -359,7 +366,7 @@ const UpdateBookModal = (props: UpdateBookProps) => {
                             </Row>
 
                             <Form.Item<BookUpdateValues>
-                                label="Ảnh:"
+                                label="Image:"
                                 name="images"
                                 valuePropName="fileList"
                                 getValueFromEvent={normFile}
