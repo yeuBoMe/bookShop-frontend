@@ -38,10 +38,10 @@ export const AuthProvider = (props: IProps) => {
     const fetchUserInfoWithAccessTokenRequest = async () => {
         try {
             const getAccountInfoResponse = await getAccountInfoAPI();
-            await delayTime(400);
+            await delayTime(200);
 
             if (getAccountInfoResponse?.data) {
-                await new Promise((resolve) => setTimeout(resolve, 400));
+                await new Promise((resolve) => setTimeout(resolve, 300));
 
                 const mappedIAccountToIUser: IUser = {
                     id: getAccountInfoResponse.data.user.id,

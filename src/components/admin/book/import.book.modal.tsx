@@ -112,7 +112,6 @@ const ImportBookModal = (props: BookImportProps) => {
                 });
                 refreshTable();
             }
-
         } catch (error: any) {
             notification.error({
                 message: "Error",

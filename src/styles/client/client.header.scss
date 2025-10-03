@@ -18,8 +18,8 @@
     font-weight: 600;
   }
 
-  @media (max-width: 600px) {
-    font-size: 0.8rem;
+  @media (max-width: 768px) {
+    font-size: 0.75rem;
     padding: 0.5rem 0.75rem;
   }
 }
@@ -40,9 +40,10 @@
     padding: 0.75rem 0;
   }
 
-  @media (max-width: 767px) {
+  @media (max-width: 768px) {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
+    padding: 0.5rem 0;
   }
 }
 
@@ -58,41 +59,77 @@
       color: #1f2937;
     }
 
-    @media (max-width: 600px) {
+    @media (max-width: 768px) {
       font-size: 1.5rem;
+      margin-bottom: 0.5rem;
     }
   }
 }
 
-.desktopNav {
+.mobileMenuToggle {
   display: none;
 
-  @media (min-width: 768px) {
-    display: flex;
-    align-items: center;
-    gap: 2rem;
+  @media (max-width: 768px) {
+    display: block;
+    margin-left: auto;
+    cursor: pointer;
+  }
+}
 
-    a {
-      color: #374151;
-      font-size: 1rem;
-      font-weight: 500;
-      text-decoration: none;
-      transition: color 0.2s;
+.desktopNav {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
 
-      &:hover {
-        color: #2563eb;
-      }
+  a {
+    color: #374151;
+    font-size: 1rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: color 0.2s;
 
-      &.active {
-        color: #2563eb;
-        font-weight: 700;
-        border-bottom: 2px solid #2563eb;
-      }
+    &:hover {
+      color: #2563eb;
+    }
+
+    &.active {
+      color: #2563eb;
+      font-weight: 700;
+      border-bottom: 2px solid #2563eb;
     }
   }
 
-  @media (max-width: 767px) {
+  @media (max-width: 1024px) {
+    gap: 1.5rem;
+    a {
+      font-size: 0.9rem;
+    }
+  }
+
+  @media (max-width: 768px) {
     display: none;
+  }
+}
+
+.mobileNav {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  a {
+    color: #374151;
+    font-size: 1rem;
+    text-decoration: none;
+    transition: color 0.2s;
+
+    &:hover {
+      color: #2563eb;
+    }
+
+    &.active {
+      color: #2563eb;
+      font-weight: 700;
+    }
   }
 }
 
@@ -105,7 +142,7 @@
     gap: 0.5rem;
   }
 
-  @media (max-width: 767px) {
+  @media (max-width: 768px) {
     width: 100%;
     justify-content: space-between;
     margin-top: 0.5rem;
@@ -123,7 +160,7 @@
     max-width: 200px;
   }
 
-  @media (max-width: 767px) {
+  @media (max-width: 768px) {
     max-width: 100%;
     flex: 1;
   }
@@ -149,7 +186,7 @@
     padding: 0.45rem 0.9rem 0.45rem 2.25rem;
   }
 
-  @media (max-width: 767px) {
+  @media (max-width: 768px) {
     padding: 0.4rem 0.8rem 0.4rem 2rem;
     font-size: 0.8rem;
   }
@@ -165,7 +202,7 @@
     color: #2563eb;
   }
 
-  @media (max-width: 767px) {
+  @media (max-width: 768px) {
     left: 0.6rem;
   }
 }
@@ -181,7 +218,7 @@
     transform: scale(1.1);
   }
 
-  @media (max-width: 767px) {
+  @media (max-width: 768px) {
     margin-left: 0.5rem;
   }
 }
@@ -200,7 +237,7 @@
     color: #2563eb;
   }
 
-  @media (max-width: 767px) {
+  @media (max-width: 768px) {
     margin: 2px 0;
     padding: 0.4rem;
   }
@@ -219,17 +256,16 @@
     color: #2563eb;
   }
 
-  @media (max-width: 767px) {
+  @media (max-width: 768px) {
     margin: 2px 0;
     padding: 0.4rem;
   }
 }
 
 .cartButton {
-  margin: 5px 0px 0px 0px;
   position: relative;
 
-  @media (max-width: 767px) {
+  @media (max-width: 768px) {
     margin: 2px 0;
   }
 }
@@ -248,7 +284,7 @@
   align-items: center;
   justify-content: center;
 
-  @media (max-width: 767px) {
+  @media (max-width: 768px) {
     top: -0.2rem;
     right: -0.15rem;
     width: 1rem;
@@ -268,7 +304,7 @@
     transform: translateY(0);
   }
 
-  @media (max-width: 767px) {
+  @media (max-width: 768px) {
     margin-left: auto;
   }
 }
@@ -312,7 +348,7 @@
       background-color: #f3f4f6;
     }
 
-    @media (max-width: 767px) {
+    @media (max-width: 768px) {
       font-size: 0.9rem;
       padding: 0.5rem 1rem;
     }
@@ -335,7 +371,7 @@
       background-color: #f3f4f6;
     }
 
-    @media (max-width: 767px) {
+    @media (max-width: 768px) {
       font-size: 0.9rem;
       padding: 0.5rem 1rem;
     }

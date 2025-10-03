@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useCurrentApp } from "components/context/app.context";
-import { FiSearch, FiShoppingCart, FiUser } from "react-icons/fi";
-import "styles/client.header.scss";
+import { FiSearch, FiShoppingCart, FiUser, FiMenu } from "react-icons/fi"; // Thêm FiMenu cho hamburger
+import "styles/client/client.header.scss";
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { App, Avatar, Button } from "antd";
+import { App, Avatar, Button, Drawer } from "antd"; // Thêm Drawer cho menu mobile
 import { logoutAPI } from "@/services/api.service";
 
 const Header = () => {
@@ -12,6 +12,7 @@ const Header = () => {
     const { notification, message } = App.useApp();
     const navigate = useNavigate();
     const urlAvatar = user?.avatar ? `${import.meta.env.VITE_BACKEND_URL}/upload/avatar/${user.avatar}` : "";
+    const [drawerVisible, setDrawerVisible] = useState(false); // State cho menu mobile
 
     const handleLogoutRequest = async () => {
         try {
@@ -19,10 +20,8 @@ const Header = () => {
             if (logoutResponse) {
                 setUser(null);
                 setIsAuthenticated(false);
-
                 localStorage.removeItem("access_token");
                 message.success("Đăng xuất thành công!");
-                
                 navigate("/login");
             }
         } catch (error: any) {
@@ -33,7 +32,7 @@ const Header = () => {
                 placement: "topRight"
             });
         }
-    }
+    };
 
     return (
         <>
@@ -51,13 +50,18 @@ const Header = () => {
                             <Link to="/">BookShop</Link>
                         </div>
 
+                        {/* Mobile Menu Toggle */}
+                        <div className="mobileMenuToggle">
+                            <FiMenu size={24} onClick={() => setDrawerVisible(true)} />
+                        </div>
+
                         {/* Desktop Navigation */}
                         <nav className="desktopNav">
                             <NavLink to="/">Trang chủ</NavLink>
-                            <NavLink to="/book">Sách</NavLink>
-                            <NavLink to="/collections">Collections</NavLink>
-                            <NavLink to="/about">About</NavLink>
-                            <NavLink to="/contact">Contact</NavLink>
+                            <NavLink to="/books">Sản phẩm</NavLink>
+                            <NavLink to="/order">Đơn hàng</NavLink>
+                            <NavLink to="/profile">Hồ sơ</NavLink>
+                            <NavLink to="/contact">Liên hệ</NavLink>
                         </nav>
 
                         {/* Right side icons */}
@@ -126,7 +130,24 @@ const Header = () => {
                         </div>
                     </div>
                 </div>
-            </header >
+            </header>
+
+            {/* Drawer for mobile menu */}
+            <Drawer
+                title="Menu"
+                placement="right"
+                onClose={() => setDrawerVisible(false)}
+                open={drawerVisible}
+                width={250}
+            >
+                <nav className="mobileNav">
+                    <NavLink to="/" onClick={() => setDrawerVisible(false)}>Trang chủ</NavLink>
+                    <NavLink to="/book" onClick={() => setDrawerVisible(false)}>Sách</NavLink>
+                    <NavLink to="/collections" onClick={() => setDrawerVisible(false)}>Collections</NavLink>
+                    <NavLink to="/about" onClick={() => setDrawerVisible(false)}>About</NavLink>
+                    <NavLink to="/contact" onClick={() => setDrawerVisible(false)}>Contact</NavLink>
+                </nav>
+            </Drawer>
         </>
     );
 };

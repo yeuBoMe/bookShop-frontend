@@ -34,10 +34,8 @@ const AdminLayout = () => {
             if (logoutResponse) {
                 setUser(null);
                 setIsAuthenticated(false);
-
                 localStorage.removeItem("access_token");
                 message.success("Đăng xuất thành công!");
-
                 navigate("/login");
             }
         } catch (error: any) {
@@ -90,9 +88,13 @@ const AdminLayout = () => {
             label: (
                 <label
                     style={{ cursor: 'pointer' }}
-                    onClick={() => alert("me")}
                 >
-                    Quản lý tài khoản
+                    <Link
+                        to={"/admin/user"}
+                        style={{ color: "black" }}
+                    >
+                        Quản lý tài khoản
+                    </Link>
                 </label>
             ),
             key: 'account',
@@ -141,14 +143,17 @@ const AdminLayout = () => {
                     />
                 </Sider>
                 <Layout>
-                    <div className='admin-header' style={{
-                        height: "50px",
-                        borderBottom: "1px solid #ebebeb",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        padding: "0 18px",
-                    }}>
+                    <div
+                        className='admin-header'
+                        style={{
+                            height: "50px",
+                            borderBottom: "1px solid #ebebeb",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            padding: "0 18px",
+                        }}
+                    >
                         <span>
                             {React.createElement(collapsed ? MenuUnfoldOutlined : MenuFoldOutlined, {
                                 className: 'trigger',

@@ -38,7 +38,7 @@ const ImportUserModal = (props: UserImportProps) => {
                 if (onSuccess) onSuccess("ok");
             }, 1000);
         },
-        async onChange(info) {  
+        async onChange(info) {
             const { status } = info.file;
             if (status !== 'uploading') {
                 console.log(info.file, info.fileList);
@@ -48,7 +48,7 @@ const ImportUserModal = (props: UserImportProps) => {
                 message.success(`${info.file.name} file uploaded successfully.`);
                 if (info.fileList && info.fileList.length > 0) {
                     const file = info.fileList[0].originFileObj!;
-                    
+
                     // load file to array buffer
                     const workbook = new Exceljs.Workbook();
                     const arrayBuffer = await file.arrayBuffer(); // lấy dữ liệu nhị phân của file
@@ -112,7 +112,8 @@ const ImportUserModal = (props: UserImportProps) => {
                 handleClearDataAndCloseModal();
                 notification.success({
                     message: "Import users from file",
-                    description: `Success = ${importUsersFromFileResponse.data.countSuccess}. Error = ${importUsersFromFileResponse.data.countError}`,
+                    description: `Success = ${importUsersFromFileResponse.data.countSuccess}. 
+                    Error = ${importUsersFromFileResponse.data.countError}`,
                     duration: 5,
                     placement: "topRight",
                 });

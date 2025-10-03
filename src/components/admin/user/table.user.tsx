@@ -276,36 +276,34 @@ const TableUser = () => {
                 dateFormatter="string"
                 headerTitle="Table user"
                 toolBarRender={() => [
-                    <>
+                    <CSVLink
+                        data={currentDataTable}
+                        filename='export-user.csv'
+                    >
                         <Button
                             key="export"
                             icon={<ExportOutlined />}
                             type="primary"
                         >
-                            <CSVLink
-                                data={currentDataTable}
-                                filename='export-user.csv'
-                            >
-                                Export
-                            </CSVLink>
+                            Export
                         </Button>
-                        <Button
-                            key="import"
-                            icon={<CloudDownloadOutlined />}
-                            onClick={() => setIsModalImportOpen(true)}
-                            type="primary"
-                        >
-                            Import
-                        </Button>
-                        <Button
-                            key="add"
-                            icon={<PlusOutlined />}
-                            onClick={() => setIsModalCreateOpen(true)}
-                            type="primary"
-                        >
-                            Add new
-                        </Button>
-                    </>
+                    </CSVLink>,
+                    <Button
+                        key="import"
+                        icon={<CloudDownloadOutlined />}
+                        onClick={() => setIsModalImportOpen(true)}
+                        type="primary"
+                    >
+                        Import
+                    </Button>,
+                    <Button
+                        key="add"
+                        icon={<PlusOutlined />}
+                        onClick={() => setIsModalCreateOpen(true)}
+                        type="primary"
+                    >
+                        Add new
+                    </Button>
                 ]}
             />
             <ImportUserModal
