@@ -21,7 +21,7 @@ const BookPage = () => {
     const [books, setBooks] = useState<IBook[]>([]);
 
     const [filter, setFilter] = useState<FilterValues>({});
-    const [sort, setSort] = useState<string>("createdAt,desc");
+    const [sort, setSort] = useState<string>("updatedAt,desc");
 
     const [meta, setMeta] = useState({
         current: 1,
@@ -50,7 +50,7 @@ const BookPage = () => {
         let filterConditions: string[] = [];
 
         if (filter.category && filter.category.length > 0) {
-            const categoryConditions = filter.category.map(id => `category.id='${id}'`).join(" or ");
+            const categoryConditions = filter.category.map(name => `category.name='${name}'`).join(" or ");
             filterConditions.push(`(${categoryConditions})`);
         }
         if (filter.range?.from) {
@@ -103,6 +103,16 @@ const BookPage = () => {
         setFilter(values);
     };
 
+    const handleReset = () => {
+        form.resetFields();
+        setFilter({});
+    }
+
+    const handlePageChange = (page: number) => {
+        fetchBooks(page);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+
     const handleTabChange = (key: string) => {
         console.log("Tab changed:", key);
         switch (key) {
@@ -122,17 +132,6 @@ const BookPage = () => {
                 break;
         }
     };
-
-    const handlePageChange = (page: number) => {
-        fetchBooks(page);
-        window.scrollTo({ top: 0, behavior: "smooth" });
-    };
-
-    const handleReset = () => {
-        form.resetFields();
-        setFilter({});
-        setSort("createdAt,desc");
-    }
 
     const items: TabsProps["items"] = [
         { key: "1", label: "Phổ biến" },
@@ -162,12 +161,15 @@ const BookPage = () => {
                             layout="vertical"
                         >
                             <Form.Item label={<strong>Danh mục sản phẩm</strong>}>
-                                <Form.Item name="category" noStyle>
+                                <Form.Item<FilterValues>
+                                    name="category"
+                                    noStyle
+                                >
                                     <Checkbox.Group style={{ width: "100%" }}>
                                         <Row>
                                             {categories.map((category) => (
-                                                <Col span={24} key={category.id} className="category-checkbox">
-                                                    <Checkbox value={category.id}>
+                                                <Col span={24} key={category.name} className="category-checkbox">
+                                                    <Checkbox value={category.name}>
                                                         {category.name}
                                                     </Checkbox>
                                                 </Col>
@@ -181,7 +183,10 @@ const BookPage = () => {
 
                             <Form.Item label={<strong>Khoảng giá</strong>}>
                                 <div className="price-range-inputs">
-                                    <Form.Item name={["range", "from"]} noStyle>
+                                    <Form.Item<FilterValues>
+                                        name={["range", "from"]}
+                                        noStyle
+                                    >
                                         <InputNumber
                                             min={0}
                                             placeholder="đ TỪ"
@@ -191,7 +196,10 @@ const BookPage = () => {
                                         />
                                     </Form.Item>
                                     <span>-</span>
-                                    <Form.Item name={["range", "to"]} noStyle>
+                                    <Form.Item<FilterValues>
+                                        name={["range", "to"]}
+                                        noStyle
+                                    >
                                         <InputNumber
                                             min={0}
                                             placeholder="đ ĐẾN"
