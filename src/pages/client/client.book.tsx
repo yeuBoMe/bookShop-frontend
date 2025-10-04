@@ -1,15 +1,27 @@
 import { FilterTwoTone, ReloadOutlined } from "@ant-design/icons";
-import { Col, Form, Row, Checkbox, Divider, InputNumber, Button, Rate, Tabs, Pagination, Spin } from "antd";
-import type { TabsProps } from "antd";
+import { Col, Form, Row, Checkbox, Divider, InputNumber, Button, Rate, Tabs, Pagination, Spin, Empty } from "antd";
+import type { FormProps, TabsProps } from "antd";
 import { useEffect, useState } from "react";
 import { fetchAllBooksAPI, fetchAllCategoriesAPI } from "@/services/api.service";
 import "styles/client/client.book.scss";
 
+interface FilterValues {
+    category?: string[];
+    range?: {
+        from?: number;
+        to?: number;
+    }
+}
+
 const BookPage = () => {
     const [form] = Form.useForm();
+    const [loading, setLoading] = useState<boolean>(true);
+
     const [categories, setCategories] = useState<ICategory[]>([]);
     const [books, setBooks] = useState<IBook[]>([]);
-    const [loading, setLoading] = useState<boolean>(true);
+
+    const [filter, setFilter] = useState<FilterValues>({});
+    const [sort, setSort] = useState<string>("createdAt,desc");
 
     const [meta, setMeta] = useState({
         current: 1,
@@ -33,12 +45,40 @@ const BookPage = () => {
         fetchCategories();
     }, []);
 
+    const buildQuery = (page: number) => {
+        let query = `page=${page}&size=${meta.pageSize}`;
+        let filterConditions: string[] = [];
+
+        if (filter.category && filter.category.length > 0) {
+            const categoryConditions = filter.category.map(id => `category.id='${id}'`).join(" or ");
+            filterConditions.push(`(${categoryConditions})`);
+        }
+        if (filter.range?.from) {
+            filterConditions.push(`price>=${filter.range.from}`);
+        }
+        if (filter.range?.to) {
+            filterConditions.push(`price<=${filter.range.to}`);
+        }
+
+        if (filterConditions.length > 0) {
+            query += `&filter=${filterConditions.join(" and ")}`;
+        }
+
+        if (sort) {
+            query += `&sort=${sort}`;
+        }
+
+        return query;
+    }
+
     // Fetch books với pagination
     const fetchBooks = async (page: number) => {
         try {
             setLoading(true);
-            const response = await fetchAllBooksAPI(`page=${page}&size=${meta.pageSize}`);
+            const queryBuilt = buildQuery(page);
+            const response = await fetchAllBooksAPI(queryBuilt);
             if (response.data) {
+                console.log("Check query >>> ", queryBuilt);
                 setBooks(response.data.result);
                 setMeta(response.data.meta);
             }
@@ -51,38 +91,48 @@ const BookPage = () => {
 
     useEffect(() => {
         fetchBooks(1);
-    }, []);
+    }, [filter, sort]);
 
     const handleChangeFilter = (changedValues: any, values: any) => {
         console.log("Filter changed:", changedValues, values);
-        // TODO: Implement filter logic
+        setFilter(values);
     };
 
-    const onFinish = async (values: any) => {
+    const onFinish: FormProps<FilterValues>['onFinish'] = async (values: any) => {
         console.log("Apply filter:", values);
-        // TODO: Implement API call with filter values
+        setFilter(values);
     };
 
     const handleTabChange = (key: string) => {
         console.log("Tab changed:", key);
-        let sortedBooks = [...books];
         switch (key) {
+            case "1":
+                setSort("updatedAt,desc");
+                break;
+            case "2":
+                setSort("createdAt,asc");
+                break;
             case "3": // Giá thấp đến cao
-                sortedBooks.sort((a, b) => (a.price || 0) - (b.price || 0));
+                setSort("price,asc");
                 break;
             case "4": // Giá cao đến thấp
-                sortedBooks.sort((a, b) => (b.price || 0) - (a.price || 0));
+                setSort("price,desc");
                 break;
             default:
                 break;
         }
-        setBooks(sortedBooks);
     };
 
     const handlePageChange = (page: number) => {
         fetchBooks(page);
         window.scrollTo({ top: 0, behavior: "smooth" });
     };
+
+    const handleReset = () => {
+        form.resetFields();
+        setFilter({});
+        setSort("createdAt,desc");
+    }
 
     const items: TabsProps["items"] = [
         { key: "1", label: "Phổ biến" },
@@ -101,7 +151,7 @@ const BookPage = () => {
                             <span>
                                 <FilterTwoTone /> Bộ lọc tìm kiếm
                             </span>
-                            <ReloadOutlined onClick={() => form.resetFields()} />
+                            <ReloadOutlined onClick={handleReset} />
                         </div>
 
                         <Form
@@ -117,7 +167,7 @@ const BookPage = () => {
                                         <Row>
                                             {categories.map((category) => (
                                                 <Col span={24} key={category.id} className="category-checkbox">
-                                                    <Checkbox value={category.id.toString()}>
+                                                    <Checkbox value={category.id}>
                                                         {category.name}
                                                     </Checkbox>
                                                 </Col>
@@ -151,13 +201,13 @@ const BookPage = () => {
                                         />
                                     </Form.Item>
                                 </div>
-                                <Button
+                                {/* <Button
                                     onClick={() => form.submit()}
                                     className="apply-filter-btn"
                                     type="primary"
                                 >
                                     Áp dụng
-                                </Button>
+                                </Button> */}
                             </Form.Item>
 
                             <Divider />
@@ -191,6 +241,10 @@ const BookPage = () => {
                         {loading ? (
                             <div className="loading-container">
                                 <Spin size="large" tip="Đang tải sản phẩm..." />
+                            </div>
+                        ) : books.length === 0 ? (
+                            <div className="empty-container">
+                                <Empty description="Không có sản phẩm nào phù hợp" />
                             </div>
                         ) : (
                             <>
@@ -239,6 +293,7 @@ const BookPage = () => {
                                         current={meta.current}
                                         total={meta.total}
                                         pageSize={meta.pageSize}
+                                        responsive
                                         onChange={handlePageChange}
                                         showSizeChanger={false}
                                     />
