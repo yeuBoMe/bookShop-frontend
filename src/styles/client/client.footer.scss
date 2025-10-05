@@ -1,0 +1,201 @@
+.footer-container {
+  background: linear-gradient(135deg, #1e3a5f 0%, #2d4a6e 100%);
+  color: #fff;
+  padding: 60px 20px 20px;
+  position: relative;
+
+  @media (max-width: 768px) {
+    padding: 40px 15px 15px;
+  }
+}
+
+.footer-content {
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+.footer-main {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 40px;
+  padding-bottom: 40px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+
+  @media (max-width: 992px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+  }
+
+  @media (max-width: 576px) {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+}
+
+.footer-section {
+  .footer-brand {
+    font-size: 32px;
+    font-weight: 700;
+    color: #5eb3f6;
+    margin-bottom: 10px;
+    letter-spacing: -0.5px;
+
+    @media (max-width: 768px) {
+      font-size: 28px;
+    }
+  }
+
+  .footer-username {
+    color: #ffa500;
+    font-size: 16px;
+    margin-bottom: 20px;
+  }
+
+  .footer-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: #fff;
+
+    @media (max-width: 768px) {
+      font-size: 18px;
+    }
+  }
+
+  .footer-description {
+    line-height: 1.8;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 15px;
+  }
+
+  .footer-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    li {
+      margin-bottom: 12px;
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 15px;
+      line-height: 1.6;
+      transition: color 0.3s;
+
+      &:hover {
+        color: #5eb3f6;
+        cursor: pointer;
+      }
+    }
+  }
+
+  .contact-item {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 12px;
+
+    .contact-label {
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 4px;
+    }
+
+    .contact-value {
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 15px;
+    }
+  }
+}
+
+.footer-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 30px;
+
+  @media (max-width: 576px) {
+    flex-direction: column;
+    text-align: center;
+    gap: 15px;
+  }
+
+  .copyright {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 14px;
+
+    .copyright-icon {
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(255, 255, 255, 0.7);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 600;
+    }
+  }
+}
+
+.scroll-to-top-btn {
+  position: fixed;
+  bottom: 40px;
+  right: 40px;
+  width: 50px;
+  height: 50px;
+  background: #1890ff;
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+  z-index: 1000;
+
+  &:hover {
+    background: #0054a2;
+    transform: translateY(-5px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+  }
+
+  &:active {
+    transform: translateY(-2px);
+  }
+
+  svg {
+    width: 24px;
+    height: 24px;
+    fill: #fff;
+  }
+
+  @media (max-width: 768px) {
+    bottom: 20px;
+    right: 20px;
+    width: 45px;
+    height: 45px;
+
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+  }
+}
+
+// Animation cho button xuất hiện
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.scroll-to-top-btn {
+  animation: fadeIn 0.3s ease-out;
+}

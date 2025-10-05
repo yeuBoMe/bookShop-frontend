@@ -29,6 +29,10 @@ import enUS from 'antd/locale/en_US';
 // import viVN from 'antd/locale/vi_VN';
 
 import "styles/global.scss";
+import CartPage from 'pages/client/cart';
+import ProfilePage from 'pages/client/profile';
+import OrderPage from 'pages/client/client.order';
+import BookDetailPage from 'pages/client/book/item';
 
 const router = createBrowserRouter([
   {
@@ -45,10 +49,38 @@ const router = createBrowserRouter([
         element: <BookPage />,
       },
       {
+        path: "/books/:id",
+        element: <BookDetailPage />,
+      },
+      {
+        path: "/order",
+        element: (
+          <ProtectedRoute>
+            <OrderPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/cart",
+        element: (
+          <ProtectedRoute>
+            <CartPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
         path: "/checkout",
         element: (
           <ProtectedRoute>
             <CheckoutPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/profile",
+        element: (
+          <ProtectedRoute>
+            <ProfilePage />
           </ProtectedRoute>
         ),
       },

@@ -73,7 +73,10 @@ export const createBookAPI = (
   author: string,
   price: number,
   quantity: number,
-  category: { id: number } | null
+  category: { id: number } | null,
+  introduceText: string,
+  description: string,
+  reader: string
 ) => {
   const data = {
     name: name,
@@ -81,6 +84,9 @@ export const createBookAPI = (
     price: price,
     quantity: quantity,
     category: category,
+    introduceText: introduceText,
+    description: description,
+    reader: reader,
   };
   const ENDPOINT_CREATE_BOOK = "/api/v1/books";
   return axios.post<IBackendRes<IBook>>(ENDPOINT_CREATE_BOOK, data);
@@ -92,7 +98,10 @@ export const updateBookAPI = (
   author: string,
   price: number,
   quantity: number,
-  category: { id: number } | null
+  category: { id: number } | null,
+  introduceText: string,
+  description: string,
+  reader: string
 ) => {
   const data = {
     id: id,
@@ -101,6 +110,9 @@ export const updateBookAPI = (
     price: price,
     quantity: quantity,
     category: category,
+    introduceText: introduceText,
+    description: description,
+    reader: reader,
   };
   const ENDPOINT_UPDATE_BOOK = `/api/v1/books/${id}`;
   return axios.patch<IBackendRes<IBook>>(ENDPOINT_UPDATE_BOOK, data);

@@ -33,6 +33,7 @@ const ProtectedRoute = (props: IProps) => {
             }
             return <>{props.children}</>;
         }
+        return <>{props.children}</>;
     }
 
     return (

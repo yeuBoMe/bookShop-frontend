@@ -17,6 +17,7 @@ import {
     type UploadProps
 } from "antd";
 import { useEffect, useState } from "react";
+const { TextArea } = Input;
 
 interface BookCreateValues {
     name: string,
@@ -26,6 +27,9 @@ interface BookCreateValues {
         id: number
     } | null,
     quantity: number,
+    introduceText: string,
+    description: string,
+    reader: string,
     images: UploadFile[];
 }
 
@@ -124,10 +128,28 @@ const CreateBookModal = (props: CreateBookProps) => {
         setIsLoading(true);
 
         try {
-            const { name, author, price, quantity, category } = values;
+            const {
+                name,
+                author,
+                price,
+                quantity,
+                category,
+                introduceText,
+                description,
+                reader
+            } = values;
 
             const finalCategory = category && category.id !== undefined ? category : null;
-            const createBookResponse = await createBookAPI(name, author, price, quantity, finalCategory);
+            const createBookResponse = await createBookAPI(
+                name,
+                author,
+                price,
+                quantity,
+                finalCategory,
+                introduceText,
+                description,
+                reader
+            );
 
             if (createBookResponse.data) {
                 // Xử lý upload ảnh nếu có
@@ -135,7 +157,7 @@ const CreateBookModal = (props: CreateBookProps) => {
                     const files = fileList
                         .filter(file => file.originFileObj) // lọc các pt trong fileList, giữ lai file có thuộc tính originFileObj
                         .map(file => file.originFileObj as File); // chuyển từng file trong Upload tm đk sang File 
-                        
+
                     if (files.length > 0) {
                         setImageLoading(true);
                         await updateBookMultipleImagesAPI(createBookResponse.data.id, files);
@@ -277,6 +299,65 @@ const CreateBookModal = (props: CreateBookProps) => {
                                 </Col>
                             </Row>
 
+                            <Row gutter={16}>
+                                <Col span={12}>
+                                    <Form.Item<BookCreateValues>
+                                        label="Introduce text:"
+                                        name="introduceText"
+                                        rules={[
+                                            { required: true, message: "Introduce text is required" },
+                                            { max: 200, message: "Introduce text must be less than 200 characters" },
+                                            {
+                                                pattern: /^[A-Za-zÀ-ỹà-ỹ0-9'.,:;\-\u2013()\s]{1,200}$/,
+                                                message: "Invalid introduce text format",
+                                            },
+                                        ]}
+                                    >
+                                        <Input />
+                                    </Form.Item>
+                                </Col>
+
+                                <Col span={12}>
+                                    <Form.Item<BookCreateValues>
+                                        label="Reader:"
+                                        name="reader"
+                                        rules={[
+                                            { required: true, message: "Reader is required" },
+                                            { max: 200, message: "Reader must be less than 200 characters" },
+                                            {
+                                                pattern: /^[A-Za-zÀ-ỹà-ỹ'.,\-()\s]{1,200}$/,
+                                                message: "Invalid reader format",
+                                            },
+                                        ]}
+                                    >
+                                        <Input />
+                                    </Form.Item>
+                                </Col>
+                            </Row>
+
+                            <Row>
+                                <Col span={24}>
+                                    <Form.Item<BookCreateValues>
+                                        label="Description:"
+                                        name="description"
+                                        rules={[
+                                            { required: true, message: "Description is required" },
+                                            { max: 5000, message: "Description must be less than 5000 characters" },
+                                            {
+                                                pattern:  /^[A-Za-zÀ-ỹà-ỹ0-9'.,:;()\-–\s]{1,5000}$/,
+                                                message: "Invalid description text format",
+                                            },
+                                        ]}
+                                    >
+                                        <TextArea
+                                            rows={6}
+                                            maxLength={5000}
+                                            placeholder="Fill book description..."
+                                        />
+                                    </Form.Item>
+                                </Col>
+                            </Row>
+
                             <Form.Item<BookCreateValues>
                                 label="Image:"
                                 name="images"
@@ -314,7 +395,6 @@ const CreateBookModal = (props: CreateBookProps) => {
                                     src={previewImage}
                                 />
                             )}
-
                         </Form>
                     </Col>
                 </Row>

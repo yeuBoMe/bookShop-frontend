@@ -23,6 +23,7 @@ import {
 } from "antd";
 import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from 'uuid';
+const { TextArea } = Input;
 
 interface BookUpdateValues {
     name: string,
@@ -32,6 +33,9 @@ interface BookUpdateValues {
         id: number
     } | null,
     quantity: number,
+    introduceText: string,
+    description: string,
+    reader: string,
     images: UploadFile[];
 }
 
@@ -127,6 +131,9 @@ const UpdateBookModal = (props: UpdateBookProps) => {
                 // category: selectedCategory ? { id: selectedCategory.value } : { id: null },
                 category: initialCategory,
                 quantity: dataUpdate.quantity,
+                introduceText: dataUpdate.introduceText,
+                description: dataUpdate.description,
+                reader: dataUpdate.reader,
                 images: imgFiles,
             });
         } else {
@@ -190,7 +197,16 @@ const UpdateBookModal = (props: UpdateBookProps) => {
         setIsLoading(true);
         try {
             if (dataUpdate) {
-                const { name, author, price, quantity, category } = values;
+                const {
+                    name,
+                    author,
+                    price,
+                    quantity,
+                    category,
+                    introduceText,
+                    description,
+                    reader
+                } = values;
 
                 // Step 1: Delete all removed images at client and in db server 
                 if (deletedImages.length > 0) {
@@ -224,7 +240,17 @@ const UpdateBookModal = (props: UpdateBookProps) => {
 
                 // Step 3: Update book
                 const finalCategory = category && category.id !== undefined ? category : null;
-                const updateBookResponse = await updateBookAPI(dataUpdate.id, name, author, price, quantity, finalCategory);
+                const updateBookResponse = await updateBookAPI(
+                    dataUpdate.id,
+                    name,
+                    author,
+                    price,
+                    quantity,
+                    finalCategory,
+                    introduceText,
+                    description,
+                    reader,
+                );
 
                 if (updateBookResponse.data) {
                     handleClearDataAndCloseModal();
@@ -360,6 +386,65 @@ const UpdateBookModal = (props: UpdateBookProps) => {
                                             placeholder="Select a category"
                                             onChange={handleSelectChange}
                                             options={categories}
+                                        />
+                                    </Form.Item>
+                                </Col>
+                            </Row>
+
+                            <Row gutter={16}>
+                                <Col span={12}>
+                                    <Form.Item<BookUpdateValues>
+                                        label="Introduce text:"
+                                        name="introduceText"
+                                        rules={[
+                                            { required: true, message: "Introduce text is required" },
+                                            { max: 200, message: "Introduce text must be less than 200 characters" },
+                                            {
+                                                pattern: /^[A-Za-zÀ-ỹà-ỹ0-9'.,:;\-\u2013()\s]{1,200}$/,
+                                                message: "Invalid introduce text format",
+                                            },
+                                        ]}
+                                    >
+                                        <Input />
+                                    </Form.Item>
+                                </Col>
+
+                                <Col span={12}>
+                                    <Form.Item<BookUpdateValues>
+                                        label="Reader:"
+                                        name="reader"
+                                        rules={[
+                                            { required: true, message: "Reader is required" },
+                                            { max: 200, message: "Reader must be less than 200 characters" },
+                                            {
+                                                pattern: /^[A-Za-zÀ-ỹà-ỹ'.,\-()\s]{1,200}$/,
+                                                message: "Invalid reader format",
+                                            },
+                                        ]}
+                                    >
+                                        <Input />
+                                    </Form.Item>
+                                </Col>
+                            </Row>
+
+                            <Row>
+                                <Col span={24}>
+                                    <Form.Item<BookUpdateValues>
+                                        label="Description:"
+                                        name="description"
+                                        rules={[
+                                            { required: true, message: "Description is required" },
+                                            { max: 5000, message: "Description must be less than 5000 characters" },
+                                            {
+                                                pattern:  /^[A-Za-zÀ-ỹà-ỹ0-9'.,:;()\-–\s]{1,5000}$/,
+                                                message: "Invalid description text format",
+                                            },
+                                        ]}
+                                    >
+                                        <TextArea
+                                            rows={6}
+                                            maxLength={5000}
+                                            placeholder="Fill book description..."
                                         />
                                     </Form.Item>
                                 </Col>

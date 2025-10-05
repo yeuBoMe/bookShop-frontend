@@ -58,10 +58,10 @@ const Header = () => {
                         {/* Desktop Navigation */}
                         <nav className="desktopNav">
                             <NavLink to="/">Trang chủ</NavLink>
-                            <NavLink to="/books">Sản phẩm</NavLink>
+                            <NavLink to="/books" end>Sản phẩm</NavLink>
                             <NavLink to="/order">Đơn hàng</NavLink>
                             <NavLink to="/profile">Hồ sơ</NavLink>
-                            <NavLink to="/contact">Liên hệ</NavLink>
+                            <NavLink to="/about">Liên hệ</NavLink>
                         </nav>
 
                         {/* Right side icons */}
@@ -142,10 +142,10 @@ const Header = () => {
             >
                 <nav className="mobileNav">
                     <NavLink to="/" onClick={() => setDrawerVisible(false)}>Trang chủ</NavLink>
-                    <NavLink to="/book" onClick={() => setDrawerVisible(false)}>Sách</NavLink>
-                    <NavLink to="/collections" onClick={() => setDrawerVisible(false)}>Collections</NavLink>
-                    <NavLink to="/about" onClick={() => setDrawerVisible(false)}>About</NavLink>
-                    <NavLink to="/contact" onClick={() => setDrawerVisible(false)}>Contact</NavLink>
+                    <NavLink to="/books" onClick={() => setDrawerVisible(false)}>Sản phẩm</NavLink>
+                    <NavLink to="/order" onClick={() => setDrawerVisible(false)}>Đơn hàng</NavLink>
+                    <NavLink to="/profile" onClick={() => setDrawerVisible(false)}>Hồ sơ</NavLink>
+                    <NavLink to="/about" onClick={() => setDrawerVisible(false)}>Liên hệ</NavLink>
                 </nav>
             </Drawer>
         </>

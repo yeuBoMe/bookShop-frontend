@@ -118,6 +118,9 @@ declare global {
     quantity: number;
     images: string[];
     author: string;
+    introduceText: string;
+    description: string;
+    reader: string;
     createdAt?: Date;
     updatedAt?: Date;
     createdBy?: string;

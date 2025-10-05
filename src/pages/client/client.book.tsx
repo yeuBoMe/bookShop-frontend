@@ -4,6 +4,7 @@ import type { FormProps, TabsProps } from "antd";
 import { useEffect, useState } from "react";
 import { fetchAllBooksAPI, fetchAllCategoriesAPI } from "@/services/api.service";
 import "styles/client/client.book.scss";
+import { useNavigate } from "react-router-dom";
 
 interface FilterValues {
     category?: string[];
@@ -14,7 +15,9 @@ interface FilterValues {
 }
 
 const BookPage = () => {
+    const navigate = useNavigate();
     const [form] = Form.useForm();
+
     const [loading, setLoading] = useState<boolean>(true);
 
     const [categories, setCategories] = useState<ICategory[]>([]);
@@ -168,7 +171,7 @@ const BookPage = () => {
                                     <Checkbox.Group style={{ width: "100%" }}>
                                         <Row>
                                             {categories.map((category) => (
-                                                <Col span={24} key={category.name} className="category-checkbox">
+                                                <Col span={24} key={category.id} className="category-checkbox">
                                                     <Checkbox value={category.name}>
                                                         {category.name}
                                                     </Checkbox>
@@ -269,12 +272,16 @@ const BookPage = () => {
                                                                 : "https://via.placeholder.com/200x280?text=No+Image"
                                                         }
                                                         alt={book.name}
+                                                        onClick={() => navigate(`/books/${book.id}`)}
                                                     />
                                                 </div>
 
                                                 {/* Book Info */}
                                                 <div className="book-info">
-                                                    <div className="book-name">
+                                                    <div
+                                                        className="book-name"
+                                                        onClick={() => navigate(`/books/${book.id}`)}
+                                                    >
                                                         {book.name}
                                                     </div>
 
