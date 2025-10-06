@@ -8,7 +8,8 @@ import {
     Tabs,
     Spin,
     App,
-    Divider
+    Divider,
+    Skeleton
 } from "antd";
 import {
     ShoppingCartOutlined,
@@ -46,12 +47,12 @@ const BookDetailPage = () => {
     const fetchBookDetailById = async (bookId: number) => {
         try {
             setLoading(true);
-            const fetchBookByIdResponse = await getBookByIdAPI(bookId);
+            await new Promise((resolve) => setTimeout(resolve, 1000));
 
+            const fetchBookByIdResponse = await getBookByIdAPI(bookId);
             if (fetchBookByIdResponse.data) {
                 setBook(fetchBookByIdResponse.data);
             }
-
         } catch (error: any) {
             console.error("Failed to fetch book:", error);
             notification.error({
@@ -74,10 +75,102 @@ const BookDetailPage = () => {
         message.info("Chức năng đang phát triển");
     };
 
-    if (loading || !book) {
+    if (loading) {
+        return (
+            <div className="book-detail-container">
+                <div className="book-breadcrumb">
+                    <Skeleton active>
+                        <Skeleton.Button active style={{ width: 80, height: 20, marginRight: 10 }} />
+                        <Skeleton.Button active style={{ width: 80, height: 20, marginRight: 10 }} />
+                        <Skeleton.Button active style={{ width: 120, height: 20, marginRight: 10 }} />
+                        <Skeleton.Button active style={{ width: 200, height: 20 }} />
+                    </Skeleton>
+                </div>
+                <div className="book-detail-content">
+                    <div className="book-detail-main">
+                        <div className="book-gallery">
+                            <Skeleton.Image active style={{ width: 450, height: 550, borderRadius: 8 }} />
+                            <div style={{ display: "flex", gap: 10, marginTop: 10, justifyContent: "center" }}>
+                                {[1, 2, 3, 4].map((item) => (
+                                    <Skeleton.Image
+                                        key={item}
+                                        active
+                                        style={{ width: 100, height: 100, borderRadius: 4 }}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                        <div className="book-info">
+                            <Skeleton.Input active style={{ width: "100%", height: 40, marginBottom: 15 }} />
+                            <div className="book-rating-section">
+                                <Skeleton.Button active style={{ width: 120, height: 20, marginRight: 20 }} />
+                                <Skeleton.Button active style={{ width: 40, height: 20, marginRight: 20 }} />
+                                <Skeleton.Button active style={{ width: 80, height: 20 }} />
+                            </div>
+                            <div
+                                className="book-price-section"
+                                style={{
+                                    background: "linear-gradient(135deg, #f0f9ff 0%, #e6f4ff 100%)",
+                                    padding: 25,
+                                    borderRadius: 8,
+                                    marginBottom: 25,
+                                }}
+                            >
+                                <Skeleton.Input active style={{ width: 100, height: 20, marginBottom: 8 }} />
+                                <Skeleton.Input active style={{ width: 200, height: 36, marginBottom: 8 }} />
+                                <Skeleton.Input active style={{ width: 150, height: 20 }} />
+                            </div>
+                            <div className="book-meta">
+                                {[1, 2, 3].map((item) => (
+                                    <div key={item} className="meta-item" style={{ display: "flex", padding: "12px 0" }}>
+                                        <Skeleton.Input active style={{ width: 140, height: 20, marginRight: 10 }} />
+                                        <Skeleton.Input active style={{ width: 200, height: 20 }} />
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="quantity-section">
+                                <Skeleton.Input active style={{ width: 100, height: 20, marginBottom: 12 }} />
+                                <div className="quantity-controls" style={{ display: "flex", gap: 15 }}>
+                                    <Skeleton.Input active style={{ width: 120, height: 40 }} />
+                                    <Skeleton.Input active style={{ width: 150, height: 20 }} />
+                                </div>
+                            </div>
+                            <div className="action-buttons" style={{ display: "flex", gap: 15, marginBottom: 20 }}>
+                                <Skeleton.Button active style={{ width: 200, height: 48, borderRadius: 6 }} />
+                                <Skeleton.Button active style={{ width: 200, height: 48, borderRadius: 6 }} />
+                            </div>
+                            <div
+                                className="guarantee-section"
+                                style={{ background: "#f6ffed", border: "1px solid #b7eb8f", borderRadius: 6, padding: 15 }}
+                            >
+                                <Skeleton.Input active style={{ width: 200, height: 20, marginBottom: 10 }} />
+                                <Skeleton active paragraph={{ rows: 4, width: ["80%", "60%", "70%", "50%"] }} />
+                            </div>
+                        </div>
+                    </div>
+                    <Divider />
+                    <div className="book-description-section">
+                        <div style={{ display: "flex", gap: 20, marginBottom: 20 }}>
+                            {[1, 2, 3].map((item) => (
+                                <Skeleton.Button key={item} active style={{ width: 120, height: 40 }} />
+                            ))}
+                        </div>
+                        <div
+                            className="description-content"
+                            style={{ padding: 25, background: "#fafafa", borderRadius: 6 }}
+                        >
+                            <Skeleton active paragraph={{ rows: 6, width: ["100%", "80%", "90%", "70%", "85%", "60%"] }} />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    if (!book) {
         return (
             <div className="loading-container">
-                <Spin size="large" tip="Đang tải thông tin sách..." />
+                <p>Không tìm thấy sách</p>
             </div>
         );
     }
@@ -111,7 +204,7 @@ const BookDetailPage = () => {
         },
         {
             key: "2",
-            label: "Thông số kỹ thuật",
+            label: "Thông số chi tiết",
             children: (
                 <div className="description-content">
                     <ul>
@@ -167,7 +260,7 @@ const BookDetailPage = () => {
                                 title: <span onClick={() => navigate("/books")} style={{ cursor: "pointer" }}>Sản phẩm</span>,
                             },
                             {
-                                title: <span onClick={() => navigate(`/books?category.name=${book.category}`)} style={{ cursor: "pointer" }}>{book.category}</span>,
+                                title: <span>{book.category}</span>,
                             },
                             {
                                 title: book.name,
@@ -307,7 +400,7 @@ const BookDetailPage = () => {
                 setModalGalleryOpen={setModalGalleryOpen}
                 currentImageIndex={currentImageIndex}
                 items={images}
-            // title={"Book Image"}
+                title={book.name}
             />
         </>
     );

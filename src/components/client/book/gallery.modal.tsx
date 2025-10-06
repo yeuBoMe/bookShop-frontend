@@ -8,10 +8,18 @@ interface BookGalleryProps {
     setModalGalleryOpen: (v: boolean) => void;
     currentImageIndex: number;
     items: { original: string; thumbnail: string }[];
+    title: string;
 }
 
 const BookGalleryModal = (props: BookGalleryProps) => {
-    const { modalGalleryOpen, setModalGalleryOpen, currentImageIndex, items } = props;
+    const {
+        modalGalleryOpen,
+        setModalGalleryOpen,
+        currentImageIndex,
+        items,
+        title
+    } = props;
+
     const refGallery = useRef<ImageGallery>(null);
 
     useEffect(() => {
@@ -26,7 +34,7 @@ const BookGalleryModal = (props: BookGalleryProps) => {
 
     return (
         <Modal
-            title="Book Image"
+            title={title}
             closable={true}
             maskClosable={false}
             open={modalGalleryOpen}
