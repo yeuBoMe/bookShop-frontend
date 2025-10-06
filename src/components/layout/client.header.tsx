@@ -122,7 +122,10 @@ const Header = () => {
                                         </div>
                                     </>
                                 ) : (
-                                    <Button type="primary">
+                                    <Button
+                                        type="primary"
+                                        style={{ borderRadius: "20px" }}
+                                    >
                                         <Link to="/login">Đăng nhập</Link>
                                     </Button>
                                 )}

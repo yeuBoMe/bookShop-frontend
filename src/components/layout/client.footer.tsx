@@ -31,7 +31,7 @@ const Footer = () => {
                     <div className="footer-main">
                         {/* Giới thiệu */}
                         <div className="footer-section">
-                            <h2 className="footer-brand">LaptopShop</h2>
+                            <h2 className="footer-brand">BookShop</h2>
                             <p className="footer-username">@hoaininh</p>
                             <p className="footer-description">
                                 Mình là Hoài Ninh, bán laptop cá nhân, hàng xách tay chất lượng cao, giá cả hợp lý. Cảm ơn bạn đã ủng hộ!

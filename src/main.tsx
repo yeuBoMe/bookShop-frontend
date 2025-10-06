@@ -32,7 +32,7 @@ import "styles/global.scss";
 import CartPage from 'pages/client/cart';
 import ProfilePage from 'pages/client/profile';
 import OrderPage from 'pages/client/client.order';
-import BookDetailPage from 'pages/client/book/item';
+import BookDetailPage from '@/pages/client/book/item';
 
 const router = createBrowserRouter([
   {

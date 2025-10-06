@@ -92,6 +92,11 @@ export const createBookAPI = (
   return axios.post<IBackendRes<IBook>>(ENDPOINT_CREATE_BOOK, data);
 };
 
+export const getBookByIdAPI = (id: number) => {
+  const ENDPOINT_GET_BOOK_BY_ID = `/api/v1/books/${id}`;
+  return axios.get<IBackendRes<IBook>>(ENDPOINT_GET_BOOK_BY_ID);
+}
+
 export const updateBookAPI = (
   id: number,
   name: string,

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
     Breadcrumb,
@@ -18,57 +18,50 @@ import {
 import ImageGallery from "react-image-gallery";
 import "react-image-gallery/styles/css/image-gallery.css";
 import "styles/client/book.detail.scss";
-
-interface BookDetail extends IBook {
-    // Thêm các field mở rộng nếu cần
-}
+import BookGalleryModal from "@/components/client/book/gallery.modal";
+import { getBookByIdAPI } from "@/services/api.service";
 
 const BookDetailPage = () => {
-    const { id } = useParams<{ id: string }>();
+    const { id } = useParams();
     const navigate = useNavigate();
-    const { message } = App.useApp();
+    const { notification, message } = App.useApp();
 
     const [loading, setLoading] = useState<boolean>(true);
-    const [book, setBook] = useState<BookDetail | null>(null);
+    const [book, setBook] = useState<IBook | null>(null);
     const [quantity, setQuantity] = useState<number>(1);
 
+    const [modalGalleryOpen, setModalGalleryOpen] = useState<boolean>(false);
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+    const refGallery = useRef<ImageGallery>(null);
     const baseUrl = `${import.meta.env.VITE_BACKEND_URL}`;
 
     useEffect(() => {
         if (id) {
-            fetchBookDetail(id);
+            const bookId = parseInt(id);
+            fetchBookDetailById(bookId);
         }
     }, [id]);
 
-    const fetchBookDetail = async (bookId: string) => {
+    const fetchBookDetailById = async (bookId: number) => {
         try {
             setLoading(true);
-            // TODO: Thay bằng API thật
-            // const response = await getBookByIdAPI(bookId);
+            const fetchBookByIdResponse = await getBookByIdAPI(bookId);
 
-            // Mock data tạm
-            setTimeout(() => {
-                const mockBook: BookDetail = {
-                    id: parseInt(bookId),
-                    name: "Clean Code: A Handbook of Agile Software Craftsmanship",
-                    author: "Robert C. Martin",
-                    price: 450000,
-                    quantity: 50,
-                    category: "Programming",
-                    images: [
-                        "book1.jpg",
-                        "book2.jpg",
-                        "book3.jpg"
-                    ],
-                    // createdAt: "2024-01-01",
-                    // updatedAt: "2024-01-01"
-                };
-                setBook(mockBook);
-                setLoading(false);
-            }, 500);
+            if (fetchBookByIdResponse.data) {
+                setBook(fetchBookByIdResponse.data);
+            }
+
         } catch (error: any) {
             console.error("Failed to fetch book:", error);
-            message.error("Không thể tải thông tin sách");
+            notification.error({
+                message: "Error",
+                description: error?.message,
+                duration: 5,
+                placement: "topRight"
+            });
+
+        } finally {
             setLoading(false);
         }
     };
@@ -81,7 +74,7 @@ const BookDetailPage = () => {
         message.info("Chức năng đang phát triển");
     };
 
-    if (loading) {
+    if (loading || !book) {
         return (
             <div className="loading-container">
                 <Spin size="large" tip="Đang tải thông tin sách..." />
@@ -89,28 +82,15 @@ const BookDetailPage = () => {
         );
     }
 
-    if (!book) {
-        return (
-            <div className="loading-container">
-                <p>Không tìm thấy sách</p>
-            </div>
-        );
+    const handleOnClickImage = () => {
+        setModalGalleryOpen(true);
+        setCurrentImageIndex(refGallery.current?.getCurrentIndex() ?? 0)
     }
 
-    const images = [
-        {
-            original: "https://picsum.photos/id/1018/1000/600/",
-            thumbnail: "https://picsum.photos/id/1018/250/150/",
-        },
-        {
-            original: "https://picsum.photos/id/1015/1000/600/",
-            thumbnail: "https://picsum.photos/id/1015/250/150/",
-        },
-        {
-            original: "https://picsum.photos/id/1019/1000/600/",
-            thumbnail: "https://picsum.photos/id/1019/250/150/",
-        },
-    ];
+    const images = book?.images.map((img) => ({
+        original: `${baseUrl}/upload/book/${img}`,
+        thumbnail: `${baseUrl}/upload/book/${img}`,
+    })) || [];
 
     const tabItems = [
         {
@@ -119,26 +99,13 @@ const BookDetailPage = () => {
             children: (
                 <div className="description-content">
                     <h3>Giới thiệu sách</h3>
-                    <p>
-                        <strong>{book.name}</strong> là cuốn sách kinh điển trong lĩnh vực lập trình,
-                        được viết bởi {book.author}. Cuốn sách cung cấp những nguyên tắc và kỹ thuật
-                        để viết code sạch, dễ đọc và dễ bảo trì.
-                    </p>
+                    <p>{book.introduceText || "Không có thông tin giới thiệu."}</p>
 
                     <h3>Nội dung chính</h3>
-                    <ul>
-                        <li>Các nguyên tắc cơ bản để viết code sạch</li>
-                        <li>Cách đặt tên biến, hàm và class hiệu quả</li>
-                        <li>Kỹ thuật tổ chức code và refactoring</li>
-                        <li>Unit testing và TDD (Test-Driven Development)</li>
-                        <li>Best practices trong phát triển phần mềm</li>
-                    </ul>
+                    <p>{book.description || "Không có mô tả chi tiết."}</p>
 
                     <h3>Đối tượng đọc giả</h3>
-                    <p>
-                        Cuốn sách phù hợp với lập trình viên ở mọi cấp độ, từ người mới bắt đầu
-                        đến những người có kinh nghiệm muốn cải thiện kỹ năng viết code.
-                    </p>
+                    <p>{book.reader || "Phù hợp với mọi đối tượng độc giả."}</p>
                 </div>
             ),
         },
@@ -151,11 +118,10 @@ const BookDetailPage = () => {
                         <li><strong>Tên sách:</strong> {book.name}</li>
                         <li><strong>Tác giả:</strong> {book.author}</li>
                         <li><strong>Thể loại:</strong> {book.category}</li>
-                        <li><strong>Nhà xuất bản:</strong> Prentice Hall</li>
-                        <li><strong>Năm xuất bản:</strong> 2008</li>
-                        <li><strong>Số trang:</strong> 464 trang</li>
-                        <li><strong>Ngôn ngữ:</strong> Tiếng Anh</li>
-                        <li><strong>Hình thức:</strong> Bìa mềm</li>
+                        <li><strong>Giá:</strong> {new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(book.price)}</li>
+                        <li><strong>Số lượng còn lại:</strong> {book.quantity}</li>
+                        <li><strong>Ngày tạo:</strong> {book.createdAt ? new Date(book.createdAt).toLocaleDateString("vi-VN") : "N/A"}</li>
+                        <li><strong>Ngày cập nhật:</strong> {book.updatedAt ? new Date(book.updatedAt).toLocaleDateString("vi-VN") : "N/A"}</li>
                     </ul>
                 </div>
             ),
@@ -188,151 +154,162 @@ const BookDetailPage = () => {
     ];
 
     return (
-        <div className="book-detail-container">
-            {/* Breadcrumb */}
-            <div className="book-breadcrumb">
-                <Breadcrumb
-                    items={[
-                        {
-                            title: <HomeOutlined onClick={() => navigate("/")} style={{ cursor: "pointer" }} />,
-                        },
-                        {
-                            title: <span onClick={() => navigate("/books")} style={{ cursor: "pointer" }}>Sản phẩm</span>,
-                        },
-                        {
-                            title: <span onClick={() => navigate(`/books?category.name=${book.category}`)} style={{ cursor: "pointer" }}>{book.category}</span>,
-                        },
-                        {
-                            title: book.name,
-                        },
-                    ]}
-                />
-            </div>
+        <>
+            <div className="book-detail-container">
+                {/* Breadcrumb */}
+                <div className="book-breadcrumb">
+                    <Breadcrumb
+                        items={[
+                            {
+                                title: <HomeOutlined onClick={() => navigate("/")} style={{ cursor: "pointer" }} />,
+                            },
+                            {
+                                title: <span onClick={() => navigate("/books")} style={{ cursor: "pointer" }}>Sản phẩm</span>,
+                            },
+                            {
+                                title: <span onClick={() => navigate(`/books?category.name=${book.category}`)} style={{ cursor: "pointer" }}>{book.category}</span>,
+                            },
+                            {
+                                title: book.name,
+                            },
+                        ]}
+                    />
+                </div>
 
-            {/* Main Content */}
-            <div className="book-detail-content">
-                <div className="book-detail-main">
-                    {/* Gallery */}
-                    <div className="book-gallery">
-                        <ImageGallery
-                            items={images}
-                            showPlayButton={false}
-                            showFullscreenButton={true}
-                            showNav={true}
-                            thumbnailPosition="bottom"
-                        />
-                    </div>
-
-                    {/* Book Info */}
-                    <div className="book-info">
-                        <h1 className="book-title">{book.name}</h1>
-
-                        {/* Rating */}
-                        <div className="book-rating-section">
-                            <div className="rating-group">
-                                <Rate disabled defaultValue={5} />
-                                <span className="rating-number">5.0</span>
-                            </div>
-                            <span className="divider"></span>
-                            <span className="sold-count">Đã bán 1.2k</span>
+                {/* Main Content */}
+                <div className="book-detail-content">
+                    <div className="book-detail-main">
+                        {/* Gallery */}
+                        <div className="book-gallery">
+                            <ImageGallery
+                                ref={refGallery}
+                                items={images}
+                                showPlayButton={false}
+                                showFullscreenButton={false}
+                                showNav={false}
+                                thumbnailPosition="bottom"
+                                onClick={handleOnClickImage}
+                            />
                         </div>
 
-                        {/* Price */}
-                        <div className="book-price-section">
-                            <div className="price-label">Giá bán</div>
-                            <div className="current-price">
-                                {new Intl.NumberFormat("vi-VN", {
-                                    style: "currency",
-                                    currency: "VND",
-                                }).format(book.price)}
+                        {/* Book Info */}
+                        <div className="book-info">
+                            <h1 className="book-title">{book.name}</h1>
+
+                            {/* Rating */}
+                            <div className="book-rating-section">
+                                <div className="rating-group">
+                                    <Rate disabled defaultValue={5} />
+                                    <span className="rating-number">5.0</span>
+                                </div>
+                                <span className="divider"></span>
+                                <span className="sold-count">Đã bán 1.2k</span>
                             </div>
-                            <div>
-                                <span className="original-price">
+
+                            {/* Price */}
+                            <div className="book-price-section">
+                                <div className="price-label">Giá bán</div>
+                                <div className="current-price">
                                     {new Intl.NumberFormat("vi-VN", {
                                         style: "currency",
                                         currency: "VND",
-                                    }).format(book.price * 1.3)}
-                                </span>
-                                <span className="discount-badge">-23%</span>
+                                    }).format(book.price)}
+                                </div>
+                                <div>
+                                    <span className="original-price">
+                                        {new Intl.NumberFormat("vi-VN", {
+                                            style: "currency",
+                                            currency: "VND",
+                                        }).format(book.price * 1.3)}
+                                    </span>
+                                    <span className="discount-badge">-23%</span>
+                                </div>
                             </div>
-                        </div>
 
-                        {/* Meta Info */}
-                        <div className="book-meta">
-                            <div className="meta-item">
-                                <span className="meta-label">Tác giả:</span>
-                                <span className="meta-value">{book.author}</span>
+                            {/* Meta Info */}
+                            <div className="book-meta">
+                                <div className="meta-item">
+                                    <span className="meta-label">Tác giả:</span>
+                                    <span className="meta-value">{book.author}</span>
+                                </div>
+                                <div className="meta-item">
+                                    <span className="meta-label">Thể loại:</span>
+                                    <span className="meta-value">{book.category}</span>
+                                </div>
+                                <div className="meta-item">
+                                    <span className="meta-label">Tình trạng:</span>
+                                    <span className="meta-value">Còn hàng</span>
+                                </div>
                             </div>
-                            <div className="meta-item">
-                                <span className="meta-label">Thể loại:</span>
-                                <span className="meta-value">{book.category}</span>
-                            </div>
-                            <div className="meta-item">
-                                <span className="meta-label">Tình trạng:</span>
-                                <span className="meta-value">Còn hàng</span>
-                            </div>
-                        </div>
 
-                        {/* Quantity */}
-                        <div className="quantity-section">
-                            <div className="quantity-label">Số lượng</div>
-                            <div className="quantity-controls">
-                                <InputNumber
-                                    min={1}
-                                    max={book.quantity}
-                                    value={quantity}
-                                    onChange={(value) => setQuantity(value || 1)}
+                            {/* Quantity */}
+                            <div className="quantity-section">
+                                <div className="quantity-label">Số lượng</div>
+                                <div className="quantity-controls">
+                                    <InputNumber
+                                        min={1}
+                                        max={book.quantity}
+                                        value={quantity}
+                                        onChange={(value) => setQuantity(value || 1)}
+                                        size="large"
+                                    />
+                                    <span className="stock-info">
+                                        {book.quantity} sản phẩm có sẵn
+                                    </span>
+                                </div>
+                            </div>
+
+                            {/* Action Buttons */}
+                            <div className="action-buttons">
+                                <Button
                                     size="large"
-                                />
-                                <span className="stock-info">
-                                    {book.quantity} sản phẩm có sẵn
-                                </span>
+                                    icon={<ShoppingCartOutlined />}
+                                    className="btn-add-cart"
+                                    onClick={handleAddToCart}
+                                >
+                                    Thêm vào giỏ
+                                </Button>
+                                <Button
+                                    type="primary"
+                                    size="large"
+                                    className="btn-buy-now"
+                                    onClick={handleBuyNow}
+                                >
+                                    Mua ngay
+                                </Button>
                             </div>
-                        </div>
 
-                        {/* Action Buttons */}
-                        <div className="action-buttons">
-                            <Button
-                                size="large"
-                                icon={<ShoppingCartOutlined />}
-                                className="btn-add-cart"
-                                onClick={handleAddToCart}
-                            >
-                                Thêm vào giỏ
-                            </Button>
-                            <Button
-                                type="primary"
-                                size="large"
-                                className="btn-buy-now"
-                                onClick={handleBuyNow}
-                            >
-                                Mua ngay
-                            </Button>
-                        </div>
-
-                        {/* Guarantee */}
-                        <div className="guarantee-section">
-                            <div className="guarantee-title">
-                                <SafetyOutlined /> Cam kết từ BookShop
+                            {/* Guarantee */}
+                            <div className="guarantee-section">
+                                <div className="guarantee-title">
+                                    <SafetyOutlined /> Cam kết từ BookShop
+                                </div>
+                                <ul>
+                                    <li>✓ Sản phẩm chính hãng 100%</li>
+                                    <li>✓ Đổi trả miễn phí trong 7 ngày</li>
+                                    <li>✓ Freeship đơn hàng từ 150.000đ</li>
+                                    <li>✓ Hỗ trợ 24/7</li>
+                                </ul>
                             </div>
-                            <ul>
-                                <li>✓ Sản phẩm chính hãng 100%</li>
-                                <li>✓ Đổi trả miễn phí trong 7 ngày</li>
-                                <li>✓ Freeship đơn hàng từ 150.000đ</li>
-                                <li>✓ Hỗ trợ 24/7</li>
-                            </ul>
                         </div>
                     </div>
-                </div>
 
-                <Divider />
+                    <Divider />
 
-                {/* Description Tabs */}
-                <div className="book-description-section">
-                    <Tabs defaultActiveKey="1" items={tabItems} />
+                    {/* Description Tabs */}
+                    <div className="book-description-section">
+                        <Tabs defaultActiveKey="1" items={tabItems} />
+                    </div>
                 </div>
             </div>
-        </div>
+            <BookGalleryModal
+                modalGalleryOpen={modalGalleryOpen}
+                setModalGalleryOpen={setModalGalleryOpen}
+                currentImageIndex={currentImageIndex}
+                items={images}
+            // title={"Book Image"}
+            />
+        </>
     );
 };
 
