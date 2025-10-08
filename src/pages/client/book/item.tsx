@@ -6,7 +6,6 @@ import {
     InputNumber,
     Button,
     Tabs,
-    Spin,
     App,
     Divider,
     Skeleton
@@ -21,10 +20,13 @@ import "react-image-gallery/styles/css/image-gallery.css";
 import "styles/client/book.detail.scss";
 import BookGalleryModal from "@/components/client/book/gallery.modal";
 import { getBookByIdAPI } from "@/services/api.service";
+import { useCurrentApp } from "@/components/context/app.context";
 
 const BookDetailPage = () => {
     const { id } = useParams();
     const navigate = useNavigate();
+    const { setCarts } = useCurrentApp();
+
     const { notification, message } = App.useApp();
 
     const [loading, setLoading] = useState<boolean>(true);
@@ -68,6 +70,41 @@ const BookDetailPage = () => {
     };
 
     const handleAddToCart = () => {
+        if (!book) return;
+
+        // update local storage
+        const cartStorage = localStorage.getItem("carts");
+        if (cartStorage) {
+            // update
+            const carts = JSON.parse(cartStorage) as ICart[];
+
+            // check exists
+            let isExistIndex = carts.findIndex(cart => cart.id === book.id);
+            if (isExistIndex > -1) {
+                carts[isExistIndex].quantity = carts[isExistIndex].quantity + quantity;
+            } else {
+                carts.push({
+                    id: book.id,
+                    quantity: quantity,
+                    detail: book
+                });
+            }
+
+            localStorage.setItem("carts", JSON.stringify(carts));
+            setCarts(carts);
+        } else {
+            // create
+            const data = [{
+                id: book.id,
+                quantity: quantity,
+                detail: book!
+            }];
+
+            localStorage.setItem("carts", JSON.stringify(data));
+
+            // sync React context
+            setCarts(data);
+        }
         message.success(`Đã thêm ${quantity} sản phẩm vào giỏ hàng`);
     };
 

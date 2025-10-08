@@ -1,18 +1,18 @@
 import { useState } from "react";
 import { useCurrentApp } from "components/context/app.context";
-import { FiSearch, FiShoppingCart, FiUser, FiMenu } from "react-icons/fi"; // Thêm FiMenu cho hamburger
+import { FiSearch, FiShoppingCart, FiUser, FiMenu, FiX } from "react-icons/fi";
 import "styles/client/client.header.scss";
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { App, Avatar, Button, Drawer } from "antd"; // Thêm Drawer cho menu mobile
+import { App, Avatar, Button, Drawer } from "antd";
 import { logoutAPI } from "@/services/api.service";
 
 const Header = () => {
-    const { user, setUser, setIsAuthenticated } = useCurrentApp();
+    const { user, setUser, setIsAuthenticated, carts } = useCurrentApp();
     const [searchTerm, setSearchTerm] = useState<string>("");
     const { notification, message } = App.useApp();
     const navigate = useNavigate();
     const urlAvatar = user?.avatar ? `${import.meta.env.VITE_BACKEND_URL}/upload/avatar/${user.avatar}` : "";
-    const [drawerVisible, setDrawerVisible] = useState(false); // State cho menu mobile
+    const [drawerVisible, setDrawerVisible] = useState(false);
 
     const handleLogoutRequest = async () => {
         try {
@@ -32,6 +32,14 @@ const Header = () => {
                 placement: "topRight"
             });
         }
+    };
+
+    // Format price to VND
+    const formatPrice = (price: number) => {
+        return new Intl.NumberFormat('vi-VN', {
+            style: 'currency',
+            currency: 'VND'
+        }).format(price);
     };
 
     return (
@@ -78,12 +86,62 @@ const Header = () => {
                                 />
                             </div>
 
-                            {/* Cart */}
+                            {/* Cart with Dropdown */}
                             {user && (
-                                <button className="iconButton cartButton">
-                                    <FiShoppingCart size={20} />
-                                    <span className="cartBadge">3</span>
-                                </button>
+                                <div className="cartDropdown">
+                                    <button className="iconButton cartButton">
+                                        <FiShoppingCart size={20} />
+                                        <span className="cartBadge">{carts?.length ?? 0}</span>
+                                    </button>
+
+                                    {/* Cart Dropdown Menu */}
+                                    <div className="cartDropdownMenu">
+                                        {carts && carts.length > 0 ? (
+                                            <>
+                                                <div className="cartDropdownHeader">
+                                                    <h3>Giỏ hàng của bạn</h3>
+                                                    <Link to={"/order"}>
+                                                        <span className="cartItemWatch">Xem giỏ hàng</span>
+                                                    </Link>
+                                                </div>
+
+                                                <div className="cartItemsList">
+                                                    {carts.slice(0, 3).map((item) => (
+                                                        <div key={item.id} className="cartItem">
+                                                            <div className="cartItemInfo">
+                                                                <h4 className="cartItemTitle">
+                                                                    {item.detail.name}
+                                                                </h4>
+                                                                <div className="cartItemDetails">
+                                                                    <span className="cartItemQuantity">
+                                                                        x{item.quantity}
+                                                                    </span>
+                                                                    <span className="cartItemPrice">
+                                                                        {formatPrice(item.detail?.price * item.quantity)}
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+
+                                                {carts.length > 3 && (
+                                                    <div className="cartMoreItems">
+                                                        +{carts.length - 3} sản phẩm khác
+                                                    </div>
+                                                )}
+                                            </>
+                                        ) : (
+                                            <div className="emptyCart">
+                                                <FiShoppingCart size={48} />
+                                                <p>Giỏ hàng trống</p>
+                                                <Link to="/books" className="shopNowButton">
+                                                    Mua sắm ngay
+                                                </Link>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
                             )}
 
                             {/* User account */}

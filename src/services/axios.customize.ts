@@ -24,7 +24,7 @@ instance.interceptors.request.use(
     const token = localStorage.getItem("access_token");
     const auth = token ? `Bearer ${token}` : "";
     config.headers["Authorization"] = auth;
-    
+
     return config;
   },
   function (error) {

@@ -3,6 +3,7 @@ import React, { createContext, useContext, useEffect, useMemo, useState } from "
 import BarLoader from "react-spinners/BarLoader";
 import "styles/spinner.scss";
 
+// blueprint
 interface CurrentUserContextType {
     isAuthenticated: boolean;
     setIsAuthenticated: (v: boolean) => void;
@@ -10,8 +11,11 @@ interface CurrentUserContextType {
     setIsAppLoading: (v: boolean) => void;
     user: IUser | null;
     setUser: (v: IUser | null) => void;
+    carts: ICart[] | null;
+    setCarts: (v: ICart[]) => void;
 }
 
+// where provide data
 const CurrentUserContext = createContext<CurrentUserContextType | null>(null);
 
 type IProps = {
@@ -19,9 +23,11 @@ type IProps = {
 }
 
 export const AuthProvider = (props: IProps) => {
+    // real data
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
     const [isAppLoading, setIsAppLoading] = useState<boolean>(true);
     const [user, setUser] = useState<IUser | null>(null);
+    const [carts, setCarts] = useState<ICart[] | null>([]);
 
     useEffect(() => {
         fetchUserInfoWithAccessTokenRequest()
@@ -38,6 +44,7 @@ export const AuthProvider = (props: IProps) => {
     const fetchUserInfoWithAccessTokenRequest = async () => {
         try {
             const getAccountInfoResponse = await getAccountInfoAPI();
+            const carts = localStorage.getItem("carts");
             await delayTime(200);
 
             if (getAccountInfoResponse?.data) {
@@ -54,6 +61,11 @@ export const AuthProvider = (props: IProps) => {
 
                 setUser(mappedIAccountToIUser);
                 setIsAuthenticated(true);
+
+                if (carts) {
+                    const cartsData = JSON.parse(carts) as ICart[];
+                    setCarts(cartsData);
+                }
             }
         } catch (error: any) {
             console.log("Check error fetching user info >>> ", error)
@@ -66,8 +78,9 @@ export const AuthProvider = (props: IProps) => {
     const value = useMemo(() => ({
         isAuthenticated, setIsAuthenticated,
         isAppLoading, setIsAppLoading,
-        user, setUser
-    }), [isAuthenticated, isAppLoading, user]);
+        user, setUser,
+        carts, setCarts
+    }), [isAuthenticated, isAppLoading, user, carts]);
 
     return (
         <>

@@ -135,4 +135,11 @@ declare global {
     createdBy?: string;
     updatedBy?: string;
   }
+
+
+  interface ICart {
+    id: number;
+    quantity: number; // book quantity
+    detail: IBook;
+  }
 }
