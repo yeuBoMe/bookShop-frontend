@@ -13,7 +13,7 @@ import AdminLayout from 'components/layout/admin.layout';
 import BookPage from '@/pages/client/client.book';
 import HomePage from 'pages/client/home';
 import AboutPage from 'pages/client/about';
-import CheckoutPage from '@/pages/client/shop/checkout';
+
 
 import LoginPage from 'pages/auth/login';
 import RegisterPage from 'pages/auth/register';
@@ -29,10 +29,10 @@ import enUS from 'antd/locale/en_US';
 // import viVN from 'antd/locale/vi_VN';
 
 import "styles/global.scss";
-import CartPage from '@/pages/client/shop/cart';
 import ProfilePage from 'pages/client/profile';
 import OrderPage from '@/pages/client/order.history';
 import BookDetailPage from '@/pages/client/book/item';
+import CheckoutPage from './pages/client/shop/checkout';
 
 const router = createBrowserRouter([
   {
@@ -57,14 +57,6 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <OrderPage />
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: "/cart",
-        element: (
-          <ProtectedRoute>
-            <CartPage />
           </ProtectedRoute>
         ),
       },

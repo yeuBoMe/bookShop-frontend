@@ -258,7 +258,7 @@ const BookPage = () => {
                         ) : books.length === 0 ? (
                             <div className="empty-container">
                                 <Empty description="Không có sản phẩm nào phù hợp" />
-                            </div>
+                            </div> 
                         ) : (
                             <>
                                 <Row gutter={[20, 20]} className="books-grid">

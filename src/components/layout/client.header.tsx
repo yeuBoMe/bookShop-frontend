@@ -100,7 +100,7 @@ const Header = () => {
                                             <>
                                                 <div className="cartDropdownHeader">
                                                     <h3>Giỏ hàng của bạn</h3>
-                                                    <Link to={"/cart"}>
+                                                    <Link to={"/checkout"}>
                                                         <span className="cartItemWatch">Xem giỏ hàng</span>
                                                     </Link>
                                                 </div>
