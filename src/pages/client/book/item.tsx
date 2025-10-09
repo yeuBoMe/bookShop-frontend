@@ -63,7 +63,6 @@ const BookDetailPage = () => {
                 duration: 5,
                 placement: "topRight"
             });
-
         } finally {
             setLoading(false);
         }

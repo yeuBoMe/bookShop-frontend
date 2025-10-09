@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useCurrentApp } from "components/context/app.context";
-import { FiSearch, FiShoppingCart, FiUser, FiMenu, FiX } from "react-icons/fi";
+import { FiSearch, FiShoppingCart, FiUser, FiMenu } from "react-icons/fi";
 import "styles/client/client.header.scss";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { App, Avatar, Button, Drawer } from "antd";
@@ -67,7 +67,7 @@ const Header = () => {
                         <nav className="desktopNav">
                             <NavLink to="/">Trang chủ</NavLink>
                             <NavLink to="/books" end>Sản phẩm</NavLink>
-                            <NavLink to="/order">Đơn hàng</NavLink>
+                            <NavLink to="/order-history">Đơn hàng</NavLink>
                             <NavLink to="/profile">Hồ sơ</NavLink>
                             <NavLink to="/about">Liên hệ</NavLink>
                         </nav>
@@ -100,7 +100,7 @@ const Header = () => {
                                             <>
                                                 <div className="cartDropdownHeader">
                                                     <h3>Giỏ hàng của bạn</h3>
-                                                    <Link to={"/order"}>
+                                                    <Link to={"/cart"}>
                                                         <span className="cartItemWatch">Xem giỏ hàng</span>
                                                     </Link>
                                                 </div>
@@ -170,7 +170,6 @@ const Header = () => {
                                                 <Link to="/admin">Trang quản trị</Link>
                                             )}
                                             <Link to="/account">Quản lý tài khoản</Link>
-                                            <Link to="/orders">Lịch sử mua hàng</Link>
                                             <button
                                                 className="dropdownLogout"
                                                 onClick={handleLogoutRequest}
@@ -204,7 +203,7 @@ const Header = () => {
                 <nav className="mobileNav">
                     <NavLink to="/" onClick={() => setDrawerVisible(false)}>Trang chủ</NavLink>
                     <NavLink to="/books" onClick={() => setDrawerVisible(false)}>Sản phẩm</NavLink>
-                    <NavLink to="/order" onClick={() => setDrawerVisible(false)}>Đơn hàng</NavLink>
+                    <NavLink to="/order-history" onClick={() => setDrawerVisible(false)}>Đơn hàng</NavLink>
                     <NavLink to="/profile" onClick={() => setDrawerVisible(false)}>Hồ sơ</NavLink>
                     <NavLink to="/about" onClick={() => setDrawerVisible(false)}>Liên hệ</NavLink>
                 </nav>
