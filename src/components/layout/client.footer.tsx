@@ -6,11 +6,7 @@ const Footer = () => {
 
     useEffect(() => {
         const handleScroll = () => {
-            if (window.scrollY > 300) {
-                setShowScrollButton(true);
-            } else {
-                setShowScrollButton(false);
-            }
+            setShowScrollButton(window.scrollY > 300);
         };
 
         window.addEventListener("scroll", handleScroll);
@@ -18,74 +14,71 @@ const Footer = () => {
     }, []);
 
     const scrollToTop = () => {
-        window.scrollTo({
-            top: 0,
-            behavior: "smooth"
-        });
+        window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
     return (
         <>
-            <footer className="footer-container">
-                <div className="footer-content">
-                    <div className="footer-main">
-                        {/* Giới thiệu */}
-                        <div className="footer-section">
-                            <h2 className="footer-brand">BookShop</h2>
-                            <p className="footer-username">@hoaininh</p>
-                            <p className="footer-description">
+            <footer className="footer">
+                <div className="footer__container">
+                    <div className="footer__grid">
+                        {/* About Section */}
+                        <div className="footer__section footer__section--about">
+                            <h2 className="footer__brand">BookShop</h2>
+                            <p className="footer__username">@hoaininh</p>
+                            <p className="footer__description">
                                 Mình là Hoài Ninh, bán laptop cá nhân, hàng xách tay chất lượng cao, giá cả hợp lý. Cảm ơn bạn đã ủng hộ!
                             </p>
                         </div>
 
-                        {/* Thông tin shop */}
-                        <div className="footer-section">
-                            <h3 className="footer-title">Thông tin shop</h3>
-                            <ul className="footer-list">
-                                <li>Giới thiệu về BookShop</li>
-                                <li>Chính sách đổi trả trong 7 ngày</li>
-                                <li>Freeship đơn hàng từ 150.000đ</li>
+                        {/* Shop Info */}
+                        <div className="footer__section">
+                            <h3 className="footer__title">Thông tin shop</h3>
+                            <ul className="footer__list">
+                                <li className="footer__item">Giới thiệu về BookShop</li>
+                                <li className="footer__item">Chính sách đổi trả trong 7 ngày</li>
+                                <li className="footer__item">Freeship đơn hàng từ 150.000đ</li>
                             </ul>
                         </div>
 
-                        {/* Hỗ trợ khách hàng */}
-                        <div className="footer-section">
-                            <h3 className="footer-title">Hỗ trợ khách hàng</h3>
-                            <ul className="footer-list">
-                                <li>Hướng dẫn đặt hàng</li>
-                                <li>Phương thức thanh toán</li>
-                                <li>Chính sách bảo mật</li>
+                        {/* Customer Support */}
+                        <div className="footer__section">
+                            <h3 className="footer__title">Hỗ trợ khách hàng</h3>
+                            <ul className="footer__list">
+                                <li className="footer__item">Hướng dẫn đặt hàng</li>
+                                <li className="footer__item">Phương thức thanh toán</li>
+                                <li className="footer__item">Chính sách bảo mật</li>
                             </ul>
                         </div>
 
-                        {/* Liên hệ */}
-                        <div className="footer-section">
-                            <h3 className="footer-title">Liên hệ</h3>
-                            <div className="contact-item">
-                                <span className="contact-label">Chủ shop:</span>
-                                <span className="contact-value">Hoài Ninh</span>
-                            </div>
-                            <div className="contact-item">
-                                <span className="contact-label">SĐT:</span>
-                                <span className="contact-value">0123 456 789</span>
-                            </div>
-                            <div className="contact-item">
-                                <span className="contact-label">Email:</span>
-                                <span className="contact-value">ninh2k4@gmail.com</span>
-                            </div>
-                            <div className="contact-item">
-                                <span className="contact-label">Địa chỉ:</span>
-                                <span className="contact-value">Gần trường ĐH Điện Lực</span>
+                        {/* Contact Info */}
+                        <div className="footer__section">
+                            <h3 className="footer__title">Liên hệ</h3>
+                            <div className="footer__contact">
+                                <div className="footer__contact-item">
+                                    <span className="footer__contact-label">Chủ shop:</span>
+                                    <span className="footer__contact-value">Hoài Ninh</span>
+                                </div>
+                                <div className="footer__contact-item">
+                                    <span className="footer__contact-label">SĐT:</span>
+                                    <span className="footer__contact-value">0123 456 789</span>
+                                </div>
+                                <div className="footer__contact-item">
+                                    <span className="footer__contact-label">Email:</span>
+                                    <span className="footer__contact-value">ninh2k4@gmail.com</span>
+                                </div>
+                                <div className="footer__contact-item">
+                                    <span className="footer__contact-label">Địa chỉ:</span>
+                                    <span className="footer__contact-value">Gần trường ĐH Điện Lực</span>
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     {/* Copyright */}
-                    <div className="footer-bottom">
-                        <div className="copyright">
-                            <span className="copyright-icon">©</span>
-                            <span>Hoài Ninh - BookShop, All rights reserved.</span>
-                        </div>
+                    <div className="footer__copyright">
+                        <span className="footer__copyright-icon">©</span>
+                        <span className="footer__copyright-text">Hoài Ninh - BookShop, All rights reserved.</span>
                     </div>
                 </div>
             </footer>
@@ -93,7 +86,7 @@ const Footer = () => {
             {/* Scroll to Top Button */}
             {showScrollButton && (
                 <button
-                    className="scroll-to-top-btn"
+                    className="scroll-top"
                     onClick={scrollToTop}
                     aria-label="Scroll to top"
                 >

@@ -1,0 +1,938 @@
+// ===================================
+// HOMEPAGE STYLES
+// ===================================
+
+// Variables
+$primary-color: #2563eb;
+$secondary-color: #3b82f6;
+$accent-color: #f59e0b;
+$success-color: #10b981;
+$danger-color: #ef4444;
+$text-dark: #1f2937;
+$text-muted: #6b7280;
+$border-color: #e5e7eb;
+$bg-light: #f9fafb;
+
+// Breakpoints
+$breakpoint-xl: 1280px;
+$breakpoint-lg: 1024px;
+$breakpoint-md: 768px;
+$breakpoint-sm: 576px;
+
+// Mixins
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin transition($property: all) {
+  transition: $property 0.3s ease;
+}
+
+// ===================================
+// LOADING
+// ===================================
+.homepage-loading {
+  @include flex-center;
+  min-height: 60vh;
+}
+
+// ===================================
+// HOMEPAGE CONTAINER
+// ===================================
+.homepage {
+  background-color: $bg-light;
+  padding-bottom: 3rem;
+
+  @media (max-width: $breakpoint-md) {
+    padding-bottom: 2rem;
+  }
+}
+
+// ===================================
+// SECTION HEADER
+// ===================================
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+
+  @media (max-width: $breakpoint-sm) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+}
+
+.section-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: $text-dark;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0;
+
+  .anticon {
+    color: $accent-color;
+    font-size: 2rem;
+  }
+
+  @media (max-width: $breakpoint-md) {
+    font-size: 1.75rem;
+
+    .anticon {
+      font-size: 1.75rem;
+    }
+  }
+
+  @media (max-width: $breakpoint-sm) {
+    font-size: 1.5rem;
+
+    .anticon {
+      font-size: 1.5rem;
+    }
+  }
+}
+
+.section-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: $primary-color;
+  font-weight: 500;
+  font-size: 1rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  @include transition;
+
+  &:hover {
+    color: $secondary-color;
+    transform: translateX(4px);
+  }
+
+  @media (max-width: $breakpoint-sm) {
+    font-size: 0.875rem;
+  }
+}
+
+// ===================================
+// HERO BANNER
+// ===================================
+.hero {
+  margin-bottom: 3rem;
+  overflow: hidden;
+
+  @media (max-width: $breakpoint-md) {
+    margin-bottom: 2rem;
+  }
+
+  .ant-carousel {
+    .slick-dots {
+      bottom: 2rem;
+
+      li button {
+        background: rgba(255, 255, 255, 0.5);
+        height: 4px;
+        border-radius: 2px;
+      }
+
+      li.slick-active button {
+        background: white;
+        width: 32px;
+      }
+    }
+  }
+
+  &__slide {
+    position: relative;
+    height: 600px;
+    display: flex !important;
+    align-items: center;
+    padding: 0 5rem;
+    overflow: hidden;
+
+    @media (max-width: $breakpoint-lg) {
+      height: 500px;
+      padding: 0 3rem;
+    }
+
+    @media (max-width: $breakpoint-md) {
+      height: 400px;
+      padding: 0 2rem;
+      flex-direction: column;
+      justify-content: center;
+      text-align: center;
+    }
+
+    @media (max-width: $breakpoint-sm) {
+      height: 350px;
+      padding: 0 1.5rem;
+    }
+
+    &--1 {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    &--2 {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+
+    &--3 {
+      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+  }
+
+  &__content {
+    flex: 1;
+    z-index: 2;
+    max-width: 600px;
+
+    @media (max-width: $breakpoint-md) {
+      max-width: 100%;
+    }
+  }
+
+  &__subtitle {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 0.5rem 1.25rem;
+    border-radius: 2rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    backdrop-filter: blur(10px);
+
+    @media (max-width: $breakpoint-sm) {
+      font-size: 0.75rem;
+      padding: 0.375rem 1rem;
+      margin-bottom: 1rem;
+    }
+  }
+
+  &__title {
+    font-size: 4rem;
+    font-weight: 800;
+    color: white;
+    line-height: 1.1;
+    margin: 0 0 1.5rem 0;
+
+    .highlight {
+      color: $accent-color;
+      display: block;
+    }
+
+    @media (max-width: $breakpoint-lg) {
+      font-size: 3rem;
+    }
+
+    @media (max-width: $breakpoint-md) {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+
+    @media (max-width: $breakpoint-sm) {
+      font-size: 2rem;
+    }
+  }
+
+  &__description {
+    font-size: 1.125rem;
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.6;
+    margin-bottom: 2rem;
+
+    @media (max-width: $breakpoint-md) {
+      font-size: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    @media (max-width: $breakpoint-sm) {
+      font-size: 0.875rem;
+    }
+  }
+
+  &__btn {
+    background: white;
+    color: $text-dark;
+    border: none;
+    padding: 1rem 2.5rem;
+    font-size: 1.125rem;
+    font-weight: 600;
+    border-radius: 3rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    @include transition;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+
+    @media (max-width: $breakpoint-sm) {
+      padding: 0.875rem 2rem;
+      font-size: 1rem;
+    }
+  }
+
+  &__image {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+    z-index: 1;
+
+    img {
+      max-width: 100%;
+      max-height: 500px;
+      object-fit: contain;
+      filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.3));
+      animation: float 6s ease-in-out infinite;
+    }
+
+    @media (max-width: $breakpoint-md) {
+      display: none;
+    }
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+// ===================================
+// FEATURES
+// ===================================
+.features {
+  background: white;
+  padding: 3rem 0;
+  margin-bottom: 3rem;
+
+  @media (max-width: $breakpoint-md) {
+    padding: 2rem 0;
+    margin-bottom: 2rem;
+  }
+
+  &__container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
+
+    @media (max-width: $breakpoint-lg) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (max-width: $breakpoint-sm) {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+      padding: 0 1rem;
+    }
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 1.5rem;
+    border-radius: 1rem;
+    @include transition;
+
+    &:hover {
+      background: $bg-light;
+      transform: translateY(-4px);
+    }
+
+    @media (max-width: $breakpoint-sm) {
+      padding: 1rem;
+    }
+  }
+
+  &__icon {
+    width: 60px;
+    height: 60px;
+    @include flex-center;
+    border-radius: 50%;
+    font-size: 1.75rem;
+    flex-shrink: 0;
+
+    &--delivery {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    &--secure {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      color: white;
+    }
+
+    &--return {
+      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      color: white;
+    }
+
+    &--support {
+      background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+      color: white;
+    }
+
+    @media (max-width: $breakpoint-sm) {
+      width: 50px;
+      height: 50px;
+      font-size: 1.5rem;
+    }
+  }
+
+  &__content {
+    h3 {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: $text-dark;
+      margin: 0 0 0.25rem 0;
+
+      @media (max-width: $breakpoint-sm) {
+        font-size: 1rem;
+      }
+    }
+
+    p {
+      font-size: 0.875rem;
+      color: $text-muted;
+      margin: 0;
+
+      @media (max-width: $breakpoint-sm) {
+        font-size: 0.8125rem;
+      }
+    }
+  }
+}
+
+// ===================================
+// CATEGORIES
+// ===================================
+.categories {
+  max-width: 1280px;
+  margin: 0 auto 3rem;
+  padding: 0 2rem;
+
+  @media (max-width: $breakpoint-md) {
+    margin-bottom: 2rem;
+  }
+
+  @media (max-width: $breakpoint-sm) {
+    padding: 0 1rem;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 1.5rem;
+
+    @media (max-width: $breakpoint-lg) {
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    @media (max-width: $breakpoint-md) {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+
+    @media (max-width: $breakpoint-sm) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+}
+
+.category-card {
+  background: white;
+  padding: 2rem 1rem;
+  border-radius: 1rem;
+  text-align: center;
+  cursor: pointer;
+  border: 2px solid transparent;
+  @include transition;
+
+  &:hover {
+    border-color: $primary-color;
+    transform: translateY(-4px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+
+    .category-card__icon {
+      background: $primary-color;
+      color: white;
+    }
+  }
+
+  &__icon {
+    width: 80px;
+    height: 80px;
+    @include flex-center;
+    background: $bg-light;
+    border-radius: 50%;
+    margin: 0 auto 1rem;
+    font-size: 2rem;
+    color: $primary-color;
+    @include transition;
+
+    @media (max-width: $breakpoint-sm) {
+      width: 60px;
+      height: 60px;
+      font-size: 1.5rem;
+    }
+  }
+
+  &__name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: $text-dark;
+    margin: 0 0 0.5rem 0;
+
+    @media (max-width: $breakpoint-sm) {
+      font-size: 0.875rem;
+    }
+  }
+
+  &__count {
+    font-size: 0.875rem;
+    color: $text-muted;
+    margin: 0;
+
+    @media (max-width: $breakpoint-sm) {
+      font-size: 0.75rem;
+    }
+  }
+}
+
+// ===================================
+// FLASH SALE
+// ===================================
+.flash-sale {
+  max-width: 1280px;
+  margin: 0 auto 3rem;
+  padding: 2rem;
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  border-radius: 1rem;
+
+  @media (max-width: $breakpoint-md) {
+    margin-bottom: 2rem;
+  }
+
+  @media (max-width: $breakpoint-sm) {
+    padding: 1.5rem 1rem;
+  }
+
+  .section-title {
+    color: white;
+
+    .anticon {
+      color: $accent-color;
+    }
+  }
+}
+
+// ===================================
+// FEATURED PRODUCTS & NEW ARRIVALS
+// ===================================
+.featured-products,
+.new-arrivals {
+  max-width: 1280px;
+  margin: 0 auto 3rem;
+  padding: 0 2rem;
+
+  @media (max-width: $breakpoint-md) {
+    margin-bottom: 2rem;
+  }
+
+  @media (max-width: $breakpoint-sm) {
+    padding: 0 1rem;
+  }
+}
+
+// ===================================
+// PRODUCTS GRID
+// ===================================
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+
+  @media (max-width: $breakpoint-lg) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @media (max-width: $breakpoint-md) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  @media (max-width: $breakpoint-sm) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+}
+
+// ===================================
+// PRODUCT CARD
+// ===================================
+.product-card {
+  background: white;
+  border-radius: 1rem;
+  overflow: hidden;
+  cursor: pointer;
+  border: 1px solid $border-color;
+  @include transition;
+
+  &:hover {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    transform: translateY(-8px);
+
+    .product-card__image img {
+      transform: scale(1.1);
+    }
+
+    .product-card__btn {
+      background: $primary-color;
+      color: white;
+    }
+  }
+
+  &__image {
+    position: relative;
+    width: 100%;
+    padding-top: 133.33%; // 3:4 ratio
+    background: $bg-light;
+    overflow: hidden;
+
+    img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      @include transition(transform);
+    }
+  }
+
+  &__badge {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: $danger-color;
+    color: white;
+    padding: 0.375rem 0.875rem;
+    border-radius: 2rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    z-index: 2;
+
+    @media (max-width: $breakpoint-sm) {
+      top: 0.5rem;
+      right: 0.5rem;
+      padding: 0.25rem 0.625rem;
+      font-size: 0.625rem;
+    }
+  }
+
+  &__content {
+    padding: 1.25rem;
+
+    @media (max-width: $breakpoint-sm) {
+      padding: 1rem;
+    }
+  }
+
+  &__title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: $text-dark;
+    margin: 0 0 0.75rem 0;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    height: 2.8em;
+
+    @media (max-width: $breakpoint-sm) {
+      font-size: 0.875rem;
+      margin-bottom: 0.5rem;
+    }
+  }
+
+  &__rating {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+
+    .stars {
+      font-size: 0.875rem;
+
+      .ant-rate-star {
+        margin-right: 2px;
+      }
+    }
+
+    .count {
+      font-size: 0.875rem;
+      color: $text-muted;
+
+      @media (max-width: $breakpoint-sm) {
+        font-size: 0.75rem;
+      }
+    }
+
+    @media (max-width: $breakpoint-sm) {
+      margin-bottom: 0.5rem;
+    }
+  }
+
+  &__price {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+
+    .current {
+      font-size: 1.375rem;
+      font-weight: 700;
+      color: $danger-color;
+
+      @media (max-width: $breakpoint-sm) {
+        font-size: 1.125rem;
+      }
+    }
+
+    .original {
+      font-size: 1rem;
+      color: $text-muted;
+      text-decoration: line-through;
+
+      @media (max-width: $breakpoint-sm) {
+        font-size: 0.875rem;
+      }
+    }
+
+    @media (max-width: $breakpoint-sm) {
+      margin-bottom: 0.75rem;
+      gap: 0.5rem;
+    }
+  }
+
+  &__btn {
+    width: 100%;
+    padding: 0.875rem;
+    background: $bg-light;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: $text-dark;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    @include transition;
+
+    &:hover {
+      background: $primary-color;
+      color: white;
+    }
+
+    @media (max-width: $breakpoint-sm) {
+      padding: 0.75rem;
+      font-size: 0.875rem;
+    }
+  }
+}
+
+// ===================================
+// NEWSLETTER
+// ===================================
+.newsletter {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 5rem 2rem;
+  margin-top: 3rem;
+  text-align: center;
+
+  @media (max-width: $breakpoint-md) {
+    padding: 4rem 2rem;
+    margin-top: 2rem;
+  }
+
+  @media (max-width: $breakpoint-sm) {
+    padding: 3rem 1rem;
+  }
+
+  &__content {
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  &__title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: white;
+    margin: 0 0 1rem 0;
+
+    @media (max-width: $breakpoint-md) {
+      font-size: 2rem;
+    }
+
+    @media (max-width: $breakpoint-sm) {
+      font-size: 1.75rem;
+    }
+  }
+
+  &__description {
+    font-size: 1.125rem;
+    color: rgba(255, 255, 255, 0.9);
+    margin: 0 0 2rem 0;
+
+    @media (max-width: $breakpoint-md) {
+      font-size: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    @media (max-width: $breakpoint-sm) {
+      font-size: 0.875rem;
+    }
+  }
+
+  &__form {
+    display: flex;
+    gap: 1rem;
+    max-width: 500px;
+    margin: 0 auto;
+
+    @media (max-width: $breakpoint-sm) {
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+  }
+
+  &__input {
+    flex: 1;
+    padding: 1rem 1.5rem;
+    border: none;
+    border-radius: 3rem;
+    font-size: 1rem;
+    outline: none;
+    @include transition;
+
+    &:focus {
+      box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+    }
+
+    @media (max-width: $breakpoint-sm) {
+      padding: 0.875rem 1.25rem;
+      font-size: 0.875rem;
+    }
+  }
+
+  &__btn {
+    padding: 1rem 2.5rem;
+    background: $accent-color;
+    color: white;
+    border: none;
+    border-radius: 3rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    @include transition;
+
+    &:hover {
+      background: darken($accent-color, 10%);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+
+    @media (max-width: $breakpoint-sm) {
+      padding: 0.875rem 2rem;
+      font-size: 0.875rem;
+    }
+  }
+}
+
+// ===================================
+// ANTD OVERRIDES
+// ===================================
+.ant-rate {
+  &-star {
+    &-full,
+    &-half .ant-rate-star-first {
+      color: $accent-color;
+    }
+  }
+}
+
+.ant-carousel {
+  .slick-slider {
+    .slick-list {
+      overflow: hidden;
+    }
+
+    .slick-track {
+      display: flex;
+      align-items: center;
+    }
+  }
+}
+
+// ===================================
+// UTILITIES
+// ===================================
+.text-center {
+  text-align: center;
+}
+
+.mt-1 {
+  margin-top: 1rem;
+}
+
+.mt-2 {
+  margin-top: 2rem;
+}
+
+.mt-3 {
+  margin-top: 3rem;
+}
+
+.mb-1 {
+  margin-bottom: 1rem;
+}
+
+.mb-2 {
+  margin-bottom: 2rem;
+}
+
+.mb-3 {
+  margin-bottom: 3rem;
+}

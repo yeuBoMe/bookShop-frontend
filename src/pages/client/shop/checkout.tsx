@@ -10,6 +10,7 @@ import {
     Form,
     Input,
     Radio,
+    type FormProps,
 } from "antd";
 import {
     DeleteOutlined,
@@ -42,6 +43,7 @@ const CheckoutPage = () => {
     const [paymentMethod, setPaymentMethod] = useState<string>("cod");
 
     useEffect(() => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
         if (carts && carts.length > 0) {
             let sum = 0;
             carts.map((item) => {
@@ -53,7 +55,6 @@ const CheckoutPage = () => {
         }
 
         if (user && currentStep === 1) {
-            console.log(">>> user ", user)
             form.setFieldsValue({
                 fullName: user.fullName,
                 email: user.email,
@@ -102,8 +103,9 @@ const CheckoutPage = () => {
         window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
-    const handlePayment = async (values: any) => {
+    const handlePayment: FormProps<UserCheckoutValues>['onFinish'] = async (values) => {
         // Logic thanh toán sẽ được thêm vào đây
+        console.log(">>> data order ", values)
     };
 
     const formatPrice = (price: number) => {

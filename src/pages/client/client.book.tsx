@@ -37,6 +37,7 @@ const BookPage = () => {
 
     // Fetch categories
     useEffect(() => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
         const fetchCategories = async () => {
             try {
                 const response = await fetchAllCategoriesAPI();
@@ -137,6 +138,11 @@ const BookPage = () => {
                 break;
         }
     };
+
+    const handleNavigateBookItem = (bookId: number) => {
+        navigate(`/books/${bookId}`);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    }
 
     const items: TabsProps["items"] = [
         { key: "1", label: "Phổ biến" },
@@ -274,7 +280,7 @@ const BookPage = () => {
                                                                 : "https://via.placeholder.com/200x280?text=No+Image"
                                                         }
                                                         alt={book.name}
-                                                        onClick={() => navigate(`/books/${book.id}`)}
+                                                        onClick={() => handleNavigateBookItem(book.id)}
                                                     />
                                                 </div>
 
@@ -282,7 +288,7 @@ const BookPage = () => {
                                                 <div className="book-info">
                                                     <div
                                                         className="book-name"
-                                                        onClick={() => navigate(`/books/${book.id}`)}
+                                                        onClick={() => handleNavigateBookItem(book.id)}
                                                     >
                                                         {book.name}
                                                     </div>
