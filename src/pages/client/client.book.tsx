@@ -1,10 +1,11 @@
-import { FilterTwoTone, ReloadOutlined } from "@ant-design/icons";
-import { Col, Form, Row, Checkbox, Divider, InputNumber, Button, Rate, Tabs, Pagination, Spin, Empty } from "antd";
+import { FilterTwoTone, ReloadOutlined, ShoppingCartOutlined } from "@ant-design/icons";
+import { Col, Form, Row, Checkbox, Divider, InputNumber, Button, Rate, Tabs, Pagination, Spin, Empty, App } from "antd";
 import type { FormProps, TabsProps } from "antd";
 import { useEffect, useState } from "react";
 import { fetchAllBooksAPI, fetchAllCategoriesAPI } from "@/services/api.service";
 import "styles/client/client.book.scss";
 import { useNavigate } from "react-router-dom";
+import { useCurrentApp } from "@/components/context/app.context";
 
 interface FilterValues {
     category?: string[];
@@ -16,6 +17,8 @@ interface FilterValues {
 
 const BookPage = () => {
     const navigate = useNavigate();
+    const { user, setCarts } = useCurrentApp();
+    const { notification, message } = App.useApp();
     const [form] = Form.useForm();
 
     const [loading, setLoading] = useState<boolean>(true);
@@ -35,7 +38,6 @@ const BookPage = () => {
         total: 0
     });
 
-    // Fetch categories
     useEffect(() => {
         window.scrollTo({ top: 0, behavior: "smooth" });
         const fetchCategories = async () => {
@@ -77,7 +79,6 @@ const BookPage = () => {
         return query;
     }
 
-    // Fetch books với pagination
     const fetchBooks = async (page: number) => {
         try {
             setLoading(true);
@@ -128,10 +129,10 @@ const BookPage = () => {
             case "2":
                 setSort("createdAt,asc");
                 break;
-            case "3": // Giá thấp đến cao
+            case "3":
                 setSort("price,asc");
                 break;
-            case "4": // Giá cao đến thấp
+            case "4":
                 setSort("price,desc");
                 break;
             default:
@@ -143,6 +144,52 @@ const BookPage = () => {
         navigate(`/books/${bookId}`);
         window.scrollTo({ top: 0, behavior: "smooth" });
     }
+
+    const handleAddToCart = (e: React.MouseEvent, book: IBook) => {
+        e.stopPropagation();
+
+        if (!user || !user.id) {
+            notification.warning({
+                message: "Chưa đăng nhập",
+                description: "Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng",
+                duration: 3,
+                placement: "topRight"
+            });
+            setTimeout(() => {
+                navigate("/login");
+            }, 1000);
+            return;
+        }
+
+        if (!book) return;
+
+        const cartStorage = localStorage.getItem("carts");
+        if (cartStorage) {
+            const carts = JSON.parse(cartStorage) as ICart[];
+            let isExistIndex = carts.findIndex((cart) => cart.id === book.id);
+            if (isExistIndex > -1) {
+                carts[isExistIndex].quantity = carts[isExistIndex].quantity + 1;
+            } else {
+                carts.push({
+                    id: book.id,
+                    quantity: 1,
+                    detail: book
+                });
+            }
+            localStorage.setItem("carts", JSON.stringify(carts));
+            setCarts(carts);
+        } else {
+            const data = [{
+                id: book.id,
+                quantity: 1,
+                detail: book
+            }];
+            localStorage.setItem("carts", JSON.stringify(data));
+            setCarts(data);
+        }
+
+        message.success(`Đã thêm "${book.name}" vào giỏ hàng`);
+    };
 
     const items: TabsProps["items"] = [
         { key: "1", label: "Phổ biến" },
@@ -220,13 +267,6 @@ const BookPage = () => {
                                         />
                                     </Form.Item>
                                 </div>
-                                {/* <Button
-                                    onClick={() => form.submit()}
-                                    className="apply-filter-btn"
-                                    type="primary"
-                                >
-                                    Áp dụng
-                                </Button> */}
                             </Form.Item>
 
                             <Divider />
@@ -248,7 +288,6 @@ const BookPage = () => {
                 {/* Products Grid */}
                 <Col xs={24} sm={24} md={18} lg={18}>
                     <div className="products-section">
-                        {/* Tabs for sorting */}
                         <Tabs
                             defaultActiveKey="1"
                             items={items}
@@ -256,7 +295,6 @@ const BookPage = () => {
                             className="sort-tabs"
                         />
 
-                        {/* Books Grid */}
                         {loading ? (
                             <div className="loading-container">
                                 <Spin size="large" tip="Đang tải sản phẩm..." />
@@ -264,15 +302,17 @@ const BookPage = () => {
                         ) : books.length === 0 ? (
                             <div className="empty-container">
                                 <Empty description="Không có sản phẩm nào phù hợp" />
-                            </div> 
+                            </div>
                         ) : (
                             <>
                                 <Row gutter={[20, 20]} className="books-grid">
                                     {books.map((book) => (
                                         <Col xs={12} sm={8} md={8} lg={6} key={book.id}>
                                             <div className="book-card">
-                                                {/* Book Image */}
-                                                <div className="book-image-wrapper">
+                                                <div
+                                                    className="book-image-wrapper"
+                                                    onClick={() => handleNavigateBookItem(book.id)}
+                                                >
                                                     <img
                                                         src={
                                                             book.images && book.images.length > 0
@@ -280,11 +320,10 @@ const BookPage = () => {
                                                                 : "https://via.placeholder.com/200x280?text=No+Image"
                                                         }
                                                         alt={book.name}
-                                                        onClick={() => handleNavigateBookItem(book.id)}
                                                     />
+                                                    <div className="book-badge">Hot</div>
                                                 </div>
 
-                                                {/* Book Info */}
                                                 <div className="book-info">
                                                     <div
                                                         className="book-name"
@@ -304,13 +343,22 @@ const BookPage = () => {
                                                         <Rate value={5} disabled />
                                                         <span className="sold-count">Đã bán 29</span>
                                                     </div>
+
+                                                    <Button
+                                                        type="default"
+                                                        icon={<ShoppingCartOutlined />}
+                                                        className="book-add-cart-btn"
+                                                        onClick={(e) => handleAddToCart(e, book)}
+                                                        block
+                                                    >
+                                                        Thêm vào giỏ
+                                                    </Button>
                                                 </div>
                                             </div>
                                         </Col>
                                     ))}
                                 </Row>
 
-                                {/* Pagination */}
                                 <div className="pagination-wrapper">
                                     <Pagination
                                         current={meta.current}

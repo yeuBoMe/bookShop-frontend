@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Carousel, Rate, Spin } from "antd";
+import { App, Carousel, Rate, Spin } from "antd";
 import {
     ShoppingCartOutlined,
     TruckOutlined,
@@ -13,9 +13,13 @@ import {
 } from "@ant-design/icons";
 import "styles/client/home.scss";
 import { fetchAllBooksAPI, fetchAllCategoriesAPI } from "@/services/api.service";
+import { useCurrentApp } from "@/components/context/app.context";
 
 const HomePage = () => {
+    const { user, setCarts } = useCurrentApp();
+    const { notification } = App.useApp();
     const navigate = useNavigate();
+
     const [loading, setLoading] = useState(true);
     const [featuredBooks, setFeaturedBooks] = useState<IBook[]>([]);
     const [newArrivals, setNewArrivals] = useState<IBook[]>([]);
@@ -84,6 +88,54 @@ const HomePage = () => {
         window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
+    const handleAddEachProductToCart = (e: React.MouseEvent, book: IBook) => {
+        // Ngăn chặn sự kiện click lan ra card cha
+        e.stopPropagation();
+
+        if (!user || !user.id) {
+            notification.warning({
+                message: "Chưa đăng nhập",
+                description: "Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng",
+                duration: 3,
+                placement: "topRight"
+            });
+            // Chuyển hướng về trang đăng nhập sau 1 giây
+            setTimeout(() => {
+                navigate("/login");
+            }, 1000);
+            return;
+        }
+
+        const cartStorage = localStorage.getItem("carts");
+        if (cartStorage) {
+            const carts = JSON.parse(cartStorage) as ICart[];
+
+            let isExistIndex = carts.findIndex((cart) => cart.id === book.id);
+            if (isExistIndex > -1) {
+                carts[isExistIndex].quantity = carts[isExistIndex].quantity + 1;
+            } else {
+                carts.push({
+                    id: book.id,
+                    quantity: 1,
+                    detail: book
+                });
+            }
+
+            localStorage.setItem("carts", JSON.stringify(carts));
+            setCarts(carts);
+        } else {
+            const data = [{
+                id: book.id,
+                quantity: 1,
+                detail: book
+            }];
+            localStorage.setItem("carts", JSON.stringify(data));
+
+            // sync React context
+            setCarts(data);
+        }
+    }
+
     const renderBookCard = (book: IBook) => (
         <div
             key={book.id}
@@ -111,8 +163,11 @@ const HomePage = () => {
                     <span className="current">{formatPrice(book.price)}</span>
                     <span className="original">{formatPrice(book.price * 1.3)}</span>
                 </div>
-                <button className="product-card__btn">
-                    <ShoppingCartOutlined /> Thêm vào giỏ
+                <button
+                    className="product-card__btn"
+                    onClick={(e) => handleAddEachProductToCart(e, book)}
+                >
+                    <ShoppingCartOutlined /> Thêm vào giỏ hàng
                 </button>
             </div>
         </div>
@@ -263,13 +318,11 @@ const HomePage = () => {
                         <div
                             key={category.id}
                             className="category-card"
-                            onClick={() => handleNavigate("/books")}
                         >
                             <div className="category-card__icon">
                                 <ShoppingCartOutlined />
                             </div>
                             <h3 className="category-card__name">{category.name}</h3>
-                            <p className="category-card__count">120+ sản phẩm</p>
                         </div>
                     ))}
                 </div>

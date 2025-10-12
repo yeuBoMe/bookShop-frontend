@@ -510,16 +510,6 @@ $breakpoint-sm: 576px;
       font-size: 0.875rem;
     }
   }
-
-  &__count {
-    font-size: 0.875rem;
-    color: $text-muted;
-    margin: 0;
-
-    @media (max-width: $breakpoint-sm) {
-      font-size: 0.75rem;
-    }
-  }
 }
 
 // ===================================

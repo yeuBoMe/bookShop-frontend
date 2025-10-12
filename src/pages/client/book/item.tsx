@@ -25,7 +25,7 @@ import { useCurrentApp } from "@/components/context/app.context";
 const BookDetailPage = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { setCarts } = useCurrentApp();
+    const { user, setCarts } = useCurrentApp();
 
     const { notification, message } = App.useApp();
 
@@ -69,6 +69,21 @@ const BookDetailPage = () => {
     };
 
     const handleAddToCart = () => {
+        // Kiểm tra đăng nhập
+        if (!user || !user.id) {
+            notification.warning({
+                message: "Chưa đăng nhập",
+                description: "Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng",
+                duration: 3,
+                placement: "topRight"
+            });
+            // Chuyển hướng về trang đăng nhập sau 1 giây
+            setTimeout(() => {
+                navigate("/login");
+            }, 1000);
+            return;
+        }
+
         if (!book) return;
 
         // update local storage

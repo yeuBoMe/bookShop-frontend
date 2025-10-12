@@ -142,7 +142,7 @@
   .books-grid {
     .book-card {
       border: 1px solid #e8e8e8;
-      border-radius: 4px;
+      border-radius: 8px;
       overflow: hidden;
       cursor: pointer;
       transition: all 0.3s ease;
@@ -152,14 +152,24 @@
       flex-direction: column;
 
       &:hover {
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
         transform: translateY(-4px);
+
+        .book-image-wrapper img {
+          transform: scale(1.05);
+        }
+
+        .book-add-cart-btn {
+          background-color: #2563eb;
+          color: #fff;
+          border-color: #2563eb;
+        }
       }
 
       .book-image-wrapper {
-        width: 100%;
-        padding-top: 140%;
         position: relative;
+        width: 100%;
+        padding-top: 133.33%; // Tỷ lệ 3:4 giống HomePage
         background-color: #f5f5f5;
         overflow: hidden;
 
@@ -169,7 +179,28 @@
           left: 0;
           width: 100%;
           height: 100%;
-          object-fit: contain;
+          object-fit: cover; // Đổi từ contain sang cover để giống HomePage
+          transition: transform 0.3s ease;
+        }
+
+        .book-badge {
+          position: absolute;
+          top: 10px;
+          right: 10px;
+          background: #ef4444;
+          color: white;
+          padding: 4px 12px;
+          border-radius: 20px;
+          font-size: 11px;
+          font-weight: 600;
+          z-index: 2;
+
+          @media (max-width: 768px) {
+            top: 8px;
+            right: 8px;
+            padding: 3px 10px;
+            font-size: 10px;
+          }
         }
       }
 
@@ -180,8 +211,8 @@
         flex-direction: column;
 
         .book-name {
-          font-size: 13px;
-          color: #1890ff;
+          font-size: 14px;
+          color: #1f2937;
           font-weight: 600;
           margin-bottom: 8px;
           height: 40px;
@@ -191,20 +222,25 @@
           -webkit-line-clamp: 2;
           -webkit-box-orient: vertical;
           line-height: 20px;
+          transition: color 0.3s;
+
+          &:hover {
+            color: #2563eb;
+          }
 
           @media (max-width: 768px) {
-            font-size: 12px;
+            font-size: 13px;
           }
         }
 
         .book-price {
-          font-size: 16px;
-          font-weight: 600;
-          color: #d0021b;
-          margin-bottom: 6px;
+          font-size: 18px;
+          font-weight: 700;
+          color: #ef4444;
+          margin-bottom: 8px;
 
           @media (max-width: 768px) {
-            font-size: 14px;
+            font-size: 16px;
           }
         }
 
@@ -212,15 +248,56 @@
           display: flex;
           align-items: center;
           font-size: 12px;
-          color: #787878;
+          color: #6b7280;
+          margin-bottom: 12px;
 
           .ant-rate {
-            color: #ffc107;
-            font-size: 11px;
+            color: #f59e0b;
+            font-size: 12px;
+
+            .ant-rate-star {
+              margin-right: 2px;
+            }
           }
 
           .sold-count {
-            margin-left: 6px;
+            margin-left: 8px;
+            font-size: 12px;
+
+            @media (max-width: 768px) {
+              font-size: 11px;
+            }
+          }
+        }
+
+        .book-add-cart-btn {
+          margin-top: auto;
+          border-radius: 6px;
+          font-weight: 600;
+          height: 38px;
+          transition: all 0.3s ease;
+          background-color: #f9fafb;
+          border-color: #e5e7eb;
+          color: #1f2937;
+
+          &:hover {
+            background-color: #2563eb;
+            color: #fff;
+            border-color: #2563eb;
+            transform: translateY(-2px);
+          }
+
+          .anticon {
+            font-size: 16px;
+          }
+
+          @media (max-width: 768px) {
+            height: 36px;
+            font-size: 13px;
+
+            .anticon {
+              font-size: 14px;
+            }
           }
         }
       }
@@ -242,12 +319,12 @@
         border-radius: 4px;
 
         &:hover {
-          border-color: #1890ff;
+          border-color: #2563eb;
         }
 
         &.ant-pagination-item-active {
-          background-color: #1890ff;
-          border-color: #1890ff;
+          background-color: #2563eb;
+          border-color: #2563eb;
 
           a {
             color: #fff;
@@ -258,6 +335,14 @@
       .ant-pagination-prev,
       .ant-pagination-next {
         border-radius: 4px;
+
+        &:hover {
+          border-color: #2563eb;
+
+          .ant-pagination-item-link {
+            color: #2563eb;
+          }
+        }
       }
     }
   }
