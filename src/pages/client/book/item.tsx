@@ -17,7 +17,7 @@ import {
 } from "@ant-design/icons";
 import ImageGallery from "react-image-gallery";
 import "react-image-gallery/styles/css/image-gallery.css";
-import "styles/client/book.detail.scss";
+import "styles/client/book/book.detail.scss";
 import BookGalleryModal from "@/components/client/book/gallery.modal";
 import { getBookByIdAPI } from "@/services/api.service";
 import { useCurrentApp } from "@/components/context/app.context";

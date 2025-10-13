@@ -3,7 +3,7 @@ import { Col, Form, Row, Checkbox, Divider, InputNumber, Button, Rate, Tabs, Pag
 import type { FormProps, TabsProps } from "antd";
 import { useEffect, useState } from "react";
 import { fetchAllBooksAPI, fetchAllCategoriesAPI } from "@/services/api.service";
-import "styles/client/client.book.scss";
+import "styles/client/book/client.book.scss";
 import { useNavigate } from "react-router-dom";
 import { useCurrentApp } from "@/components/context/app.context";
 

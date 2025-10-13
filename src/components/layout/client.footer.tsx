@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import "styles/client/client.footer.scss";
+import "styles/client/layout/client.footer.scss";
 
 const Footer = () => {
     const [showScrollButton, setShowScrollButton] = useState<boolean>(false);

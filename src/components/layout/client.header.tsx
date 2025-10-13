@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useCurrentApp } from "components/context/app.context";
 import { FiSearch, FiShoppingCart, FiUser, FiMenu } from "react-icons/fi";
-import "styles/client/client.header.scss";
+import "styles/client/layout/client.header.scss";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { App, Avatar, Button, Drawer } from "antd";
 import { logoutAPI } from "@/services/api.service";

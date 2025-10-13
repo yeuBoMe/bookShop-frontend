@@ -1,0 +1,221 @@
+.cart-page-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 30px 20px;
+  min-height: calc(100vh - 200px);
+
+  // Steps Component
+  .checkout-steps {
+    margin-bottom: 40px;
+
+    .custom-steps {
+      .ant-steps-item {
+        &.ant-steps-item-active {
+          .ant-steps-item-icon {
+            background: #1890ff;
+            border-color: #1890ff;
+
+            .ant-steps-icon {
+              color: white;
+            }
+          }
+
+          .ant-steps-item-title {
+            color: #1890ff;
+            font-weight: 600;
+          }
+        }
+
+        &.ant-steps-item-finish {
+          .ant-steps-item-icon {
+            background: #52c41a;
+            border-color: #52c41a;
+
+            .ant-steps-icon {
+              color: white;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Header
+  .cart-header {
+    margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: #333;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .cart-count {
+      font-size: 16px;
+      color: #666;
+      margin: 0;
+    }
+  }
+
+  // Empty cart
+  .cart-empty {
+    background: #fff;
+    padding: 80px 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    text-align: center;
+
+    .empty-text {
+      margin-top: 20px;
+      margin-bottom: 30px;
+
+      h3 {
+        font-size: 20px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 10px;
+      }
+
+      p {
+        font-size: 14px;
+        color: #999;
+      }
+    }
+  }
+
+  // Content wrapper
+  .cart-content {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 30px;
+  }
+
+  // Responsive
+  @media (max-width: 1024px) {
+    .cart-content {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 768px) {
+    padding: 20px 15px;
+
+    .checkout-steps {
+      margin-bottom: 30px;
+
+      .custom-steps {
+        .ant-steps-item {
+          display: flex !important;
+          align-items: flex-start !important;
+
+          .ant-steps-item-container {
+            display: flex !important;
+            align-items: flex-start !important;
+          }
+
+          .ant-steps-item-icon {
+            flex-shrink: 0 !important;
+            width: 28px !important;
+            height: 28px !important;
+            line-height: 28px !important;
+            margin-inline-end: 8px !important;
+            margin-top: 0 !important;
+
+            .ant-steps-icon {
+              font-size: 14px !important;
+              line-height: 28px !important;
+            }
+          }
+
+          .ant-steps-item-content {
+            flex: 1 !important;
+            min-width: 0 !important;
+            padding-top: 3px !important;
+
+            .ant-steps-item-title {
+              font-size: 11px !important;
+              line-height: 1.4 !important;
+              margin: 0 !important;
+            }
+          }
+
+          .ant-steps-item-tail {
+            top: 14px !important;
+            padding: 0 !important;
+            margin-inline-start: 14px !important;
+          }
+        }
+      }
+    }
+
+    .cart-header {
+      h1 {
+        font-size: 22px;
+      }
+
+      .cart-count {
+        font-size: 14px;
+      }
+    }
+  }
+
+  @media (max-width: 480px) {
+    padding: 15px 10px;
+
+    .checkout-steps {
+      margin-bottom: 25px;
+
+      .custom-steps {
+        .ant-steps-item {
+          .ant-steps-item-icon {
+            width: 24px !important;
+            height: 24px !important;
+            line-height: 24px !important;
+            margin-inline-end: 6px !important;
+
+            .ant-steps-icon {
+              font-size: 12px !important;
+              line-height: 24px !important;
+            }
+          }
+
+          .ant-steps-item-content {
+            padding-top: 2px !important;
+
+            .ant-steps-item-title {
+              font-size: 10px !important;
+              padding-inline-end: 6px !important;
+            }
+          }
+
+          .ant-steps-item-tail {
+            top: 12px !important;
+            margin-inline-start: 12px !important;
+          }
+        }
+      }
+    }
+
+    .cart-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 5px;
+      margin-bottom: 20px;
+
+      h1 {
+        font-size: 20px;
+      }
+
+      .cart-count {
+        font-size: 13px;
+      }
+    }
+  }
+}
