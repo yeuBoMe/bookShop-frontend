@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, Form, Input, Radio, type FormProps } from "antd";
 import { ShoppingOutlined, CreditCardOutlined } from "@ant-design/icons";
 import "styles/client/checkout/payment.scss";
@@ -25,14 +25,15 @@ const Payment = (props: PaymentProps) => {
     const [paymentMethod, setPaymentMethod] = useState<string>("cod");
     const baseUrl = `${import.meta.env.VITE_BACKEND_URL}`;
 
-    // Set initial values from user data
-    if (user) {
-        form.setFieldsValue({
-            fullName: user.fullName,
-            email: user.email,
-            phone: user.phone
-        });
-    }
+    useEffect(() => {
+        if (user) {
+            form.setFieldsValue({
+                fullName: user.fullName,
+                email: user.email,
+                phone: user.phone
+            });
+        }
+    }, [user]);
 
     const formatPrice = (price: number) => {
         return new Intl.NumberFormat("vi-VN", {
