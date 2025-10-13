@@ -34,6 +34,14 @@ const Header = () => {
         }
     };
 
+    // Xử lý click vào giỏ hàng trên mobile
+    const handleCartClick = () => {
+        // Kiểm tra xem có phải mobile không
+        if (window.innerWidth <= 768) {
+            navigate("/checkout");
+        }
+    };
+
     // Format price to VND
     const formatPrice = (price: number) => {
         return new Intl.NumberFormat('vi-VN', {
@@ -89,12 +97,15 @@ const Header = () => {
                             {/* Cart with Dropdown */}
                             {user && (
                                 <div className="cartDropdown">
-                                    <button className="iconButton cartButton">
+                                    <button
+                                        className="iconButton cartButton"
+                                        onClick={handleCartClick}
+                                    >
                                         <FiShoppingCart size={20} />
                                         <span className="cartBadge">{carts?.length ?? 0}</span>
                                     </button>
 
-                                    {/* Cart Dropdown Menu */}
+                                    {/* Cart Dropdown Menu - Chỉ hiển thị trên desktop */}
                                     <div className="cartDropdownMenu">
                                         {carts && carts.length > 0 ? (
                                             <>
