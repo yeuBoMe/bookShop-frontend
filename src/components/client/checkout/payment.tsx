@@ -4,7 +4,7 @@ import { ShoppingOutlined, CreditCardOutlined } from "@ant-design/icons";
 import "styles/client/checkout/payment.scss";
 
 interface UserCheckoutValues {
-    fullName: string;
+    name: string;
     email: string;
     phone: string;
     address: string;
@@ -15,12 +15,13 @@ interface PaymentProps {
     carts: ICart[];
     totalPrice: number;
     user: IUser | null;
+    isPaymentLoading: boolean;
     onBackToCart: () => void;
     onPaymentSubmit: (values: UserCheckoutValues) => void;
 }
 
 const Payment = (props: PaymentProps) => {
-    const { carts, totalPrice, user, onBackToCart, onPaymentSubmit } = props;
+    const { carts, totalPrice, user, isPaymentLoading, onBackToCart, onPaymentSubmit } = props;
     const [form] = Form.useForm<UserCheckoutValues>();
     const [paymentMethod, setPaymentMethod] = useState<string>("cod");
     const baseUrl = `${import.meta.env.VITE_BACKEND_URL}`;
@@ -28,7 +29,7 @@ const Payment = (props: PaymentProps) => {
     useEffect(() => {
         if (user) {
             form.setFieldsValue({
-                fullName: user.fullName,
+                name: user.fullName,
                 email: user.email,
                 phone: user.phone
             });
@@ -61,7 +62,7 @@ const Payment = (props: PaymentProps) => {
                     >
                         <Form.Item<UserCheckoutValues>
                             label="Họ và tên:"
-                            name="fullName"
+                            name="name"
                             rules={[
                                 {
                                     required: true,
@@ -168,6 +169,7 @@ const Payment = (props: PaymentProps) => {
                                 size="large"
                                 htmlType="submit"
                                 className="submit-order-btn"
+                                // loading={isPaymentLoading}
                             >
                                 Thanh toán
                             </Button>

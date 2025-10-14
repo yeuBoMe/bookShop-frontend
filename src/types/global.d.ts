@@ -136,10 +136,30 @@ declare global {
     updatedBy?: string;
   }
 
-
   interface ICart {
     id: number;
     quantity: number; // book quantity
     detail: IBook;
+  }
+
+  interface IOrder {
+    id: number;
+    name: string;
+    email: string;
+    phone: string;
+    address: string;
+    paymentMethod: string;
+    totalPrice: number;
+    detail: IOrderDetail[];
+    createdAt?: Date;
+    updatedAt?: Date;
+    createdBy?: string;
+    updatedBy?: string;
+  }
+
+  interface IOrderDetail {
+    id: number;
+    quantity: number;
+    bookName: string;
   }
 }

@@ -95,7 +95,7 @@ export const createBookAPI = (
 export const getBookByIdAPI = (id: number) => {
   const ENDPOINT_GET_BOOK_BY_ID = `/api/v1/books/${id}`;
   return axios.get<IBackendRes<IBook>>(ENDPOINT_GET_BOOK_BY_ID);
-}
+};
 
 export const updateBookAPI = (
   id: number,
@@ -197,10 +197,24 @@ export const importListBooksFromFileAPI = (
 
 // Module category
 export const fetchAllCategoriesAPI = () => {
-  const ENDPOINT_FETCH_ALL_CATEGORIES = `/api/v1/categories`;
+  const ENDPOINT_FETCH_ALL_CATEGORIES = "/api/v1/categories";
   return axios.get<IBackendRes<IModelPaginate<ICategory>>>(
     ENDPOINT_FETCH_ALL_CATEGORIES
   );
+};
+
+// Module order
+export const createAnOrderAPI = (data: {
+  name: string;
+  email: string;
+  phone: string;
+  address: string;
+  paymentMethod: string;
+  totalPrice: number;
+  detail: any;
+}) => {
+  const ENDPOINT_CREATE_ORDER = "/api/v1/orders";
+  return axios.post<IBackendRes<IOrder>>(ENDPOINT_CREATE_ORDER, data);
 };
 
 // Module auth

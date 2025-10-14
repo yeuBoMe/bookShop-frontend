@@ -11,9 +11,10 @@ import "styles/client/checkout/checkout.scss";
 import OrderSuccess from "@/components/client/checkout/order-success";
 import Cart from "@/components/client/checkout/cart";
 import Payment from "@/components/client/checkout/payment";
+import { createAnOrderAPI } from "@/services/api.service";
 
 interface UserCheckoutValues {
-    fullName: string;
+    name: string;
     email: string;
     phone: string;
     address: string;
@@ -23,9 +24,12 @@ interface UserCheckoutValues {
 const CheckoutPage = () => {
     const navigate = useNavigate();
     const { user, carts, setCarts } = useCurrentApp();
-    const { message } = App.useApp();
+    const { notification, message } = App.useApp();
     const [totalPrice, setTotalPrice] = useState<number>(0);
     const [currentStep, setCurrentStep] = useState<number>(0);
+    const [isPaymentLoading, setIsPaymentLoading] = useState<boolean>(false);
+
+    console.log("Check cart >>> ", carts)
 
     useEffect(() => {
         window.scrollTo({ top: 0, behavior: "smooth" });
@@ -50,13 +54,50 @@ const CheckoutPage = () => {
         window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
-    const handlePaymentSubmit = (values: UserCheckoutValues) => {
+    const handlePaymentSubmit = async (values: UserCheckoutValues) => {
         // Logic thanh toán sẽ được thêm vào đây
-        console.log(">>> data order ", values);
+        // console.log(">>> data order ", values);
+        if (!carts) return;
 
-        // Giả lập thanh toán thành công
-        setCurrentStep(2);
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        try {
+            setIsPaymentLoading(true);
+
+            const orderData = {
+                name: values.name,
+                email: values.email,
+                phone: values.phone,
+                address: values.address,
+                paymentMethod: values.paymentMethod,
+                totalPrice: totalPrice + (totalPrice >= 150000 ? 0 : 30000),
+                detail: carts.map((item) => ({
+                    book: { id: item.id },
+                    quantity: item.quantity,
+                    bookName: item.detail.name
+                }))
+            };
+
+            const createOrderResponse = await createAnOrderAPI(orderData);
+
+            if (createOrderResponse.data) {
+                console.log(">>> order data: ", createOrderResponse)
+                message.success("Thanh toán thành công!");
+                localStorage.removeItem("carts");
+                setCarts([]);
+
+                // Giả lập thanh toán thành công
+                setCurrentStep(2);
+                window.scrollTo({ top: 0, behavior: "smooth" });
+            }
+        } catch (error: any) {
+            notification.error({
+                message: "Error",
+                description: error?.message || "An error happens when updating book",
+                duration: 5,
+                placement: "topRight",
+            });
+        } finally {
+            setIsPaymentLoading(false);
+        }
     };
 
     const steps = [
@@ -146,6 +187,7 @@ const CheckoutPage = () => {
                     carts={carts}
                     totalPrice={totalPrice}
                     user={user}
+                    isPaymentLoading={isPaymentLoading}
                     onBackToCart={handleBackToCart}
                     onPaymentSubmit={handlePaymentSubmit}
                 />
