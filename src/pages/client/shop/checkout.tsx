@@ -62,13 +62,14 @@ const CheckoutPage = () => {
         try {
             setIsPaymentLoading(true);
 
+            const finalTotalPrice = totalPrice + (totalPrice >= 150000 ? 0 : 30000);
             const orderData = {
                 name: values.name,
                 email: values.email,
                 phone: values.phone,
                 address: values.address,
                 paymentMethod: values.paymentMethod,
-                totalPrice: totalPrice + (totalPrice >= 150000 ? 0 : 30000),
+                totalPrice: finalTotalPrice,
                 detail: carts.map((item) => ({
                     book: { id: item.id },
                     quantity: item.quantity,

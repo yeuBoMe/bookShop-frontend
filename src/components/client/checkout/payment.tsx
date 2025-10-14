@@ -169,7 +169,7 @@ const Payment = (props: PaymentProps) => {
                                 size="large"
                                 htmlType="submit"
                                 className="submit-order-btn"
-                                // loading={isPaymentLoading}
+                                loading={isPaymentLoading}
                             >
                                 Thanh toán
                             </Button>
