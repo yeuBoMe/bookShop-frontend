@@ -21,7 +21,7 @@ type MenuItem = Required<MenuProps>['items'][number];
 const { Content, Footer, Sider } = Layout;
 
 const AdminLayout = () => {
-    const { user, setUser, setIsAuthenticated } = useCurrentApp();
+    const { user, setUser, setIsAuthenticated, setCarts } = useCurrentApp();
     const [collapsed, setCollapsed] = useState<boolean>(false);
     const { notification, message } = App.useApp();
     const navigate = useNavigate();
@@ -33,8 +33,10 @@ const AdminLayout = () => {
             const logoutResponse = await logoutAPI();
             if (logoutResponse) {
                 setUser(null);
+                setCarts([]);
                 setIsAuthenticated(false);
                 localStorage.removeItem("access_token");
+                localStorage.removeItem(`carts_${user?.email}`);
                 message.success("Đăng xuất thành công!");
                 navigate("/login");
             }

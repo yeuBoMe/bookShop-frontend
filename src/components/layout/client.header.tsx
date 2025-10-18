@@ -7,7 +7,7 @@ import { App, Avatar, Button, Drawer } from "antd";
 import { logoutAPI } from "@/services/api.service";
 
 const Header = () => {
-    const { user, setUser, setIsAuthenticated, carts } = useCurrentApp();
+    const { user, setUser, setIsAuthenticated, carts, setCarts } = useCurrentApp();
     const [searchTerm, setSearchTerm] = useState<string>("");
     const { notification, message } = App.useApp();
     const navigate = useNavigate();
@@ -19,8 +19,10 @@ const Header = () => {
             const logoutResponse = await logoutAPI();
             if (logoutResponse) {
                 setUser(null);
+                setCarts([]);
                 setIsAuthenticated(false);
                 localStorage.removeItem("access_token");
+                localStorage.removeItem(`carts_${user?.email}`);
                 message.success("Đăng xuất thành công!");
                 navigate("/login");
             }

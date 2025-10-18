@@ -44,11 +44,10 @@ export const AuthProvider = (props: IProps) => {
     const fetchUserInfoWithAccessTokenRequest = async () => {
         try {
             const getAccountInfoResponse = await getAccountInfoAPI();
-            const carts = localStorage.getItem("carts");
             await delayTime(200);
 
             if (getAccountInfoResponse?.data) {
-                await new Promise((resolve) => setTimeout(resolve, 300));
+                await new Promise((resolve) => setTimeout(resolve, 100));
 
                 const mappedIAccountToIUser: IUser = {
                     id: getAccountInfoResponse.data.user.id,
@@ -62,6 +61,7 @@ export const AuthProvider = (props: IProps) => {
                 setUser(mappedIAccountToIUser);
                 setIsAuthenticated(true);
 
+                const carts = localStorage.getItem(`carts_${user?.email}`);
                 if (carts) {
                     const cartsData = JSON.parse(carts) as ICart[];
                     setCarts(cartsData);

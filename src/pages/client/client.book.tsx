@@ -163,7 +163,7 @@ const BookPage = () => {
 
         if (!book) return;
 
-        const cartStorage = localStorage.getItem("carts");
+        const cartStorage = localStorage.getItem(`carts_${user.email}`);
         if (cartStorage) {
             const carts = JSON.parse(cartStorage) as ICart[];
             let isExistIndex = carts.findIndex((cart) => cart.id === book.id);
@@ -176,7 +176,7 @@ const BookPage = () => {
                     detail: book
                 });
             }
-            localStorage.setItem("carts", JSON.stringify(carts));
+            localStorage.setItem(`carts_${user.email}`, JSON.stringify(carts));
             setCarts(carts);
         } else {
             const data = [{
@@ -184,7 +184,7 @@ const BookPage = () => {
                 quantity: 1,
                 detail: book
             }];
-            localStorage.setItem("carts", JSON.stringify(data));
+            localStorage.setItem(`carts_${user.email}`, JSON.stringify(data));
             setCarts(data);
         }
 

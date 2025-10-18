@@ -32,6 +32,15 @@ const HomePage = () => {
     useEffect(() => {
         window.scrollTo({ top: 0, behavior: "smooth" });
         fetchData();
+
+        if (user && user.id) {
+            const cartStorage = localStorage.getItem(`carts_${user.email}`);
+            if (cartStorage) {
+                setCarts(JSON.parse(cartStorage) as ICart[]);
+            } else {
+                setCarts([]);
+            }
+        }
     }, []);
 
     const fetchData = async () => {
@@ -106,7 +115,7 @@ const HomePage = () => {
             return;
         }
 
-        const cartStorage = localStorage.getItem("carts");
+        const cartStorage = localStorage.getItem(`carts_${user.email}`);
         if (cartStorage) {
             const carts = JSON.parse(cartStorage) as ICart[];
 
@@ -121,7 +130,7 @@ const HomePage = () => {
                 });
             }
 
-            localStorage.setItem("carts", JSON.stringify(carts));
+            localStorage.setItem(`carts_${user.email}`, JSON.stringify(carts));
             setCarts(carts);
         } else {
             const data = [{
@@ -129,7 +138,7 @@ const HomePage = () => {
                 quantity: 1,
                 detail: book
             }];
-            localStorage.setItem("carts", JSON.stringify(data));
+            localStorage.setItem(`carts_${user.email}`, JSON.stringify(data));
 
             // sync React context
             setCarts(data);

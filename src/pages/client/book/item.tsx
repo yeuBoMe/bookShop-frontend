@@ -87,7 +87,7 @@ const BookDetailPage = () => {
         if (!book) return;
 
         // update local storage
-        const cartStorage = localStorage.getItem("carts");
+        const cartStorage = localStorage.getItem(`carts_${user.email}`);
         if (cartStorage) {
             // update
             const carts = JSON.parse(cartStorage) as ICart[];
@@ -104,7 +104,7 @@ const BookDetailPage = () => {
                 });
             }
 
-            localStorage.setItem("carts", JSON.stringify(carts));
+            localStorage.setItem(`carts_${user.email}`, JSON.stringify(carts));
             setCarts(carts);
         } else {
             // create
@@ -114,7 +114,7 @@ const BookDetailPage = () => {
                 detail: book!
             }];
 
-            localStorage.setItem("carts", JSON.stringify(data));
+            localStorage.setItem(`carts_${user.email}`, JSON.stringify(data));
 
             // sync React context
             setCarts(data);
