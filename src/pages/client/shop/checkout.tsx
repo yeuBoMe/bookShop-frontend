@@ -70,6 +70,7 @@ const CheckoutPage = () => {
                 address: values.address,
                 paymentMethod: values.paymentMethod,
                 totalPrice: finalTotalPrice,
+                status: "PENDING", 
                 detail: carts.map((item) => ({
                     book: { id: item.id },
                     quantity: item.quantity,
@@ -80,6 +81,7 @@ const CheckoutPage = () => {
             const createOrderResponse = await createAnOrderAPI(orderData);
 
             if (createOrderResponse.data) {
+                await new Promise((resolve) => setTimeout(resolve, 2000));
                 console.log(">>> order data: ", createOrderResponse)
                 message.success("Thanh toán thành công!");
                 localStorage.removeItem("carts");
@@ -92,7 +94,7 @@ const CheckoutPage = () => {
         } catch (error: any) {
             notification.error({
                 message: "Error",
-                description: error?.message || "An error happens when updating book",
+                description: error?.message || "An error happens when handle payment",
                 duration: 5,
                 placement: "topRight",
             });
@@ -187,7 +189,6 @@ const CheckoutPage = () => {
                 <Payment
                     carts={carts}
                     totalPrice={totalPrice}
-                    user={user}
                     isPaymentLoading={isPaymentLoading}
                     onBackToCart={handleBackToCart}
                     onPaymentSubmit={handlePaymentSubmit}

@@ -61,7 +61,7 @@ export const AuthProvider = (props: IProps) => {
                 setUser(mappedIAccountToIUser);
                 setIsAuthenticated(true);
 
-                const carts = localStorage.getItem(`carts_${user?.email}`);
+                const carts = localStorage.getItem("carts");
                 if (carts) {
                     const cartsData = JSON.parse(carts) as ICart[];
                     setCarts(cartsData);

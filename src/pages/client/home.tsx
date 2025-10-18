@@ -115,7 +115,7 @@ const HomePage = () => {
             return;
         }
 
-        const cartStorage = localStorage.getItem(`carts_${user.email}`);
+        const cartStorage = localStorage.getItem("carts");
         if (cartStorage) {
             const carts = JSON.parse(cartStorage) as ICart[];
 
@@ -130,7 +130,7 @@ const HomePage = () => {
                 });
             }
 
-            localStorage.setItem(`carts_${user.email}`, JSON.stringify(carts));
+            localStorage.setItem("carts", JSON.stringify(carts));
             setCarts(carts);
         } else {
             const data = [{
@@ -138,7 +138,7 @@ const HomePage = () => {
                 quantity: 1,
                 detail: book
             }];
-            localStorage.setItem(`carts_${user.email}`, JSON.stringify(data));
+            localStorage.setItem("carts", JSON.stringify(data));
 
             // sync React context
             setCarts(data);

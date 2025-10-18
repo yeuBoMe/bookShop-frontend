@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Button, Form, Input, Radio, type FormProps } from "antd";
 import { ShoppingOutlined, CreditCardOutlined } from "@ant-design/icons";
 import "styles/client/checkout/payment.scss";
+import { useCurrentApp } from "@/components/context/app.context";
 
 interface UserCheckoutValues {
     name: string;
@@ -14,14 +15,14 @@ interface UserCheckoutValues {
 interface PaymentProps {
     carts: ICart[];
     totalPrice: number;
-    user: IUser | null;
     isPaymentLoading: boolean;
     onBackToCart: () => void;
     onPaymentSubmit: (values: UserCheckoutValues) => void;
 }
 
 const Payment = (props: PaymentProps) => {
-    const { carts, totalPrice, user, isPaymentLoading, onBackToCart, onPaymentSubmit } = props;
+    const { user } = useCurrentApp();
+    const { carts, totalPrice, isPaymentLoading, onBackToCart, onPaymentSubmit } = props;
     const [form] = Form.useForm<UserCheckoutValues>();
     const [paymentMethod, setPaymentMethod] = useState<string>("cod");
     const baseUrl = `${import.meta.env.VITE_BACKEND_URL}`;

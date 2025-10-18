@@ -211,10 +211,16 @@ export const createAnOrderAPI = (data: {
   address: string;
   paymentMethod: string;
   totalPrice: number;
+  status: string;
   detail: any;
 }) => {
   const ENDPOINT_CREATE_ORDER = "/api/v1/orders";
   return axios.post<IBackendRes<IOrder>>(ENDPOINT_CREATE_ORDER, data);
+};
+
+export const getOrderHistoryAPI = () => {
+  const ENDPOINT_GET_ORDER_HISTORY = "/api/v1/orders/history";
+  return axios.get<IBackendRes<IOrder>>(ENDPOINT_GET_ORDER_HISTORY);
 };
 
 // Module auth

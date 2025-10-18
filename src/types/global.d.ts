@@ -150,6 +150,7 @@ declare global {
     address: string;
     paymentMethod: string;
     totalPrice: number;
+    status: string;
     detail: IOrderDetail[];
     createdAt?: Date;
     updatedAt?: Date;
