@@ -23,7 +23,7 @@ interface UserCheckoutValues {
 
 const CheckoutPage = () => {
     const navigate = useNavigate();
-    const { user, carts, setCarts } = useCurrentApp();
+    const { carts, setCarts } = useCurrentApp();
     const { notification, message } = App.useApp();
     const [totalPrice, setTotalPrice] = useState<number>(0);
     const [currentStep, setCurrentStep] = useState<number>(0);
@@ -98,6 +98,7 @@ const CheckoutPage = () => {
                 duration: 5,
                 placement: "topRight",
             });
+            console.log("error order >>>", error);
         } finally {
             setIsPaymentLoading(false);
         }

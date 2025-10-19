@@ -3,7 +3,9 @@ import "styles/client/layout/client.footer.scss";
 
 const Footer = () => {
     const [showScrollButton, setShowScrollButton] = useState<boolean>(false);
+    const [showFooter, setShowFooter] = useState<boolean>(false); // Trạng thái hiển thị footer
 
+    // Xử lý nút scroll to top
     useEffect(() => {
         const handleScroll = () => {
             setShowScrollButton(window.scrollY > 300);
@@ -13,9 +15,23 @@ const Footer = () => {
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
+    // Hiển thị footer sau 2 giây
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setShowFooter(true);
+        }, 2000); // 2000ms = 2 giây
+
+        return () => clearTimeout(timer);
+    }, []);
+
     const scrollToTop = () => {
         window.scrollTo({ top: 0, behavior: "smooth" });
     };
+
+    // Nếu chưa đến 2 giây thì ẩn hoàn toàn footer
+    if (!showFooter) {
+        return null;
+    }
 
     return (
         <>

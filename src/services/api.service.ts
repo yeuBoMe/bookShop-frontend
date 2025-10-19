@@ -220,7 +220,7 @@ export const createAnOrderAPI = (data: {
 
 export const getOrderHistoryAPI = () => {
   const ENDPOINT_GET_ORDER_HISTORY = "/api/v1/orders/history";
-  return axios.get<IBackendRes<IOrder>>(ENDPOINT_GET_ORDER_HISTORY);
+  return axios.get<IBackendRes<IModelPaginate<IOrder>>>(ENDPOINT_GET_ORDER_HISTORY);
 };
 
 // Module auth

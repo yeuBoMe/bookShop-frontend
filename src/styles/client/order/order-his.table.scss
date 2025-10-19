@@ -1,0 +1,133 @@
+$primary-color: #1890ff;
+$success-color: #52c41a;
+$warning-color: #faad14;
+$error-color: #ff4d4f;
+$text-color: #262626;
+$text-secondary: #8c8c8c;
+$border-color: #e8e8e8;
+$bg-gray: #fafafa;
+$shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+$mobile: 576px;
+$tablet: 768px;
+$desktop: 1200px;
+
+.order-history-table {
+  .ant-table {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: $shadow-sm;
+
+    .ant-table-thead > tr > th {
+      background: $bg-gray;
+      font-weight: 600;
+      color: $text-color;
+      border-bottom: 2px solid $border-color;
+      padding: 12px;
+      font-size: 14px;
+
+      @media (max-width: $tablet) {
+        padding: 10px 8px;
+        font-size: 13px;
+      }
+
+      @media (max-width: $mobile) {
+        padding: 8px 6px;
+        font-size: 12px;
+      }
+    }
+
+    .ant-table-tbody > tr {
+      transition: all 0.3s ease;
+
+      &:hover {
+        background: #f0f7ff;
+      }
+
+      > td {
+        padding: 12px;
+        font-size: 14px;
+
+        @media (max-width: $tablet) {
+          padding: 10px 8px;
+          font-size: 13px;
+        }
+
+        @media (max-width: $mobile) {
+          padding: 8px 6px;
+          font-size: 12px;
+        }
+      }
+    }
+
+    .order-item {
+      margin-bottom: 6px;
+      .item-quantity {
+        color: $text-secondary;
+        margin-left: 8px;
+      }
+    }
+
+    .total-price {
+      color: $error-color;
+      font-weight: 600;
+    }
+
+    .ant-btn {
+      border-radius: 6px;
+      font-size: 13px;
+      padding: 4px 8px;
+
+      @media (max-width: $mobile) {
+        font-size: 12px;
+        padding: 2px 6px;
+      }
+    }
+  }
+
+  .ant-pagination {
+    margin-top: 20px;
+    text-align: right;
+
+    @media (max-width: $mobile) {
+      text-align: center;
+      .ant-pagination-options {
+        display: none;
+      }
+    }
+
+    .ant-pagination-item,
+    .ant-pagination-prev,
+    .ant-pagination-next {
+      min-width: 32px;
+      height: 32px;
+      line-height: 32px;
+      font-size: 14px;
+
+      @media (max-width: $mobile) {
+        min-width: 28px;
+        height: 28px;
+        line-height: 28px;
+        font-size: 12px;
+      }
+    }
+  }
+
+  @media (max-width: $tablet) {
+    .ant-table-wrapper {
+      overflow-x: auto;
+    }
+
+    .ant-table-thead > tr > th:first-child,
+    .ant-table-tbody > tr > td:first-child {
+      position: sticky;
+      left: 0;
+      background: $bg-gray;
+      z-index: 2;
+      box-shadow: 2px 0 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .ant-table-tbody > tr > td:first-child {
+      background: white;
+    }
+  }
+}
