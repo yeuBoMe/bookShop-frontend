@@ -280,7 +280,7 @@ const UpdateBookModal = (props: UpdateBookProps) => {
         setDeletedImages([]);
         setDataUpdate(null);
     }
-
+    
     return (
         <>
             <Modal

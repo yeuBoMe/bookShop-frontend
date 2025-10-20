@@ -28,7 +28,7 @@ const TableBook = () => {
         pageSize: 5,
         pages: 0,
         total: 0
-    })
+    });
 
     const [isModalImportOpen, setIsModalImportOpen] = useState<boolean>(false);
     const [isModalCreateOpen, setIsModalCreateOpen] = useState<boolean>(false);

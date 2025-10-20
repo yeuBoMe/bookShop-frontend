@@ -6,10 +6,16 @@ import "styles/client/order/order-his.table.scss";
 interface OrderHistoryTableProps {
     orders: IOrder[];
     onViewDetail: (order: IOrder) => void;
+    meta: {
+        current: number;
+        pageSize: number;
+        pages: number;
+        total: number;
+    };
 }
 
 const OrderHistoryTable = (props: OrderHistoryTableProps) => {
-    const { orders, onViewDetail } = props;
+    const { orders, onViewDetail, meta } = props;
 
     // Format giá tiền
     const formatPrice = (price: number) => {
@@ -172,9 +178,17 @@ const OrderHistoryTable = (props: OrderHistoryTableProps) => {
             dataSource={orders}
             rowKey="id"
             pagination={{
-                pageSize: 10,
+                current: meta.current,
+                pageSize: meta.pageSize,
                 showSizeChanger: true,
-                showTotal: (total) => `Tổng ${total} đơn hàng`,
+                total: meta.total,
+                showTotal: (total, range) => {
+                    return (
+                        <div>
+                            {range[0]} - {range[1]} on {total} rows
+                        </div>
+                    )
+                },
             }}
             bordered
             className="order-history-table"

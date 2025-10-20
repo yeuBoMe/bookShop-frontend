@@ -29,17 +29,30 @@ export const updateUserAPI = (id: number, fullName: string, phone: string) => {
   return axios.put<IBackendRes<IUser>>(ENDPOINT_UPDATE_USER, data);
 };
 
+export const updateUserAvatarAPI = (id: number, file: File) => {
+  const formData = new FormData();
+  formData.append("fileName", file);
+
+  return axios.patch<IBackendRes<IUser>>(
+    `/api/v1/users/${id}/avatar`,
+    formData,
+    {
+      headers: { "Content-Type": "multipart/form-data" },
+    }
+  );
+};
+
+export const deleteUserAvatarAPI = (id: number, fileName: string) => {
+  return axios.delete<IBackendRes<IUser>>(`/api/v1/users/${id}/avatar`, {
+    params: { fileName },
+  });
+};
+
 export const deleteUserAPI = (id: number) => {
   const ENDPOINT_DELETE_USER = `/api/v1/users/${id}`;
   return axios.delete<IBackendRes<IUser>>(ENDPOINT_DELETE_USER);
 };
 
-// export const fetchAllUsersAPI = (current: number, pageSize: number) => {
-//   const ENDPOINT_FETCH_ALL_USERS = `/api/v1/users?page=${current}&size=${pageSize}`;
-//   return axios.get<IBackendRes<IModelPaginate<IUserTable>>>(
-//     ENDPOINT_FETCH_ALL_USERS
-//   );
-// };
 export const fetchAllUsersAPI = (query: string) => {
   const ENDPOINT_FETCH_ALL_USERS = `/api/v1/users?${query}`;
   return axios.get<IBackendRes<IModelPaginate<IUserView>>>(
@@ -220,7 +233,9 @@ export const createAnOrderAPI = (data: {
 
 export const getOrderHistoryAPI = () => {
   const ENDPOINT_GET_ORDER_HISTORY = "/api/v1/orders/history";
-  return axios.get<IBackendRes<IModelPaginate<IOrder>>>(ENDPOINT_GET_ORDER_HISTORY);
+  return axios.get<IBackendRes<IModelPaginate<IOrder>>>(
+    ENDPOINT_GET_ORDER_HISTORY
+  );
 };
 
 // Module auth

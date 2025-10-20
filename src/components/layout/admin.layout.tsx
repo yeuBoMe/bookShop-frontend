@@ -36,7 +36,7 @@ const AdminLayout = () => {
                 setCarts([]);
                 setIsAuthenticated(false);
                 localStorage.removeItem("access_token");
-                localStorage.removeItem(`carts_${user?.email}`);
+                localStorage.removeItem("carts");
                 message.success("Đăng xuất thành công!");
                 navigate("/login");
             }

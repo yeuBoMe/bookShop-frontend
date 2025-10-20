@@ -14,6 +14,13 @@ const OrderHistoryPage = () => {
     const [selectedOrder, setSelectedOrder] = useState<IOrder | null>(null);
     const [modalVisible, setModalVisible] = useState<boolean>(false);
 
+    const [meta, setMeta] = useState({
+        current: 1,
+        pageSize: 5,
+        pages: 0,
+        total: 0
+    });
+
     useEffect(() => {
         fetchOrders();
     }, []);
@@ -22,9 +29,12 @@ const OrderHistoryPage = () => {
         window.scrollTo({ top: 0, behavior: "smooth" });
         try {
             setLoading(true);
-            const res = await getOrderHistoryAPI();
+            const fetchOrderHistoryResponse = await getOrderHistoryAPI();
             await new Promise((resolve) => setTimeout(resolve, 1000));
-            if (res.data) setOrders(res.data.result);
+            if (fetchOrderHistoryResponse.data) {
+                setOrders(fetchOrderHistoryResponse.data.result);
+                setMeta(fetchOrderHistoryResponse.data.meta);
+            }
         } catch (error) {
             console.error("Lỗi khi tải đơn hàng:", error);
         } finally {
@@ -66,6 +76,7 @@ const OrderHistoryPage = () => {
                     <OrderHistoryTable
                         orders={orders}
                         onViewDetail={handleViewDetail}
+                        meta={meta}
                     />
                 )}
             </div>

@@ -22,7 +22,7 @@ const Header = () => {
                 setCarts([]);
                 setIsAuthenticated(false);
                 localStorage.removeItem("access_token");
-                localStorage.removeItem(`carts_${user?.email}`);
+                localStorage.removeItem("carts");
                 message.success("Đăng xuất thành công!");
                 navigate("/login");
             }
@@ -179,10 +179,14 @@ const Header = () => {
                                             <div className="userInfo">
                                                 <p>Hello, {user.fullName}</p>
                                             </div>
+                                            
                                             {user.role?.name === "ADMIN" && (
-                                                <Link to="/admin">Trang quản trị</Link>
+                                                <>
+                                                    <Link to="/admin">Trang quản trị</Link>
+                                                    <Link to="/admin/user">Quản lý tài khoản</Link>
+                                                </>
                                             )}
-                                            <Link to="/account">Quản lý tài khoản</Link>
+
                                             <button
                                                 className="dropdownLogout"
                                                 onClick={handleLogoutRequest}
