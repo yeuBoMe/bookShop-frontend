@@ -194,69 +194,69 @@ const UpdateBookModal = (props: UpdateBookProps) => {
         console.log('Form values:', values);
         console.log('Images removed >>> ', deletedImages);
 
-        setIsLoading(true);
+        if (!dataUpdate) return;
+        
         try {
-            if (dataUpdate) {
-                const {
-                    name,
-                    author,
-                    price,
-                    quantity,
-                    category,
-                    introduceText,
-                    description,
-                    reader
-                } = values;
+            setIsLoading(true);
+            const {
+                name,
+                author,
+                price,
+                quantity,
+                category,
+                introduceText,
+                description,
+                reader
+            } = values;
 
-                // Step 1: Delete all removed images at client and in db server 
-                if (deletedImages.length > 0) {
-                    setImageLoading(true);
-                    try {
-                        await deleteBookMultipleImagesAPI(dataUpdate.id, deletedImages);
-                        console.log(`Deleted ${deletedImages.length} images`);
-                    } catch (error: any) {
-                        console.error('Check error delete image >>> ', error);
-                        message.warning('Cannot delete images!');
-                        // Continue update      
-                    }
+            // Step 1: Delete all removed images at client and in db server 
+            if (deletedImages.length > 0) {
+                setImageLoading(true);
+                try {
+                    await deleteBookMultipleImagesAPI(dataUpdate.id, deletedImages);
+                    console.log(`Deleted ${deletedImages.length} images`);
+                } catch (error: any) {
+                    console.error('Check error delete image >>> ', error);
+                    message.warning('Cannot delete images!');
+                    // Continue update      
                 }
+            }
 
-                // Step 2: Upload images
-                const newFiles = fileList
-                    .filter(file => file.originFileObj)
-                    .map(file => file.originFileObj as File);
+            // Step 2: Upload images
+            const newFiles = fileList
+                .filter(file => file.originFileObj)
+                .map(file => file.originFileObj as File);
 
-                if (newFiles.length > 0) {
-                    setImageLoading(true);
-                    try {
-                        await updateBookMultipleImagesAPI(dataUpdate.id, newFiles);
-                        console.log(`Uploaded ${newFiles.length} images`);
-                    } catch (error: any) {
-                        console.error('Check error update image >>> ', error);
-                        message.error('Cannot upload new images');
-                        throw error; // Stop if upload fail
-                    }
+            if (newFiles.length > 0) {
+                setImageLoading(true);
+                try {
+                    await updateBookMultipleImagesAPI(dataUpdate.id, newFiles);
+                    console.log(`Uploaded ${newFiles.length} images`);
+                } catch (error: any) {
+                    console.error('Check error update image >>> ', error);
+                    message.error('Cannot upload new images');
+                    throw error; // Stop if upload fail
                 }
+            }
 
-                // Step 3: Update book
-                const finalCategory = category && category.id !== undefined ? category : null;
-                const updateBookResponse = await updateBookAPI(
-                    dataUpdate.id,
-                    name,
-                    author,
-                    price,
-                    quantity,
-                    finalCategory,
-                    introduceText,
-                    description,
-                    reader,
-                );
+            // Step 3: Update book
+            const finalCategory = category && category.id !== undefined ? category : null;
+            const updateBookResponse = await updateBookAPI(
+                dataUpdate.id,
+                name,
+                author,
+                price,
+                quantity,
+                finalCategory,
+                introduceText,
+                description,
+                reader,
+            );
 
-                if (updateBookResponse.data) {
-                    handleClearDataAndCloseModal();
-                    message.success("Update book successfully!");
-                    refreshTable();
-                }
+            if (updateBookResponse.data) {
+                handleClearDataAndCloseModal();
+                message.success("Update book successfully!");
+                refreshTable();
             }
         } catch (error: any) {
             notification.error({
@@ -280,7 +280,7 @@ const UpdateBookModal = (props: UpdateBookProps) => {
         setDeletedImages([]);
         setDataUpdate(null);
     }
-    
+
     return (
         <>
             <Modal
@@ -436,7 +436,7 @@ const UpdateBookModal = (props: UpdateBookProps) => {
                                             { required: true, message: "Description is required" },
                                             { max: 5000, message: "Description must be less than 5000 characters" },
                                             {
-                                                pattern:  /^[A-Za-zÀ-ỹà-ỹ0-9'.,:;()\-–\s]{1,5000}$/,
+                                                pattern: /^[A-Za-zÀ-ỹà-ỹ0-9'.,:;()\-–\s]{1,5000}$/,
                                                 message: "Invalid description text format",
                                             },
                                         ]}

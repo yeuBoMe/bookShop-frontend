@@ -125,9 +125,9 @@ const CreateBookModal = (props: CreateBookProps) => {
 
     const handleCreateBook: FormProps<BookCreateValues>['onFinish'] = async (values) => {
         console.log('Success:', values);
-        setIsLoading(true);
-
+        
         try {
+            setIsLoading(true);
             const {
                 name,
                 author,

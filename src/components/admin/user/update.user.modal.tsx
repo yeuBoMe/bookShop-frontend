@@ -39,27 +39,26 @@ const UpdateUserModal = (props: UpdateUserProps) => {
     }, [dataUpdate]);
 
     const handleUpdateUser: FormProps<UserUpdateValues>['onFinish'] = async (values) => {
-        setIsLoading(true);
+        if (!dataUpdate) return;
 
-        if (dataUpdate) {
-            try {
-                const { fullName, phone } = values;
-                const updateUserResponse = await updateUserAPI(dataUpdate?.id, fullName, phone);
-                if (updateUserResponse.data) {
-                    handleClearDataAndCloseModal();
-                    message.success("Update user successfully!");
-                    refreshTable();
-                }
-            } catch (error: any) {
-                notification.error({
-                    message: "Error",
-                    description: error?.message,
-                    duration: 5,
-                    placement: "topRight",
-                });
-            } finally {
-                setIsLoading(false);
+        try {
+            setIsLoading(true);
+            const { fullName, phone } = values;
+            const updateUserResponse = await updateUserAPI(dataUpdate?.id, fullName, phone);
+            if (updateUserResponse.data) {
+                handleClearDataAndCloseModal();
+                message.success("Update user successfully!");
+                refreshTable();
             }
+        } catch (error: any) {
+            notification.error({
+                message: "Error",
+                description: error?.message,
+                duration: 5,
+                placement: "topRight",
+            });
+        } finally {
+            setIsLoading(false);
         }
     };
 
