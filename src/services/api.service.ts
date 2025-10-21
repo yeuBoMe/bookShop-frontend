@@ -29,6 +29,21 @@ export const updateUserAPI = (id: number, fullName: string, phone: string) => {
   return axios.put<IBackendRes<IUser>>(ENDPOINT_UPDATE_USER, data);
 };
 
+export const updateUserPasswordAPI = (
+  id: number,
+  currentPassword: string,
+  newPassword: string,
+  confirmPassword: string
+) => {
+  const data = {
+    currentPassword: currentPassword,
+    newPassword: newPassword,
+    confirmPassword: confirmPassword,
+  };
+  const ENDPOINT_UPDATE_USER_PASSWORD = `/api/v1/users/${id}/password`;
+  return axios.patch<IBackendRes<IUser>>(ENDPOINT_UPDATE_USER_PASSWORD, data);
+};
+
 export const updateUserAvatarAPI = (id: number, file: File) => {
   const formData = new FormData();
   formData.append("fileName", file);

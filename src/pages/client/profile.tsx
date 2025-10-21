@@ -5,13 +5,19 @@ import type { FormProps, GetProp, UploadFile, UploadProps } from "antd";
 import { v4 as uuidv4 } from 'uuid';
 import "styles/client/profile.scss";
 import { useCurrentApp } from "@/components/context/app.context";
-import { deleteUserAvatarAPI, updateUserAPI, updateUserAvatarAPI } from "@/services/api.service";
+import { deleteUserAvatarAPI, updateUserAPI, updateUserAvatarAPI, updateUserPasswordAPI } from "@/services/api.service";
 
-interface ProfileValues {
+interface InfoValues {
     email: string;
     fullName: string;
     phone: string;
     avatar: UploadFile[];
+}
+
+interface PasswordValues {
+    currentPassword: string;
+    newPassword: string;
+    confirmPassword: string;
 }
 
 type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
@@ -31,8 +37,8 @@ const ProfilePage = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [activeTab, setActiveTab] = useState("1");
 
-    const [form] = Form.useForm<ProfileValues>();
-    const [passwordForm] = Form.useForm();
+    const [infoForm] = Form.useForm<InfoValues>();
+    const [passwordForm] = Form.useForm<PasswordValues>();
 
     const [imageLoading, setImageLoading] = useState<boolean>(false);
     const [fileList, setFileList] = useState<UploadFile[]>([]);
@@ -64,7 +70,7 @@ const ProfilePage = () => {
             setFileList(avatarFile);
             setDeletedImage("");
 
-            form.setFieldsValue({
+            infoForm.setFieldsValue({
                 email: user.email,
                 fullName: user.fullName,
                 phone: user.phone,
@@ -79,13 +85,13 @@ const ProfilePage = () => {
     const handleCloseModal = () => {
         setIsModalOpen(false);
         setActiveTab("1");
-        form.resetFields();
+        infoForm.resetFields();
         passwordForm.resetFields();
         setFileList([]);
         setDeletedImage("");
     };
 
-    const handleUpdateInfo: FormProps<ProfileValues>['onFinish'] = async (values) => {
+    const handleUpdateInfo: FormProps<InfoValues>['onFinish'] = async (values) => {
         console.log('Success:', values);
         if (!user) return;
 
@@ -94,7 +100,7 @@ const ProfilePage = () => {
             const { fullName, phone } = values;
 
             if (deletedImage) {
-                try {   
+                try {
                     setImageLoading(true);
                     await deleteUserAvatarAPI(user.id, deletedImage);
                     console.log(`Deleted ${deletedImage.length} image`);
@@ -136,13 +142,35 @@ const ProfilePage = () => {
         }
     };
 
-    const handleChangePassword = async (values: any) => {
+    const handleUpdatePassword: FormProps<PasswordValues>['onFinish'] = async (values) => {
+        console.log("Đổi mật khẩu:", values);
+        if (!user) return;
+
         try {
-            console.log("Đổi mật khẩu:", values);
-            message.success("Đổi mật khẩu thành công!");
-            passwordForm.resetFields();
-        } catch (error) {
-            message.error("Đổi mật khẩu thất bại!");
+            setIsUpdatePassLoading(true);
+            const { currentPassword, newPassword, confirmPassword } = values;
+
+            const updateUserPasswordResponse = await updateUserPasswordAPI(
+                user.id,
+                currentPassword,
+                newPassword,
+                confirmPassword
+            );
+
+            if (updateUserPasswordResponse.data) {
+                message.success("Đổi mật khẩu thành công!");
+                handleCloseModal();
+            }
+        } catch (error: any) {
+            notification.error({
+                message: "Error",
+                description: error?.message || "An error happens when updating password",
+                duration: 5,
+                placement: "topRight",
+            });
+            console.log("Check error update user password >>> ", error.message);
+        } finally {
+            setIsUpdatePassLoading(false);
         }
     };
 
@@ -188,13 +216,13 @@ const ProfilePage = () => {
                 <div className="profile-tab-content">
 
                     <Form
-                        form={form}
+                        form={infoForm}
                         layout="vertical"
                         onFinish={handleUpdateInfo}
                         className="profile-form"
                     >
                         <div className="profile-avatar-section">
-                            <Form.Item<ProfileValues>
+                            <Form.Item<InfoValues>
                                 label="Avatar:"
                                 name="avatar"
                                 valuePropName="fileList"
@@ -233,7 +261,7 @@ const ProfilePage = () => {
                                 />
                             )}
                         </div>
-                        <Form.Item<ProfileValues>
+                        <Form.Item<InfoValues>
                             label="Email:"
                             name="email"
                             rules={[{ required: true, message: "Vui lòng nhập email!" }, { type: "email", message: "Email không hợp lệ!" }]}
@@ -241,7 +269,7 @@ const ProfilePage = () => {
                             <Input prefix={<MailOutlined />} size="large" disabled />
                         </Form.Item>
 
-                        <Form.Item<ProfileValues>
+                        <Form.Item<InfoValues>
                             label="Tên hiển thị:"
                             name="fullName"
                             rules={[{ required: true, message: "Vui lòng nhập tên!" }]}
@@ -249,7 +277,7 @@ const ProfilePage = () => {
                             <Input prefix={<UserOutlined />} size="large" />
                         </Form.Item>
 
-                        <Form.Item<ProfileValues>
+                        <Form.Item<InfoValues>
                             label="Số điện thoại:"
                             name="phone"
                             rules={[{ required: true, message: "Vui lòng nhập số điện thoại!" }, { pattern: /^[0-9]{10}$/, message: "Số điện thoại không hợp lệ!" }]}
@@ -280,40 +308,54 @@ const ProfilePage = () => {
                     <Form
                         form={passwordForm}
                         layout="vertical"
-                        onFinish={handleChangePassword}
+                        onFinish={handleUpdatePassword}
                         className="profile-form"
                     >
-                        <Form.Item
+                        <Form.Item<PasswordValues>
                             label="Mật khẩu hiện tại:"
                             name="currentPassword"
                             rules={[{ required: true, message: "Vui lòng nhập mật khẩu hiện tại!" }]}
                         >
-                            <Input.Password prefix={<LockOutlined />} placeholder="Nhập mật khẩu hiện tại" size="large" />
+                            <Input.Password
+                                prefix={<LockOutlined />}
+                                placeholder="Nhập mật khẩu hiện tại"
+                                size="large"
+                            />
                         </Form.Item>
 
-                        <Form.Item
+                        <Form.Item<PasswordValues>
                             label="Mật khẩu mới:"
                             name="newPassword"
-                            rules={[{ required: true, message: "Vui lòng nhập mật khẩu mới!" }, { min: 6, message: "Mật khẩu phải có ít nhất 6 ký tự!" }]}
-                        >
-                            <Input.Password prefix={<LockOutlined />} placeholder="Nhập mật khẩu mới" size="large" />
-                        </Form.Item>
-
-                        <Form.Item
-                            label="Xác nhận mật khẩu mới:"
-                            name="confirmPassword"
-                            dependencies={["newPassword"]}
                             rules={[
-                                { required: true, message: "Vui lòng xác nhận mật khẩu!" },
-                                ({ getFieldValue }) => ({
-                                    validator(_, value) {
-                                        if (!value || getFieldValue("newPassword") === value) return Promise.resolve();
-                                        return Promise.reject(new Error("Mật khẩu xác nhận không khớp!"));
-                                    }
-                                })
+                                { required: true, message: "Vui lòng nhập mật khẩu mới!" },
+                                { min: 6, message: "Mật khẩu phải có ít nhất 6 ký tự!" }
                             ]}
                         >
-                            <Input.Password prefix={<LockOutlined />} placeholder="Xác nhận mật khẩu mới" size="large" />
+                            <Input.Password
+                                prefix={<LockOutlined />}
+                                placeholder="Nhập mật khẩu mới"
+                                size="large"
+                            />
+                        </Form.Item>
+
+                        <Form.Item<PasswordValues>
+                            label="Xác nhận mật khẩu mới:"
+                            name="confirmPassword"
+                            rules={[
+                                { required: true, message: "Vui lòng xác nhận mật khẩu!" },
+                                // ({ getFieldValue }) => ({
+                                //     validator(_, value) {
+                                //         if (!value || getFieldValue("newPassword") === value) return Promise.resolve();
+                                //         return Promise.reject(new Error("Mật khẩu xác nhận không khớp!"));
+                                //     }
+                                // })
+                            ]}
+                        >
+                            <Input.Password
+                                prefix={<LockOutlined />}
+                                placeholder="Xác nhận mật khẩu mới"
+                                size="large"
+                            />
                         </Form.Item>
 
                         <Form.Item className="form-actions">
@@ -322,6 +364,7 @@ const ProfilePage = () => {
                                 htmlType="submit"
                                 size="large"
                                 block
+                                loading={isUpdatePassLoading}
                             >
                                 Đổi mật khẩu
                             </Button>
