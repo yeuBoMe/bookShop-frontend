@@ -31,7 +31,7 @@ const getBase64 = (file: FileType): Promise<string> =>
     });
 
 const ProfilePage = () => {
-    const { user } = useCurrentApp();
+    const { user, setUser } = useCurrentApp();
     const { notification, message } = App.useApp();
 
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -110,12 +110,16 @@ const ProfilePage = () => {
                 }
             }
 
+            let updatedAvatar: string | undefined = user.avatar;
             const newAvatar = fileList[0].originFileObj;
 
             if (newAvatar) {
                 try {
                     setImageLoading(true);
-                    await updateUserAvatarAPI(user.id, newAvatar)
+                    const updateUserAvatarResponse = await updateUserAvatarAPI(user.id, newAvatar);
+                    if (updateUserAvatarResponse.data) {
+                        updatedAvatar = updateUserAvatarResponse.data.avatar;
+                    }
                 } catch (error: any) {
                     console.error('Check error update image >>> ', error);
                     message.error('Cannot upload new image');
@@ -124,7 +128,15 @@ const ProfilePage = () => {
             }
 
             const updateUserResponse = await updateUserAPI(user.id, fullName, phone);
+            await new Promise((resolve) => setTimeout(resolve, 2000));
             if (updateUserResponse.data) {
+                setUser({
+                    ...user!,
+                    fullName,
+                    phone,
+                    avatar: updatedAvatar
+                });
+
                 message.success("Cập nhật tài khoản thành công!");
                 handleCloseModal();
             }
@@ -156,6 +168,8 @@ const ProfilePage = () => {
                 newPassword,
                 confirmPassword
             );
+
+            await new Promise((resolve) => setTimeout(resolve, 2000));
 
             if (updateUserPasswordResponse.data) {
                 message.success("Đổi mật khẩu thành công!");
@@ -214,7 +228,6 @@ const ProfilePage = () => {
             label: "Cập nhật thông tin",
             children: (
                 <div className="profile-tab-content">
-
                     <Form
                         form={infoForm}
                         layout="vertical"

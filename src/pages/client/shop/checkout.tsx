@@ -8,7 +8,7 @@ import {
 } from "@ant-design/icons";
 import { useCurrentApp } from "@/components/context/app.context";
 import "styles/client/checkout/checkout.scss";
-import OrderSuccess from "@/components/client/checkout/order-success";
+import CheckoutSuccess from "@/components/client/checkout/checkout-success";
 import Cart from "@/components/client/checkout/cart";
 import Payment from "@/components/client/checkout/payment";
 import { createAnOrderAPI } from "@/services/api.service";
@@ -70,7 +70,7 @@ const CheckoutPage = () => {
                 address: values.address,
                 paymentMethod: values.paymentMethod,
                 totalPrice: finalTotalPrice,
-                status: "PENDING", 
+                status: "PENDING",
                 detail: carts.map((item) => ({
                     book: { id: item.id },
                     quantity: item.quantity,
@@ -197,7 +197,7 @@ const CheckoutPage = () => {
             )}
 
             {/* Bước 3: Thanh toán */}
-            {currentStep === 2 && <OrderSuccess />}
+            {currentStep === 2 && <CheckoutSuccess />}
         </div>
     );
 };

@@ -4,8 +4,8 @@ import { ShoppingOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { getOrderHistoryAPI } from "@/services/api.service";
 import "styles/client/order/order-history.scss";
-import OrderDetailModal from "@/components/client/checkout/order-detail.modal";
-import OrderHistoryTable from "@/components/client/checkout/order-his.table";
+import OrderDetailModal from "@/components/client/order/order-detail.modal";
+import OrderHistoryTable from "@/components/client/order/order-his.table";
 
 const OrderHistoryPage = () => {
     const navigate = useNavigate();

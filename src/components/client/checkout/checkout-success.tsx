@@ -3,7 +3,7 @@ import { Button } from "antd";
 import { CreditCardOutlined } from "@ant-design/icons";
 import "styles/client/checkout/order-success.scss";
 
-const OrderSuccess = () => {
+const CheckoutSuccess = () => {
     const navigate = useNavigate();
 
     return (
@@ -35,4 +35,4 @@ const OrderSuccess = () => {
     );
 };
 
-export default OrderSuccess;
+export default CheckoutSuccess;
