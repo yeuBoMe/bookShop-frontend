@@ -16,7 +16,6 @@ type TSearch = {
     fullName: string;
     email: string;
     phone: string;
-    createdAt: string;
     createdAtRange: string;
 }
 
@@ -274,7 +273,7 @@ const TableUser = () => {
                     },
                 }}
                 dateFormatter="string"
-                headerTitle="Table user"
+                headerTitle="Table User"
                 toolBarRender={() => [
                     <CSVLink
                         data={currentDataTable}

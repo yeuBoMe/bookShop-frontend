@@ -16,7 +16,6 @@ type TSearch = {
     name: string;
     category: string;
     author: string;
-    createdAt: string;
     createdAtRange: string;
 }
 
@@ -220,6 +219,7 @@ const TableBook = () => {
                             const order = sort[field] ? "asc" : "desc";
                             return `${field},${order}`;
                         });
+
                         if (sortFields.length > 0) {
                             query += `&sort=${sortFields.join(',')}`;
                         }
@@ -289,7 +289,7 @@ const TableBook = () => {
                     },
                 }}
                 dateFormatter="string"
-                headerTitle="Table book"
+                headerTitle="Table Book"
                 toolBarRender={() => [
                     <CSVLink
                         data={currentDataTable}

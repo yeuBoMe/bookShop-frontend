@@ -253,6 +253,13 @@ export const getOrderHistoryAPI = () => {
   );
 };
 
+export const fetchAllOrdersAPI = (query: string) => {
+  const ENDPOINT_FETCH_ALL_ORDERS = `/api/v1/orders?${query}`;
+  return axios.get<IBackendRes<IModelPaginate<IOrder>>>(
+    ENDPOINT_FETCH_ALL_ORDERS
+  );
+};
+
 // Module auth
 export const loginAPI = (email: string, password: string) => {
   const ENDPOINT_LOGIN = "/api/v1/auth/login";
