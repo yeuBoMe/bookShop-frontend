@@ -68,7 +68,6 @@ const OrderDetailModal = (props: OrderDetailModalProps) => {
 
     const statusConfig = getStatusConfig(selectedOrder.status);
 
-
     const handleCloseModal = () => {
         setModalVisible(false);
         setSelectedOrder(null);
