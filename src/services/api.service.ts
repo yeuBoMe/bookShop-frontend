@@ -274,6 +274,11 @@ export const deleteOrderAPI = (id: number) => {
   return axios.delete<IBackendRes<IOrder>>(ENDPOINT_DELETE_ORDER);
 };
 
+// Module dashboard
+export const getDashBoardInfoAPI = () => {
+  return axios.get<IBackendRes<IDashBoard>>("/api/v1/dashboards");
+};
+
 // Module auth
 export const loginAPI = (email: string, password: string) => {
   const ENDPOINT_LOGIN = "/api/v1/auth/login";

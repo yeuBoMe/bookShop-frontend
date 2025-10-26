@@ -164,4 +164,10 @@ declare global {
     bookName: string;
     price: number;
   }
+
+  interface IDashBoard {
+    countOrders: number;
+    countBooks: number;
+    countUsers: number;
+  }
 }
