@@ -119,14 +119,20 @@ const OrderDetailModal = (props: OrderDetailModalProps) => {
                 {/* Danh sách sản phẩm trong đơn hàng */}
                 <div className="modal-products">
                     <h3>Sản phẩm đã đặt</h3>
-                    {selectedOrder.detail.map((item, index) => (
-                        <div key={index} className="modal-product-item">
-                            <div className="product-info">
-                                <span className="product-name">{item.bookName}</span>
-                                <span className="product-quantity">x{item.quantity}</span>
+                    {selectedOrder.detail.map((item, index) => {
+                        console.log("Check data detail >>>", item);
+                        return (
+                            <div key={index} className="modal-product-item" >
+                                <div className="product-info">
+                                    <span className="product-name">{item.bookName}</span>
+                                    <span className="product-quantity">x{item.quantity}</span>
+                                </div>
+                                <div className="product-price">
+                                    {formatPrice(item.price * item.quantity)}
+                                </div>
                             </div>
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
 
                 {/* Tổng tiền */}
@@ -137,7 +143,7 @@ const OrderDetailModal = (props: OrderDetailModalProps) => {
                     </span>
                 </div>
             </div>
-        </Modal>
+        </Modal >
     )
 }
 

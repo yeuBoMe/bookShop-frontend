@@ -260,6 +260,20 @@ export const fetchAllOrdersAPI = (query: string) => {
   );
 };
 
+export const updateOrderAPI = (id: number, status: string) => {
+  const data = {
+    id: id,
+    status: status,
+  };
+  const ENDPOINT_UPDATE_ORDER = `/api/v1/orders/${id}`;
+  return axios.put<IBackendRes<IOrder>>(ENDPOINT_UPDATE_ORDER, data);
+};
+
+export const deleteOrderAPI = (id: number) => {
+  const ENDPOINT_DELETE_ORDER = `/api/v1/orders/${id}`;
+  return axios.delete<IBackendRes<IOrder>>(ENDPOINT_DELETE_ORDER);
+};
+
 // Module auth
 export const loginAPI = (email: string, password: string) => {
   const ENDPOINT_LOGIN = "/api/v1/auth/login";

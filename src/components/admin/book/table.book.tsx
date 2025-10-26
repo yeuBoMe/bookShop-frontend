@@ -216,7 +216,7 @@ const TableBook = () => {
 
                     if (sort && Object.keys(sort).length > 0) {
                         const sortFields = Object.keys(sort).map((field) => {
-                            const order = sort[field] ? "asc" : "desc";
+                            const order = sort[field] === 'ascend' ? "asc" : "desc";
                             return `${field},${order}`;
                         });
 

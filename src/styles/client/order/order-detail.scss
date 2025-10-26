@@ -151,6 +151,12 @@ $tablet: 768px;
             }
           }
         }
+
+        .product-price {
+          font-size: 15px;
+          color: $error-color;
+          font-weight: 700;
+        }
       }
     }
 

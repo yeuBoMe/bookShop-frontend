@@ -162,5 +162,6 @@ declare global {
     id: number;
     quantity: number;
     bookName: string;
+    price: number;
   }
 }
