@@ -266,7 +266,7 @@ export const updateOrderAPI = (id: number, status: string) => {
     status: status,
   };
   const ENDPOINT_UPDATE_ORDER = `/api/v1/orders/${id}`;
-  return axios.put<IBackendRes<IOrder>>(ENDPOINT_UPDATE_ORDER, data);
+  return axios.patch<IBackendRes<IOrder>>(ENDPOINT_UPDATE_ORDER, data);
 };
 
 export const deleteOrderAPI = (id: number) => {

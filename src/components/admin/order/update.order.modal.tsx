@@ -1,30 +1,15 @@
-import {
-    fetchAllCategoriesAPI,
-    updateBookAPI,
-    updateBookMultipleImagesAPI,
-    deleteBookMultipleImagesAPI,
-    updateOrderAPI
-} from "@/services/api.service";
-import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
+import { updateOrderAPI } from "@/services/api.service";
+import { CheckCircleOutlined, ClockCircleOutlined, CloseCircleOutlined, TruckOutlined } from "@ant-design/icons";
 import {
     App,
     Col,
     Form,
-    Image,
-    Input,
-    InputNumber,
     Modal,
     Row,
     Select,
-    Upload,
     type FormProps,
-    type GetProp,
-    type UploadFile,
-    type UploadProps
 } from "antd";
 import { useEffect, useState } from "react";
-import { v4 as uuidv4 } from 'uuid';
-const { TextArea } = Input;
 
 interface OrderUpdateValues {
     status: string
@@ -59,11 +44,6 @@ const UpdateOrderModal = (props: UpdateOrderProps) => {
         }
     }, [dataUpdate])
 
-    const handleSelectChange = (value: number | null) => {
-        console.log(`selected ${value}`);
-        form.setFieldsValue({ category: value !== null ? { id: value } : null });
-    };
-
     const handleUpdateBook: FormProps<OrderUpdateValues>['onFinish'] = async (values) => {
         if (!dataUpdate) return;
 
@@ -97,6 +77,46 @@ const UpdateOrderModal = (props: UpdateOrderProps) => {
         setDataUpdate(null);
     }
 
+    const orderStatusOptions = [
+        {
+            value: "PENDING",
+            label: (
+                <span>
+                    <ClockCircleOutlined style={{ color: "orange", marginRight: 8 }} />
+                    PENDING
+                </span>
+            ),
+        },
+        {
+            value: "SHIPPING",
+            label: (
+                <span>
+                    <TruckOutlined style={{ color: "cyan", marginRight: 8 }} />
+                    SHIPPING
+                </span>
+            ),
+        },
+        {
+            value: "SUCCESS",
+            label: (
+                <span>
+                    <CheckCircleOutlined style={{ color: "green", marginRight: 8 }} />
+                    SUCCESS
+                </span>
+            ),
+        },
+        {
+            value: "CANCEL",
+            label: (
+                <span>
+                    <CloseCircleOutlined style={{ color: "red", marginRight: 8 }} />
+                    CANCEL
+                </span>
+            ),
+        },
+    ];
+
+
     return (
         <>
             <Modal
@@ -121,17 +141,15 @@ const UpdateOrderModal = (props: UpdateOrderProps) => {
                             style={{ marginTop: "10px" }}
                         >
                             <Row gutter={16}>
-                                <Col span={8}>
+                                <Col span={17}>
                                     <Form.Item<OrderUpdateValues>
                                         label="Status:"
-                                        name={["category", "id"]}
-                                    // rules={[{ required: true, message: "Category is required" }]}
+                                        name={["status"]}
+                                        rules={[{ required: true, message: "Status is required" }]}
                                     >
                                         <Select
+                                            options={orderStatusOptions}
                                             allowClear
-                                            placeholder="Select a category"
-                                            onChange={handleSelectChange}
-                                            options={categories}
                                         />
                                     </Form.Item>
                                 </Col>

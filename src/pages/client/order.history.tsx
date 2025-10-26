@@ -77,6 +77,7 @@ const OrderHistoryPage = () => {
                         orders={orders}
                         onViewDetail={handleViewDetail}
                         meta={meta}
+                        fetchOrders={fetchOrders}
                     />
                 )}
             </div>

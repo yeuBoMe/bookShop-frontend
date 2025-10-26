@@ -1,6 +1,7 @@
+import { deleteOrderAPI } from "@/services/api.service";
 import { EyeOutlined, DeleteOutlined, ClockCircleOutlined, CheckCircleOutlined, CloseCircleOutlined, TruckOutlined } from "@ant-design/icons";
-import { Button, Table, Tag, Space, Modal, type TableProps } from "antd";
-import type { JSX } from "react";
+import { Button, Table, Tag, Space, Modal, type TableProps, Popconfirm, App } from "antd";
+import { useState, type JSX } from "react";
 import "styles/client/order/order-his.table.scss";
 
 interface OrderHistoryTableProps {
@@ -12,10 +13,13 @@ interface OrderHistoryTableProps {
         pages: number;
         total: number;
     };
+    fetchOrders: () => void;
 }
 
 const OrderHistoryTable = (props: OrderHistoryTableProps) => {
-    const { orders, onViewDetail, meta } = props;
+    const { orders, onViewDetail, meta, fetchOrders } = props;
+    const { notification, message } = App.useApp();
+    const [isDeleteOrder, setIsDeleteOrder] = useState<boolean>(false);
 
     // Format giá tiền
     const formatPrice = (price: number) => {
@@ -65,17 +69,25 @@ const OrderHistoryTable = (props: OrderHistoryTableProps) => {
     };
 
     // Xử lý huỷ đơn hàng
-    const handleCancelOrder = (orderId: number) => {
-        Modal.confirm({
-            title: "Xác nhận huỷ đơn hàng",
-            content: "Bạn có chắc chắn muốn huỷ đơn hàng này?",
-            okText: "Xác nhận",
-            cancelText: "Đóng",
-            onOk: () => {
-                // TODO: Gọi API để huỷ đơn hàng
-                console.log("Huỷ đơn hàng:", orderId);
+    const handleCancelOrder = async (orderId: number) => {
+        try {
+            setIsDeleteOrder(true);
+            await new Promise((resolve) => setTimeout(resolve, 400));
+            const deleteOrderResponse = await deleteOrderAPI(orderId);
+            if (deleteOrderResponse) {
+                message.success("Xóa đơn hàng thành công!");
+                fetchOrders();
             }
-        });
+        } catch (error: any) {
+            notification.error({
+                message: "Error",
+                description: error?.message || "Có lỗi xảy ra khi thao tác đơn hàng",
+                duration: 5,
+                placement: "topRight"
+            });
+        } finally {
+            setIsDeleteOrder(false);
+        }
     };
 
     // Định nghĩa các cột của bảng
@@ -158,14 +170,23 @@ const OrderHistoryTable = (props: OrderHistoryTableProps) => {
                         Chi tiết
                     </Button>
                     {record.status === "PENDING" && (
-                        <Button
-                            danger
-                            icon={<DeleteOutlined />}
-                            size="small"
-                            onClick={() => handleCancelOrder(record.id)}
+                        <Popconfirm
+                            placement='topLeft'
+                            title="Hủy đơn hàng"
+                            description="Bạn có chắc muốn hủy đơn hàng này?"
+                            okText="OK"
+                            cancelText="Không"
+                            onConfirm={() => handleCancelOrder(record.id)}
+                            okButtonProps={{ loading: isDeleteOrder }}
                         >
-                            Huỷ
-                        </Button>
+                            <Button
+                                danger
+                                icon={<DeleteOutlined />}
+                                size="small"
+                            >
+                                Huỷ
+                            </Button>
+                        </Popconfirm>
                     )}
                 </Space>
             ),

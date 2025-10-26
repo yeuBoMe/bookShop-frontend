@@ -358,6 +358,7 @@ const TableOrder = () => {
                 setIsModalUpdateOpen={setIsModalUpdateOpen}
                 dataUpdate={dataUpdate}
                 setDataUpdate={setDataUpdate}
+                refreshTable={refreshTable}
             />
         </>
     );
