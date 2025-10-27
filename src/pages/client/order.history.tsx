@@ -40,7 +40,7 @@ const OrderHistoryPage = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }; 
 
     const handleViewDetail = (order: IOrder) => {
         setSelectedOrder(order);

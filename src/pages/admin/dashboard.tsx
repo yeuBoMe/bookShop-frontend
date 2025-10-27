@@ -8,6 +8,7 @@ import {
 import { Card, Col, Row, Statistic } from 'antd';
 import { useEffect, useState } from 'react';
 import CountUp from 'react-countup';
+import { Link } from 'react-router-dom';
 
 interface IDashBoard {
     countOrders: number;
@@ -54,102 +55,108 @@ const DashBoardPage = () => {
                 {/* Orders Card */}
                 <Col xs={24} sm={24} md={8} lg={8} xl={8}>
                     <Card hoverable>
-                        <Statistic
-                            title={
-                                <span style={{ fontSize: '16px', fontWeight: 500 }}>
-                                    Tổng số đơn hàng
+                        <Link to={"/admin/order"}>
+                            <Statistic
+                                title={
+                                    <span style={{ fontSize: '16px', fontWeight: 500 }}>
+                                        Tổng số đơn hàng
+                                    </span>
+                                }
+                                value={dashboardData?.countOrders || 0}
+                                prefix={<ShoppingOutlined style={{ color: '#1890ff' }} />}
+                                formatter={(value) => formatter(value as number)}
+                                valueStyle={{
+                                    color: '#1890ff',
+                                    fontSize: '32px',
+                                    fontWeight: 700
+                                }}
+                            />
+                            <div style={{
+                                marginTop: '16px',
+                                paddingTop: '16px',
+                                borderTop: '1px solid #f0f0f0',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px'
+                            }}>
+                                <RiseOutlined style={{ color: '#52c41a' }} />
+                                <span style={{ color: '#52c41a', fontSize: '14px' }}>
+                                    +12% so với tháng trước
                                 </span>
-                            }
-                            value={dashboardData?.countOrders || 0}
-                            prefix={<ShoppingOutlined style={{ color: '#1890ff' }} />}
-                            formatter={(value) => formatter(value as number)}
-                            valueStyle={{
-                                color: '#1890ff',
-                                fontSize: '32px',
-                                fontWeight: 700
-                            }}
-                        />
-                        <div style={{
-                            marginTop: '16px',
-                            paddingTop: '16px',
-                            borderTop: '1px solid #f0f0f0',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '8px'
-                        }}>
-                            <RiseOutlined style={{ color: '#52c41a' }} />
-                            <span style={{ color: '#52c41a', fontSize: '14px' }}>
-                                +12% so với tháng trước
-                            </span>
-                        </div>
+                            </div>
+                        </Link>
                     </Card>
                 </Col>
 
                 {/* Books Card */}
                 <Col xs={24} sm={24} md={8} lg={8} xl={8}>
-                    <Card bordered={false} hoverable>
-                        <Statistic
-                            title={
-                                <span style={{ fontSize: '16px', fontWeight: 500 }}>
-                                    Tổng số sách
+                    <Card hoverable>
+                        <Link to={"/admin/book"}>
+                            <Statistic
+                                title={
+                                    <span style={{ fontSize: '16px', fontWeight: 500 }}>
+                                        Tổng số sách
+                                    </span>
+                                }
+                                value={dashboardData?.countBooks || 0}
+                                prefix={<BookOutlined style={{ color: '#52c41a' }} />}
+                                formatter={(value) => formatter(value as number)}
+                                valueStyle={{
+                                    color: '#52c41a',
+                                    fontSize: '32px',
+                                    fontWeight: 700
+                                }}
+                            />
+                            <div style={{
+                                marginTop: '16px',
+                                paddingTop: '16px',
+                                borderTop: '1px solid #f0f0f0',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px'
+                            }}>
+                                <RiseOutlined style={{ color: '#52c41a' }} />
+                                <span style={{ color: '#52c41a', fontSize: '14px' }}>
+                                    +8% so với tháng trước
                                 </span>
-                            }
-                            value={dashboardData?.countBooks || 0}
-                            prefix={<BookOutlined style={{ color: '#52c41a' }} />}
-                            formatter={(value) => formatter(value as number)}
-                            valueStyle={{
-                                color: '#52c41a',
-                                fontSize: '32px',
-                                fontWeight: 700
-                            }}
-                        />
-                        <div style={{
-                            marginTop: '16px',
-                            paddingTop: '16px',
-                            borderTop: '1px solid #f0f0f0',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '8px'
-                        }}>
-                            <RiseOutlined style={{ color: '#52c41a' }} />
-                            <span style={{ color: '#52c41a', fontSize: '14px' }}>
-                                +8% so với tháng trước
-                            </span>
-                        </div>
+                            </div>
+                        </Link>
                     </Card>
                 </Col>
 
                 {/* Users Card */}
                 <Col xs={24} sm={24} md={8} lg={8} xl={8}>
-                    <Card bordered={false} hoverable>
-                        <Statistic
-                            title={
-                                <span style={{ fontSize: '16px', fontWeight: 500 }}>
-                                    Tổng số người dùng
+                    <Card hoverable>
+                        <Link to={"/admin/user"}>
+                            <Statistic
+                                title={
+                                    <span style={{ fontSize: '16px', fontWeight: 500 }}>
+                                        Tổng số người dùng
+                                    </span>
+                                }
+                                value={dashboardData?.countUsers || 0}
+                                prefix={<UserOutlined style={{ color: '#faad14' }} />}
+                                formatter={(value) => formatter(value as number)}
+                                valueStyle={{
+                                    color: '#faad14',
+                                    fontSize: '32px',
+                                    fontWeight: 700
+                                }}
+                            />
+                            <div style={{
+                                marginTop: '16px',
+                                paddingTop: '16px',
+                                borderTop: '1px solid #f0f0f0',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px'
+                            }}>
+                                <RiseOutlined style={{ color: '#52c41a' }} />
+                                <span style={{ color: '#52c41a', fontSize: '14px' }}>
+                                    +15% so với tháng trước
                                 </span>
-                            }
-                            value={dashboardData?.countUsers || 0}
-                            prefix={<UserOutlined style={{ color: '#faad14' }} />}
-                            formatter={(value) => formatter(value as number)}
-                            valueStyle={{
-                                color: '#faad14',
-                                fontSize: '32px',
-                                fontWeight: 700
-                            }}
-                        />
-                        <div style={{
-                            marginTop: '16px',
-                            paddingTop: '16px',
-                            borderTop: '1px solid #f0f0f0',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '8px'
-                        }}>
-                            <RiseOutlined style={{ color: '#52c41a' }} />
-                            <span style={{ color: '#52c41a', fontSize: '14px' }}>
-                                +15% so với tháng trước
-                            </span>
-                        </div>
+                            </div>
+                        </Link>
                     </Card>
                 </Col>
             </Row>

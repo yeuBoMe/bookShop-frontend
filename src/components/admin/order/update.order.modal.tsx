@@ -116,7 +116,6 @@ const UpdateOrderModal = (props: UpdateOrderProps) => {
         },
     ];
 
-
     return (
         <>
             <Modal
@@ -149,7 +148,6 @@ const UpdateOrderModal = (props: UpdateOrderProps) => {
                                     >
                                         <Select
                                             options={orderStatusOptions}
-                                            allowClear
                                         />
                                     </Form.Item>
                                 </Col>

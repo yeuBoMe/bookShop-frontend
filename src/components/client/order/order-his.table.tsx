@@ -1,4 +1,4 @@
-import { deleteOrderAPI } from "@/services/api.service";
+import { updateOrderAPI } from "@/services/api.service";
 import { EyeOutlined, DeleteOutlined, ClockCircleOutlined, CheckCircleOutlined, CloseCircleOutlined, TruckOutlined } from "@ant-design/icons";
 import { Button, Table, Tag, Space, type TableProps, Popconfirm, App } from "antd";
 import { useState, type JSX } from "react";
@@ -73,9 +73,9 @@ const OrderHistoryTable = (props: OrderHistoryTableProps) => {
         try {
             setIsDeleteOrder(true);
             await new Promise((resolve) => setTimeout(resolve, 400));
-            const deleteOrderResponse = await deleteOrderAPI(orderId);
-            if (deleteOrderResponse) {
-                message.success("Xóa đơn hàng thành công!");
+            const updateOrderResponse = await updateOrderAPI(orderId, "CANCEL");
+            if (updateOrderResponse.data) {
+                message.success("Hủy đơn hàng thành công!");
                 fetchOrders();
             }
         } catch (error: any) {

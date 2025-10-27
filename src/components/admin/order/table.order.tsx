@@ -7,8 +7,8 @@ import { App, Button, Popconfirm, Space, Tag } from 'antd';
 import { useRef, useState, type JSX } from 'react';
 import { CSVLink } from 'react-csv';
 import { Link } from 'react-router-dom';
-import DetailOrderDrawer from './detail.order.drawer';
-import UpdateOrderModal from './update.order.modal';
+import DetailOrderDrawer from 'components/admin/order/detail.order.drawer';
+import UpdateOrderModal from 'components/admin/order/update.order.modal';
 
 type TSearch = {
     name: string;
