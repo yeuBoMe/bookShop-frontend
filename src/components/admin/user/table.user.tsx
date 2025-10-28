@@ -175,7 +175,7 @@ const TableUser = () => {
                     let filterConditions = [];
 
                     if (params.fullName) {
-                        filterConditions.push(`fullName~'${params.fullName}'`);
+                        filterConditions.push(`fullName~~'${params.fullName}'`);
                     }
                     if (params.email) {
                         filterConditions.push(`email='${params.email}'`);

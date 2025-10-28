@@ -230,16 +230,16 @@ const TableOrder = () => {
                     let filterConditions = [];
 
                     if (params.name) {
-                        filterConditions.push(`name~'${params.name}'`);
+                        filterConditions.push(`name~~'${params.name}'`);
                     }
                     if (params.address) {
-                        filterConditions.push(`address~'${params.address}'`);
+                        filterConditions.push(`address~~'${params.address}'`);
                     }
                     if (params.totalPrice) {
                         filterConditions.push(`totalPrice='${params.totalPrice}'`);
                     }
                     if (params.status) {
-                        filterConditions.push(`status~'${params.status}'`);
+                        filterConditions.push(`status~~'${params.status}'`);
                     }
 
                     if (params.createdAtRange && params.createdAtRange[0] && params.createdAtRange[1]) {

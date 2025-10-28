@@ -4,7 +4,7 @@ import type { FormProps, TabsProps } from "antd";
 import { useEffect, useState } from "react";
 import { fetchAllBooksAPI, fetchAllCategoriesAPI } from "@/services/api.service";
 import "styles/client/book/client.book.scss";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import { useCurrentApp } from "@/components/context/app.context";
 
 interface FilterValues {
@@ -16,6 +16,7 @@ interface FilterValues {
 }
 
 const BookPage = () => {
+    const [searchTerm] = useOutletContext() as any;
     const navigate = useNavigate();
     const { user, setCarts } = useCurrentApp();
     const { notification, message } = App.useApp();
@@ -42,9 +43,9 @@ const BookPage = () => {
         window.scrollTo({ top: 0, behavior: "smooth" });
         const fetchCategories = async () => {
             try {
-                const response = await fetchAllCategoriesAPI();
-                if (response.data) {
-                    setCategories(response.data.result);
+                const fetchAllCategoriesResponse = await fetchAllCategoriesAPI();
+                if (fetchAllCategoriesResponse.data) {
+                    setCategories(fetchAllCategoriesResponse.data.result);
                 }
             } catch (error: any) {
                 console.error("Failed to fetch categories:", error);
@@ -67,6 +68,9 @@ const BookPage = () => {
         if (filter.range?.to) {
             filterConditions.push(`price<=${filter.range.to}`);
         }
+        if (searchTerm) {
+            filterConditions.push(`name~~'${searchTerm}'`);
+        }
 
         if (filterConditions.length > 0) {
             query += `&filter=${filterConditions.join(" and ")}`;
@@ -83,11 +87,11 @@ const BookPage = () => {
         try {
             setLoading(true);
             const queryBuilt = buildQuery(page);
-            const response = await fetchAllBooksAPI(queryBuilt);
-            if (response.data) {
+            const fetchAllBooksResponse = await fetchAllBooksAPI(queryBuilt);
+            if (fetchAllBooksResponse.data) {
                 console.log("Check query >>> ", queryBuilt);
-                setBooks(response.data.result);
-                setMeta(response.data.meta);
+                setBooks(fetchAllBooksResponse.data.result);
+                setMeta(fetchAllBooksResponse.data.meta);
             }
         } catch (error: any) {
             console.error("Failed to fetch books:", error);
@@ -98,7 +102,7 @@ const BookPage = () => {
 
     useEffect(() => {
         fetchBooks(1);
-    }, [filter, sort]);
+    }, [filter, sort, searchTerm]);
 
     const handleChangeFilter = (changedValues: any, values: any) => {
         console.log("Filter changed:", changedValues, values);

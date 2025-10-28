@@ -6,11 +6,16 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import { App, Avatar, Button, Drawer } from "antd";
 import { logoutAPI } from "@/services/api.service";
 
-const Header = () => {
+interface HeaderProps {
+    searchTerm: string;
+    setSearchTerm: (v: string) => void;
+}
+
+const Header = (props: HeaderProps) => {
+    const {searchTerm, setSearchTerm} = props;
     const { user, setUser, setIsAuthenticated, carts, setCarts } = useCurrentApp();
-    const [searchTerm, setSearchTerm] = useState<string>("");
-    const { notification, message } = App.useApp();
     const navigate = useNavigate();
+    const { notification, message } = App.useApp();
     const urlAvatar = user?.avatar ? `${import.meta.env.VITE_BACKEND_URL}/upload/avatar/${user.avatar}` : "";
     const [drawerVisible, setDrawerVisible] = useState(false);
 

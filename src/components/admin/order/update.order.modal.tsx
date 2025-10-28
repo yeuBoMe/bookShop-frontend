@@ -46,13 +46,11 @@ const UpdateOrderModal = (props: UpdateOrderProps) => {
 
     const handleUpdateBook: FormProps<OrderUpdateValues>['onFinish'] = async (values) => {
         if (!dataUpdate) return;
-
+        
         try {
             setIsLoading(true);
             const { status } = values;
-
             const updateOrderResponse = await updateOrderAPI(dataUpdate.id, status);
-
             if (updateOrderResponse.data) {
                 handleClearDataAndCloseModal();
                 message.success("Update order successfully!");

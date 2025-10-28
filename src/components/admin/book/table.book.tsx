@@ -192,13 +192,13 @@ const TableBook = () => {
                     let filterConditions = [];
 
                     if (params.name) {
-                        filterConditions.push(`name~'${params.name}'`);
+                        filterConditions.push(`name~~'${params.name}'`);
                     }
                     if (params.category) {
                         filterConditions.push(`category.name='${params.category}'`);
                     }
                     if (params.author) {
-                        filterConditions.push(`author='${params.author}'`);
+                        filterConditions.push(`author~~'${params.author}'`);
                     }
 
                     if (params.createdAtRange && params.createdAtRange[0] && params.createdAtRange[1]) {
