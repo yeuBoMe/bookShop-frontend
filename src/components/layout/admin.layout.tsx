@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     AppstoreOutlined,
     ExceptionOutlined,
@@ -10,7 +10,7 @@ import {
     MenuUnfoldOutlined,
 } from '@ant-design/icons';
 import { Layout, Menu, Dropdown, Space, Avatar, App } from 'antd';
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { Link } from 'react-router-dom';
 import { useCurrentApp } from 'components/context/app.context';
 import type { MenuProps } from 'antd';
@@ -22,11 +22,19 @@ const { Content, Footer, Sider } = Layout;
 
 const AdminLayout = () => {
     const { user, setUser, setIsAuthenticated, setCarts } = useCurrentApp();
+    const location = useLocation();
     const [collapsed, setCollapsed] = useState<boolean>(false);
     const { notification, message } = App.useApp();
     const navigate = useNavigate();
-    // const [activeMenu, setActiveMenu] = useState<string>('dashboard');
+    const [activeMenu, setActiveMenu] = useState<string>('dashboard');
     const urlAvatar = `${import.meta.env.VITE_BACKEND_URL}/upload/avatar/${user?.avatar}`;
+
+    console.log(">>> ", location.pathname);
+
+    useEffect(() => {
+        const active: any = items.find(item => location.pathname === (item!.key as any)) ?? "/admin";
+        setActiveMenu(active.key);
+    }, [location]);
 
     const handleLogoutRequest = async () => {
         try {
@@ -53,35 +61,30 @@ const AdminLayout = () => {
     const items: MenuItem[] = [
         {
             label: <Link to='/admin'>Dashboard</Link>,
-            key: 'dashboard',
-            icon: <AppstoreOutlined />
+            key: '/admin',
+            icon: <AppstoreOutlined />,
         },
         {
-            label: <span>Manage Users</span>,
-            key: 'user',
+            label: 'Manage Users',
+            key: '/admin/user',
             icon: <UserOutlined />,
             children: [
                 {
                     label: <Link to='/admin/user'>CRUD</Link>,
-                    key: 'crud',
+                    key: '/admin/user',
                     icon: <TeamOutlined />,
                 },
-                // {
-                //     label: 'Files1',
-                //     key: 'file1',
-                //     icon: <TeamOutlined />,
-                // }
-            ]
+            ],
         },
         {
             label: <Link to='/admin/book'>Manage Books</Link>,
-            key: 'book',
-            icon: <ExceptionOutlined />
+            key: '/admin/book',
+            icon: <ExceptionOutlined />,
         },
         {
             label: <Link to='/admin/order'>Manage Orders</Link>,
-            key: 'order',
-            icon: <DollarCircleOutlined />
+            key: '/admin/order',
+            icon: <DollarCircleOutlined />,
         },
     ];
 
@@ -138,10 +141,10 @@ const AdminLayout = () => {
                         Welcome Admin
                     </div>
                     <Menu
-                        // defaultSelectedKeys={[activeMenu]}
+                        selectedKeys={[activeMenu]}
                         mode="inline"
                         items={items}
-                    // onClick={(e) => setActiveMenu(e.key)}
+                        onClick={(e) => setActiveMenu(e.key)}
                     />
                 </Sider>
                 <Layout>
