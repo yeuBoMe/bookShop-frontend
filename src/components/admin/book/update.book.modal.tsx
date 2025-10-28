@@ -90,9 +90,9 @@ const UpdateBookModal = (props: UpdateBookProps) => {
     useEffect(() => {
         const fetchAllCategories = async () => {
             try {
-                const fetchAllBooksResponse = await fetchAllCategoriesAPI();
-                if (fetchAllBooksResponse.data) {
-                    const categoriesData: CategorySelectValues[] = fetchAllBooksResponse.data.result;
+                const fetchAllCategoriesResponse = await fetchAllCategoriesAPI();
+                if (fetchAllCategoriesResponse.data) {
+                    const categoriesData: CategorySelectValues[] = fetchAllCategoriesResponse.data.result;
                     const categoriesSelect = categoriesData.map((category: CategorySelectValues) => ({
                         value: category.id,
                         label: category.name
@@ -124,6 +124,7 @@ const UpdateBookModal = (props: UpdateBookProps) => {
             const initialCategory = dataUpdate.category
                 ? { id: categories.find(cat => cat.label === dataUpdate.category)?.value }
                 : null;
+                
             form.setFieldsValue({
                 name: dataUpdate.name,
                 author: dataUpdate.author,
@@ -382,7 +383,6 @@ const UpdateBookModal = (props: UpdateBookProps) => {
                                     // rules={[{ required: true, message: "Category is required" }]}
                                     >
                                         <Select
-                                            allowClear
                                             placeholder="Select a category"
                                             onChange={handleSelectChange}
                                             options={categories}

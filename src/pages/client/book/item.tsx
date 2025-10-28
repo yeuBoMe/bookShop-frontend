@@ -122,10 +122,6 @@ const BookDetailPage = () => {
         message.success(`Đã thêm ${quantity} sản phẩm vào giỏ hàng`);
     };
 
-    const handleBuyNow = () => {
-        message.info("Chức năng đang phát triển");
-    };
-
     if (loading) {
         return (
             <div className="book-detail-container">
@@ -411,15 +407,7 @@ const BookDetailPage = () => {
                                     className="btn-add-cart"
                                     onClick={handleAddToCart}
                                 >
-                                    Thêm vào giỏ
-                                </Button>
-                                <Button
-                                    type="primary"
-                                    size="large"
-                                    className="btn-buy-now"
-                                    onClick={handleBuyNow}
-                                >
-                                    Mua ngay
+                                    Thêm vào giỏ hàng
                                 </Button>
                             </div>
 

@@ -290,7 +290,6 @@ const CreateBookModal = (props: CreateBookProps) => {
                                     // rules={[{ required: true, message: "Category is required" }]}
                                     >
                                         <Select
-                                            allowClear
                                             placeholder="Select a category"
                                             onChange={handleSelectChange}
                                             options={categories}
