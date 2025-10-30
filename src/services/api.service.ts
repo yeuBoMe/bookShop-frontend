@@ -238,8 +238,8 @@ export const fetchAllCategoriesAPI = (query: string) => {
   );
 };
 
-export const createCategoryAPI = (data: { name: string }) => {
-  return axios.post<IBackendRes<ICategory>>("/api/v1/categories", data);
+export const createCategoryAPI = (name: string) => {
+  return axios.post<IBackendRes<ICategory>>("/api/v1/categories", { name });
 };
 
 export const updateCategoryAPI = (id: number, name: string) => {
