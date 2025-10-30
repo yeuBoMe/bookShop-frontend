@@ -192,7 +192,7 @@ const BookPage = () => {
             setCarts(data);
         }
 
-        message.success(`Đã thêm "${book.name}" vào giỏ hàng`);
+        message.success(`Đã thêm 1 sản phẩm "${book.name}" vào giỏ hàng`);
     };
 
     const items: TabsProps["items"] = [

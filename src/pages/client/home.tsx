@@ -17,7 +17,7 @@ import { useCurrentApp } from "@/components/context/app.context";
 
 const HomePage = () => {
     const { user, setCarts } = useCurrentApp();
-    const { notification } = App.useApp();
+    const { message, notification } = App.useApp();
     const navigate = useNavigate();
 
     const [loading, setLoading] = useState(true);
@@ -143,6 +143,8 @@ const HomePage = () => {
             // sync React context
             setCarts(data);
         }
+
+        message.success(`Đã thêm 1 sản phẩm "${book.name}" vào giỏ hàng!`);
     }
 
     const renderBookCard = (book: IBook) => (

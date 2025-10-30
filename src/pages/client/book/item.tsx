@@ -50,7 +50,6 @@ const BookDetailPage = () => {
         try {
             setLoading(true);
             await new Promise((resolve) => setTimeout(resolve, 1000));
-
             const fetchBookByIdResponse = await getBookByIdAPI(bookId);
             if (fetchBookByIdResponse.data) {
                 setBook(fetchBookByIdResponse.data);
@@ -119,7 +118,7 @@ const BookDetailPage = () => {
             // sync React context
             setCarts(data);
         }
-        message.success(`Đã thêm ${quantity} sản phẩm vào giỏ hàng`);
+        message.success(`Đã thêm ${quantity} sản phẩm "${book.name}" vào giỏ hàng`);
     };
 
     if (loading) {

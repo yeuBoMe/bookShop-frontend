@@ -11,7 +11,7 @@ interface CartProps {
 }
 
 const Cart = (props: CartProps) => {
-    const {carts, setCarts, totalPrice, onContinueToPayment} = props;
+    const { carts, setCarts, totalPrice, onContinueToPayment } = props;
     const navigate = useNavigate();
     const { message } = App.useApp();
     const baseUrl = `${import.meta.env.VITE_BACKEND_URL}`;
@@ -155,17 +155,21 @@ const Cart = (props: CartProps) => {
                 </div>
 
                 <div className="cart-actions">
-                    <Popconfirm
-                        title="Xóa tất cả sản phẩm"
-                        description="Bạn có chắc muốn xóa tất cả sản phẩm trong giỏ hàng?"
-                        onConfirm={handleClearCart}
-                        okText="Xóa tất cả"
-                        cancelText="Hủy"
-                    >
-                        <Button icon={<DeleteOutlined />} danger>
-                            Xóa tất cả
-                        </Button>
-                    </Popconfirm>
+                    {carts.length > 1 ? (
+                        <Popconfirm
+                            title="Xóa tất cả sản phẩm"
+                            description="Bạn có chắc muốn xóa tất cả sản phẩm trong giỏ hàng?"
+                            onConfirm={handleClearCart}
+                            okText="Xóa tất cả"
+                            cancelText="Hủy"
+                        >
+                            <Button icon={<DeleteOutlined />} danger>
+                                Xóa tất cả
+                            </Button>
+                        </Popconfirm>
+                    ) : (
+                        <></>
+                    )}
                     <Button onClick={() => navigate("/books")}>
                         Tiếp tục mua sắm
                     </Button>
