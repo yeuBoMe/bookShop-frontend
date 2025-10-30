@@ -12,7 +12,7 @@ import {
     ThunderboltOutlined
 } from "@ant-design/icons";
 import "styles/client/home.scss";
-import { fetchAllBooksAPI, fetchAllCategoriesAPI } from "@/services/api.service";
+import { fetchAllBooksAPI, fetchAllCategoriesSelectAPI } from "@/services/api.service";
 import { useCurrentApp } from "@/components/context/app.context";
 
 const HomePage = () => {
@@ -48,7 +48,7 @@ const HomePage = () => {
             setLoading(true);
 
             // Fetch categories
-            const categoriesRes = await fetchAllCategoriesAPI();
+            const categoriesRes = await fetchAllCategoriesSelectAPI();
             if (categoriesRes.data) {
                 setCategories(categoriesRes.data.result.slice(0, 6));
             }

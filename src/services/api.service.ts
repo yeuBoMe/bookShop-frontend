@@ -224,11 +224,44 @@ export const importListBooksFromFileAPI = (
 };
 
 // Module category
-export const fetchAllCategoriesAPI = () => {
-  const ENDPOINT_FETCH_ALL_CATEGORIES = "/api/v1/categories";
+export const fetchAllCategoriesSelectAPI = () => {
+  const ENDPOINT_FETCH_ALL_CATEGORIES_SELECT = "/api/v1/categories";
+  return axios.get<IBackendRes<IModelPaginate<ICategory>>>(
+    ENDPOINT_FETCH_ALL_CATEGORIES_SELECT
+  );
+};
+
+export const fetchAllCategoriesAPI = (query: string) => {
+  const ENDPOINT_FETCH_ALL_CATEGORIES = `/api/v1/categories?${query}`;
   return axios.get<IBackendRes<IModelPaginate<ICategory>>>(
     ENDPOINT_FETCH_ALL_CATEGORIES
   );
+};
+
+export const createCategoryAPI = (data: { name: string }) => {
+  return axios.post<IBackendRes<ICategory>>("/api/v1/categories", data);
+};
+
+export const updateCategoryAPI = (id: number, name: string) => {
+  const data = {
+    id: id,
+    name: name,
+  };
+  return axios.put<IBackendRes<ICategory>>(`/api/v1/categories/${id}`, data);
+};
+
+export const deleteCategoryAPI = (id: number) => {
+  return axios.delete<IBackendRes<ICategory>>(`/api/v1/categories/${id}`);
+};
+
+export const importListCategoriesFromFileAPI = (
+  data: {
+    name: string;
+  }[]
+) => {
+  return axios.post<
+    IBackendRes<IResponseImportData<IDetailFaultInfo<ICategory>>>
+  >("/api/v1/categories/import", data);
 };
 
 // Module order

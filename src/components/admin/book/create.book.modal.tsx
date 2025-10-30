@@ -1,4 +1,4 @@
-import { createBookAPI, fetchAllCategoriesAPI, updateBookMultipleImagesAPI } from "@/services/api.service";
+import { createBookAPI, fetchAllCategoriesSelectAPI, updateBookMultipleImagesAPI } from "@/services/api.service";
 import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
 import {
     App,
@@ -71,7 +71,7 @@ const CreateBookModal = (props: CreateBookProps) => {
     useEffect(() => {
         const fetchAllCategories = async () => {
             try {
-                const fetchAllCategoriesResponse = await fetchAllCategoriesAPI();
+                const fetchAllCategoriesResponse = await fetchAllCategoriesSelectAPI();
                 if (fetchAllCategoriesResponse.data) {
                     const categoriesData: CategorySelectValues[] = fetchAllCategoriesResponse.data?.result;
                     const categoriesSelect = categoriesData.map((category: CategorySelectValues) => ({
@@ -125,7 +125,7 @@ const CreateBookModal = (props: CreateBookProps) => {
 
     const handleCreateBook: FormProps<BookCreateValues>['onFinish'] = async (values) => {
         console.log('Success:', values);
-        
+
         try {
             setIsLoading(true);
             const {
@@ -343,7 +343,7 @@ const CreateBookModal = (props: CreateBookProps) => {
                                             { required: true, message: "Description is required" },
                                             { max: 5000, message: "Description must be less than 5000 characters" },
                                             {
-                                                pattern:  /^[A-Za-zÀ-ỹà-ỹ0-9'.,:;()\-–\s]{1,5000}$/,
+                                                pattern: /^[A-Za-zÀ-ỹà-ỹ0-9'.,:;()\-–\s]{1,5000}$/,
                                                 message: "Invalid description text format",
                                             },
                                         ]}

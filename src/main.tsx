@@ -32,7 +32,8 @@ import "styles/global.scss";
 import ProfilePage from 'pages/client/profile';
 import OrderPage from '@/pages/client/order.history';
 import BookDetailPage from '@/pages/client/book/item';
-import CheckoutPage from './pages/client/shop/checkout';
+import CheckoutPage from '@/pages/client/shop/checkout';
+import ManageCategoryPage from '@/pages/admin/manage.category';
 
 const router = createBrowserRouter([
   {
@@ -94,6 +95,10 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <DashBoardPage />,
+      },
+      {
+        path: "category",
+        element: <ManageCategoryPage />,
       },
       {
         path: "book",

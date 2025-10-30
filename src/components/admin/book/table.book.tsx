@@ -16,6 +16,7 @@ type TSearch = {
     name: string;
     category: string;
     author: string;
+    price: number;
     createdAtRange: string;
 }
 
@@ -111,9 +112,11 @@ const TableBook = () => {
         {
             title: 'Price',
             dataIndex: 'price',
-            valueType: 'money',
+            valueType: 'digit',
+            fieldProps: {
+                addonAfter: "₫",
+            },
             sorter: true,
-            hideInSearch: true,
             render: (_, entity) => {
                 return entity.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
             }
@@ -199,6 +202,9 @@ const TableBook = () => {
                     }
                     if (params.author) {
                         filterConditions.push(`author~~'${params.author}'`);
+                    }
+                    if (params.price) {
+                        filterConditions.push(`price='${params.price}'`);
                     }
 
                     if (params.createdAtRange && params.createdAtRange[0] && params.createdAtRange[1]) {

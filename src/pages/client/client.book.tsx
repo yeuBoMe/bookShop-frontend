@@ -2,7 +2,7 @@ import { FilterTwoTone, ReloadOutlined, ShoppingCartOutlined } from "@ant-design
 import { Col, Form, Row, Checkbox, Divider, InputNumber, Button, Rate, Tabs, Pagination, Spin, Empty, App } from "antd";
 import type { FormProps, TabsProps } from "antd";
 import { useEffect, useState } from "react";
-import { fetchAllBooksAPI, fetchAllCategoriesAPI } from "@/services/api.service";
+import { fetchAllBooksAPI, fetchAllCategoriesSelectAPI } from "@/services/api.service";
 import "styles/client/book/client.book.scss";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { useCurrentApp } from "@/components/context/app.context";
@@ -43,7 +43,7 @@ const BookPage = () => {
         window.scrollTo({ top: 0, behavior: "smooth" });
         const fetchCategories = async () => {
             try {
-                const fetchAllCategoriesResponse = await fetchAllCategoriesAPI();
+                const fetchAllCategoriesResponse = await fetchAllCategoriesSelectAPI();
                 if (fetchAllCategoriesResponse.data) {
                     setCategories(fetchAllCategoriesResponse.data.result);
                 }

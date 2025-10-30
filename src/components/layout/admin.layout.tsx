@@ -86,6 +86,11 @@ const AdminLayout = () => {
             key: '/admin/order',
             icon: <DollarCircleOutlined />,
         },
+        {
+            label: <Link to='/admin/category'>Manage Categories</Link>,
+            key: '/admin/category',
+            icon: <AppstoreOutlined />,
+        },
     ];
 
     const itemsDropdown = [

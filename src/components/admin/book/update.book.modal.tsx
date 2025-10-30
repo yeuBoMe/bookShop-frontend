@@ -1,5 +1,5 @@
 import {
-    fetchAllCategoriesAPI,
+    fetchAllCategoriesSelectAPI,
     updateBookAPI,
     updateBookMultipleImagesAPI,
     deleteBookMultipleImagesAPI
@@ -90,7 +90,7 @@ const UpdateBookModal = (props: UpdateBookProps) => {
     useEffect(() => {
         const fetchAllCategories = async () => {
             try {
-                const fetchAllCategoriesResponse = await fetchAllCategoriesAPI();
+                const fetchAllCategoriesResponse = await fetchAllCategoriesSelectAPI();
                 if (fetchAllCategoriesResponse.data) {
                     const categoriesData: CategorySelectValues[] = fetchAllCategoriesResponse.data.result;
                     const categoriesSelect = categoriesData.map((category: CategorySelectValues) => ({
@@ -124,7 +124,7 @@ const UpdateBookModal = (props: UpdateBookProps) => {
             const initialCategory = dataUpdate.category
                 ? { id: categories.find(cat => cat.label === dataUpdate.category)?.value }
                 : null;
-                
+
             form.setFieldsValue({
                 name: dataUpdate.name,
                 author: dataUpdate.author,
@@ -196,7 +196,7 @@ const UpdateBookModal = (props: UpdateBookProps) => {
         console.log('Images removed >>> ', deletedImages);
 
         if (!dataUpdate) return;
-        
+
         try {
             setIsLoading(true);
             const {
