@@ -7,7 +7,9 @@ import { App, Button, Popconfirm, Space } from 'antd';
 import { useRef, useState } from 'react';
 import { CSVLink } from 'react-csv';
 import { Link } from 'react-router-dom';
-import CreateCategoryModal from './create.category.modal';
+import CreateCategoryModal from 'components/admin/category/create.category.modal';
+import UpdateCategoryModal from 'components/admin/category/update.category.modal';
+import DetailCategoryDrawer from 'components/admin/category/detail.category.drawer';
 
 type TSearch = {
     name: string;
@@ -287,6 +289,19 @@ const TableCategory = () => {
                 isModalCreateOpen={isModalCreateOpen}
                 setIsModalCreateOpen={setIsModalCreateOpen}
                 refreshTable={refreshTable}
+            />
+            <UpdateCategoryModal
+                isModalUpdateOpen={isModalUpdateOpen}
+                setIsModalUpdateOpen={setIsModalUpdateOpen}
+                dataUpdate={dataUpdate}
+                setDataUpdate={setDataUpdate}
+                refreshTable={refreshTable}
+            />
+            <DetailCategoryDrawer
+                isDrawerOpen={isDrawerOpen}
+                setIsDrawerOpen={setIsDrawerOpen}
+                dataDetail={dataDetail}
+                setDataDetail={setDataDetail}
             />
         </>
     );
