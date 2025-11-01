@@ -243,7 +243,10 @@ export const createCategoryAPI = (name: string) => {
 };
 
 export const updateCategoryAPI = (id: number, name: string) => {
-  return axios.put<IBackendRes<ICategory>>(`/api/v1/categories/${id}`, {id, name});
+  return axios.put<IBackendRes<ICategory>>(`/api/v1/categories/${id}`, {
+    id,
+    name,
+  });
 };
 
 export const deleteCategoryAPI = (id: number) => {

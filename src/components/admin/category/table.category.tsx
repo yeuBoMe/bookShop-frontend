@@ -10,6 +10,7 @@ import { Link } from 'react-router-dom';
 import CreateCategoryModal from 'components/admin/category/create.category.modal';
 import UpdateCategoryModal from 'components/admin/category/update.category.modal';
 import DetailCategoryDrawer from 'components/admin/category/detail.category.drawer';
+import ImportCategoryModal from './import.category.modal';
 
 type TSearch = {
     name: string;
@@ -284,6 +285,11 @@ const TableCategory = () => {
                         Add
                     </Button>,
                 ]}
+            />
+            <ImportCategoryModal 
+                isModalImportOpen={isModalImportOpen}
+                setIsModalImportOpen={setIsModalImportOpen}
+                refreshTable={refreshTable}
             />
             <CreateCategoryModal
                 isModalCreateOpen={isModalCreateOpen}
