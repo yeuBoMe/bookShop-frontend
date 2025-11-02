@@ -169,5 +169,6 @@ declare global {
     countOrders: number;
     countBooks: number;
     countUsers: number;
+    countCategories: number;
   }
 }

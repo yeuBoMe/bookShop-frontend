@@ -4,17 +4,12 @@ import {
     BookOutlined,
     UserOutlined,
     RiseOutlined,
+    AppstoreOutlined,
 } from '@ant-design/icons';
 import { Card, Col, Row, Statistic } from 'antd';
 import { useEffect, useState } from 'react';
 import CountUp from 'react-countup';
 import { Link } from 'react-router-dom';
-
-interface IDashBoard {
-    countOrders: number;
-    countBooks: number;
-    countUsers: number;
-}
 
 const DashBoardPage = () => {
     const [dashboardData, setDashboardData] = useState<IDashBoard | null>(null);
@@ -46,20 +41,20 @@ const DashBoardPage = () => {
                     Dashboard
                 </h1>
                 <p style={{ color: '#8c8c8c', fontSize: '14px' }}>
-                    Tổng quan thống kê hệ thống
+                    System Overview Statistics
                 </p>
             </div>
 
             {/* Statistics Cards */}
             <Row gutter={[16, 16]}>
                 {/* Orders Card */}
-                <Col xs={24} sm={24} md={8} lg={8} xl={8}>
+                <Col xs={24} sm={12} md={12} lg={6} xl={6}>
                     <Card hoverable>
                         <Link to={"/admin/order"}>
                             <Statistic
                                 title={
                                     <span style={{ fontSize: '16px', fontWeight: 500 }}>
-                                        Tổng số đơn hàng
+                                        Total Orders
                                     </span>
                                 }
                                 value={dashboardData?.countOrders || 0}
@@ -81,7 +76,7 @@ const DashBoardPage = () => {
                             }}>
                                 <RiseOutlined style={{ color: '#52c41a' }} />
                                 <span style={{ color: '#52c41a', fontSize: '14px' }}>
-                                    +12% so với tháng trước
+                                    +12% from last month
                                 </span>
                             </div>
                         </Link>
@@ -89,13 +84,13 @@ const DashBoardPage = () => {
                 </Col>
 
                 {/* Books Card */}
-                <Col xs={24} sm={24} md={8} lg={8} xl={8}>
+                <Col xs={24} sm={12} md={12} lg={6} xl={6}>
                     <Card hoverable>
                         <Link to={"/admin/book"}>
                             <Statistic
                                 title={
                                     <span style={{ fontSize: '16px', fontWeight: 500 }}>
-                                        Tổng số sách
+                                        Total Books
                                     </span>
                                 }
                                 value={dashboardData?.countBooks || 0}
@@ -117,7 +112,7 @@ const DashBoardPage = () => {
                             }}>
                                 <RiseOutlined style={{ color: '#52c41a' }} />
                                 <span style={{ color: '#52c41a', fontSize: '14px' }}>
-                                    +8% so với tháng trước
+                                    +8% from last month
                                 </span>
                             </div>
                         </Link>
@@ -125,13 +120,13 @@ const DashBoardPage = () => {
                 </Col>
 
                 {/* Users Card */}
-                <Col xs={24} sm={24} md={8} lg={8} xl={8}>
+                <Col xs={24} sm={12} md={12} lg={6} xl={6}>
                     <Card hoverable>
                         <Link to={"/admin/user"}>
                             <Statistic
                                 title={
                                     <span style={{ fontSize: '16px', fontWeight: 500 }}>
-                                        Tổng số người dùng
+                                        Total Users
                                     </span>
                                 }
                                 value={dashboardData?.countUsers || 0}
@@ -153,7 +148,43 @@ const DashBoardPage = () => {
                             }}>
                                 <RiseOutlined style={{ color: '#52c41a' }} />
                                 <span style={{ color: '#52c41a', fontSize: '14px' }}>
-                                    +15% so với tháng trước
+                                    +15% from last month
+                                </span>
+                            </div>
+                        </Link>
+                    </Card>
+                </Col>
+
+                {/* Categories Card */}
+                <Col xs={24} sm={12} md={12} lg={6} xl={6}>
+                    <Card hoverable>
+                        <Link to={"/admin/category"}>
+                            <Statistic
+                                title={
+                                    <span style={{ fontSize: '16px', fontWeight: 500 }}>
+                                        Total Categories
+                                    </span>
+                                }
+                                value={dashboardData?.countCategories || 0}
+                                prefix={<AppstoreOutlined style={{ color: '#722ed1' }} />}
+                                formatter={(value) => formatter(value as number)}
+                                valueStyle={{
+                                    color: '#722ed1',
+                                    fontSize: '32px',
+                                    fontWeight: 700
+                                }}
+                            />
+                            <div style={{
+                                marginTop: '16px',
+                                paddingTop: '16px',
+                                borderTop: '1px solid #f0f0f0',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px'
+                            }}>
+                                <RiseOutlined style={{ color: '#52c41a' }} />
+                                <span style={{ color: '#52c41a', fontSize: '14px' }}>
+                                    +5% from last month
                                 </span>
                             </div>
                         </Link>
