@@ -32,15 +32,6 @@ const HomePage = () => {
     useEffect(() => {
         window.scrollTo({ top: 0, behavior: "smooth" });
         fetchData();
-
-        if (user && user.id) {
-            const cartStorage = localStorage.getItem(`carts_${user.email}`);
-            if (cartStorage) {
-                setCarts(JSON.parse(cartStorage) as ICart[]);
-            } else {
-                setCarts([]);
-            }
-        }
     }, []);
 
     const fetchData = async () => {

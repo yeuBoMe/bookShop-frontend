@@ -165,6 +165,18 @@ declare global {
     price: number;
   }
 
+  interface IRating {
+    id: number;
+    stars: number;
+    comment: string;
+    user: string;
+    book: string;
+    createdAt?: Date;
+    updatedAt?: Date;
+    createdBy?: string;
+    updatedBy?: string;
+  }
+
   interface IDashBoard {
     countOrders: number;
     countBooks: number;

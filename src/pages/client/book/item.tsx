@@ -31,6 +31,7 @@ const BookDetailPage = () => {
 
     const [loading, setLoading] = useState<boolean>(true);
     const [book, setBook] = useState<IBook | null>(null);
+    const [ratings, setRatings] = useState<IRating[]>([]);
     const [quantity, setQuantity] = useState<number>(1);
 
     const [modalGalleryOpen, setModalGalleryOpen] = useState<boolean>(false);

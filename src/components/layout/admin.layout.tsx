@@ -8,6 +8,7 @@ import {
     DollarCircleOutlined,
     MenuFoldOutlined,
     MenuUnfoldOutlined,
+    HomeOutlined,
 } from '@ant-design/icons';
 import { Layout, Menu, Dropdown, Space, Avatar, App } from 'antd';
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
@@ -62,7 +63,7 @@ const AdminLayout = () => {
         {
             label: <Link to='/admin'>Dashboard</Link>,
             key: '/admin',
-            icon: <AppstoreOutlined />,
+            icon: <HomeOutlined />,
         },
         {
             label: 'Manage Users',

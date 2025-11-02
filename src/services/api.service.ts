@@ -278,6 +278,31 @@ export const deleteOrderAPI = (id: number) => {
   return axios.delete<IBackendRes<IOrder>>(`/api/v1/orders/${id}`);
 };
 
+// Module rating
+export const createRatingAPI = (
+  stars: number,
+  comment: string,
+  user: { id: number } | null,
+  book: { id: number } | null
+) => {
+  return axios.post<IBackendRes<IRating>>("/api/v1/ratings", {
+    stars,
+    comment,
+    user,
+    book,
+  });
+};
+
+export const fetchListRatingsByBookIdAPI = (bookId: number, query: string) => {
+  return axios.get<IBackendRes<IModelPaginate<IRating>>>(
+    `/api/v1/ratings/book/${bookId}?${query}`
+  );
+};
+
+export const deleteRatingAPI = (id: number) => {
+  return axios.delete<IBackendRes<IRating>>(`/api/v1/ratings/${id}`);
+};
+
 // Module dashboard
 export const getDashBoardInfoAPI = () => {
   return axios.get<IBackendRes<IDashBoard>>("/api/v1/dashboards");
