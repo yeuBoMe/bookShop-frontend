@@ -1,3 +1,8 @@
+/* ==============================================================
+   FILE: book.detail.scss
+   ĐÃ CẬP NHẬT PHẦN RATING (thay thế .reviews-content cũ)
+   ============================================================== */
+
 .book-detail-container {
   max-width: 1440px;
   margin: 0 auto;
@@ -363,56 +368,467 @@
     }
   }
 
+  /* ==============================================================
+     PHẦN RATING – THAY THẾ HOÀN TOÀN .reviews-content CŨ
+     ============================================================== */
   .reviews-content {
-    .review-item {
+    padding: 32px 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      "Helvetica Neue", Arial, sans-serif;
+
+    @media (max-width: 576px) {
+      padding: 20px 0;
+    }
+
+    /* --- 1. FORM ĐÁNH GIÁ (Chưa đánh giá) --- */
+    .rating-form {
+      background: #ffffff;
+      border: 1px solid #e8e8e8;
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 32px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+      transition: all 0.3s ease;
+
+      @media (max-width: 768px) {
+        padding: 20px;
+        border-radius: 12px;
+      }
+
+      @media (max-width: 576px) {
+        padding: 16px;
+        border-radius: 10px;
+      }
+
+      &:hover {
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+      }
+
+      h3 {
+        margin: 0 0 18px;
+        font-size: 20px;
+        font-weight: 700;
+        color: #1a1a1a;
+        letter-spacing: -0.3px;
+
+        @media (max-width: 576px) {
+          font-size: 18px;
+        }
+      }
+
+      .rating-stars {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 16px;
+
+        span {
+          font-size: 16px;
+          font-weight: 500;
+          white-space: nowrap;
+
+          @media (max-width: 576px) {
+            font-size: 15px;
+          }
+        }
+
+        .ant-rate {
+          font-size: 22px;
+          color: #fadb14;
+
+          .ant-rate-star {
+            transition: transform 0.2s ease;
+
+            &:hover {
+              transform: scale(1.15);
+            }
+          }
+        }
+      }
+
+      .ant-input-textarea {
+        border-radius: 12px;
+        border: 1px solid #d9d9d9;
+        font-size: 15px;
+        line-height: 1.6;
+        padding: 12px 16px;
+        resize: none;
+        transition: all 0.3s;
+
+        &:focus {
+          border-color: #40a9ff;
+          box-shadow: 0 0 0 3px rgba(24, 144, 255, 0.15);
+        }
+
+        &.ant-input-textarea-show-count {
+          .ant-input-textarea-show-count-suffix {
+            color: #8c8c8c;
+            font-size: 13px;
+            font-weight: 500;
+          }
+        }
+
+        @media (max-width: 576px) {
+          font-size: 14px;
+          padding: 10px 12px;
+        }
+      }
+
+      .ant-btn-primary {
+        margin-top: 16px;
+        height: 44px;
+        padding: 0 24px;
+        font-size: 16px;
+        font-weight: 600;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #1890ff, #40a9ff);
+        border: none;
+        box-shadow: 0 4px 10px rgba(24, 144, 255, 0.3);
+        transition: all 0.3s ease;
+
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 14px rgba(24, 144, 255, 0.4);
+        }
+
+        &:active {
+          transform: translateY(0);
+        }
+
+        &:disabled {
+          background: #d9d9d9;
+          border-color: #d9d9d9;
+          box-shadow: none;
+          cursor: not-allowed;
+          opacity: 0.65;
+        }
+
+        @media (max-width: 576px) {
+          height: 40px;
+          font-size: 15px;
+          padding: 0 20px;
+        }
+      }
+    }
+
+    /* --- 2. USER ĐÃ ĐÁNH GIÁ (Thông báo + Xóa) --- */
+    .user-rating-notice {
+      background: linear-gradient(135deg, #f6fff0 0%, #e6f7ff 100%);
+      border: 1px solid #b7eb8f;
+      border-radius: 16px;
       padding: 20px;
-      border-bottom: 1px solid #f0f0f0;
+      margin-bottom: 32px;
+      position: relative;
+      overflow: hidden;
+
+      @media (max-width: 768px) {
+        padding: 16px;
+        border-radius: 12px;
+      }
+
+      &::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 6px;
+        height: 100%;
+        background: #52c41a;
+        border-radius: 0 0 0 16px;
+      }
+
+      .notice-header {
+        font-size: 15px;
+        font-weight: 700;
+        color: #389e0d;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        &::before {
+          content: "Check";
+          font-weight: bold;
+          font-size: 16px;
+        }
+
+        @media (max-width: 576px) {
+          font-size: 14px;
+        }
+      }
+
+      .user-review {
+        .review-header {
+          justify-content: space-between;
+          flex-wrap: wrap;
+          gap: 10px;
+
+          .ant-btn {
+            height: 34px;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 0 14px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: #ff4d4f;
+            border: none;
+            color: #fff;
+            box-shadow: 0 2px 6px rgba(255, 77, 79, 0.3);
+
+            &:hover {
+              background: #ff7875;
+              transform: translateY(-1px);
+            }
+
+            .anticon {
+              font-size: 14px;
+            }
+          }
+        }
+      }
+    }
+
+    /* --- 3. TIÊU ĐỀ "Tất cả đánh giá" --- */
+    h3 {
+      margin: 0 0 24px;
+      font-size: 22px;
+      font-weight: 700;
+      color: #1a1a1a;
+      position: relative;
+      padding-bottom: 12px;
+
+      @media (max-width: 768px) {
+        font-size: 20px;
+        margin-bottom: 20px;
+      }
+
+      @media (max-width: 576px) {
+        font-size: 18px;
+      }
+
+      &::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 70px;
+        height: 4px;
+        background: linear-gradient(90deg, #1890ff, #40a9ff);
+        border-radius: 2px;
+      }
+    }
+
+    /* --- 4. MỖI ĐÁNH GIÁ --- */
+    .review-item {
+      padding: 24px 0;
+      border-bottom: 1px dashed #e8e8e8;
+      transition: background 0.2s;
 
       &:last-child {
         border-bottom: none;
+        padding-bottom: 0;
+      }
+
+      &:hover {
+        background: #fafafa;
+        border-radius: 12px;
+        margin: 0 -12px;
+        padding: 24px 12px;
+
+        @media (max-width: 576px) {
+          margin: 0 -8px;
+          padding: 20px 8px;
+        }
+      }
+
+      @media (max-width: 768px) {
+        padding: 20px 0;
+      }
+
+      @media (max-width: 576px) {
+        padding: 16px 0;
       }
 
       .review-header {
         display: flex;
         align-items: center;
-        gap: 12px;
-        margin-bottom: 12px;
+        gap: 14px;
+        margin-bottom: 14px;
+        flex-wrap: wrap;
+
+        @media (max-width: 576px) {
+          gap: 10px;
+        }
 
         .reviewer-avatar {
-          width: 40px;
-          height: 40px;
+          width: 48px;
+          height: 48px;
           border-radius: 50%;
-          background: #1890ff;
-          color: #fff;
+          background: linear-gradient(135deg, #1890ff, #40a9ff);
+          color: #ffffff;
           display: flex;
           align-items: center;
           justify-content: center;
-          font-weight: 600;
+          font-weight: 700;
+          font-size: 18px;
+          flex-shrink: 0;
+          box-shadow: 0 3px 8px rgba(24, 144, 255, 0.25);
+          text-transform: uppercase;
+
+          @media (max-width: 576px) {
+            width: 40px;
+            height: 40px;
+            font-size: 15px;
+          }
         }
 
         .reviewer-info {
           flex: 1;
+          min-width: 0;
 
           .reviewer-name {
-            font-weight: 600;
-            color: #262626;
-            margin-bottom: 4px;
+            font-weight: 700;
+            color: #1a1a1a;
+            font-size: 16px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+
+            @media (max-width: 576px) {
+              font-size: 15px;
+            }
           }
 
           .review-date {
             font-size: 13px;
             color: #8c8c8c;
+            margin-top: 2px;
           }
         }
 
         .ant-rate {
-          font-size: 14px;
+          font-size: 16px;
+          color: #fadb14;
+
+          @media (max-width: 576px) {
+            font-size: 15px;
+          }
+        }
+
+        .ant-btn {
+          margin-left: auto;
         }
       }
 
       .review-text {
         color: #595959;
-        line-height: 1.6;
+        line-height: 1.75;
+        font-size: 15.5px;
+        word-break: break-word;
+        padding-left: 62px;
+
+        @media (max-width: 768px) {
+          padding-left: 54px;
+          font-size: 15px;
+        }
+
+        @media (max-width: 576px) {
+          padding-left: 50px;
+          font-size: 14.5px;
+        }
+      }
+    }
+
+    /* --- 5. EMPTY & LOADING --- */
+    .ant-empty {
+      margin: 48px 0;
+      color: #8c8c8c;
+
+      .ant-empty-image {
+        height: 90px;
+        opacity: 0.6;
+      }
+
+      .ant-empty-description {
+        font-size: 16px;
+        color: #bfbfbf;
+      }
+
+      @media (max-width: 576px) {
+        margin: 32px 0;
+
+        .ant-empty-image {
+          height: 70px;
+        }
+      }
+    }
+
+    /* --- 6. PHÂN TRANG --- */
+    .ant-pagination {
+      margin-top: 32px;
+      text-align: center;
+      font-weight: 500;
+
+      @media (max-width: 576px) {
+        margin-top: 24px;
+      }
+
+      .ant-pagination-item,
+      .ant-pagination-prev .ant-pagination-item-link,
+      .ant-pagination-next .ant-pagination-item-link {
+        border-radius: 10px;
+        min-width: 40px;
+        height: 40px;
+        line-height: 38px;
+        font-size: 15px;
+        margin: 0 4px;
+        border: 1px solid #d9d9d9;
+        transition: all 0.3s ease;
+
+        a {
+          color: #595959;
+        }
+
+        &:hover {
+          border-color: #40a9ff;
+          a {
+            color: #1890ff;
+          }
+        }
+
+        &.ant-pagination-item-active {
+          background: linear-gradient(135deg, #1890ff, #40a9ff);
+          border-color: transparent;
+          box-shadow: 0 4px 10px rgba(24, 144, 255, 0.3);
+
+          a {
+            color: #fff;
+            font-weight: 600;
+          }
+        }
+      }
+
+      .ant-pagination-prev,
+      .ant-pagination-next {
+        .ant-pagination-item-link {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+      }
+
+      @media (max-width: 576px) {
+        .ant-pagination-item,
+        .ant-pagination-prev .ant-pagination-item-link,
+        .ant-pagination-next .ant-pagination-item-link {
+          min-width: 36px;
+          height: 36px;
+          line-height: 34px;
+          font-size: 14px;
+          margin: 0 3px;
+        }
       }
     }
   }

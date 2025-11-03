@@ -12,7 +12,8 @@ import {
     Pagination,
     Empty,
     Avatar,
-    Input
+    Input,
+    Popconfirm
 } from "antd";
 import {
     ShoppingCartOutlined,
@@ -25,20 +26,21 @@ import ImageGallery from "react-image-gallery";
 import "react-image-gallery/styles/css/image-gallery.css";
 import "styles/client/book/book.detail.scss";
 import BookGalleryModal from "@/components/client/book/gallery.modal";
-import { fetchListRatingsByBookIdAPI, getBookByIdAPI, getRatingByUserIdAndBookIdAPI } from "@/services/api.service";
+import { createRatingAPI, deleteRatingAPI, fetchListRatingsByBookIdAPI, getBookByIdAPI, getRatingByUserIdAndBookIdAPI } from "@/services/api.service";
 import { useCurrentApp } from "@/components/context/app.context";
 
 const { TextArea } = Input;
 
 const BookDetailPage = () => {
     const { id } = useParams();
-    const navigate = useNavigate();
     const { user, setCarts } = useCurrentApp();
+    const navigate = useNavigate();
 
     const { notification, message } = App.useApp();
 
     const [loading, setLoading] = useState<boolean>(false);
     const [ratingsLoading, setRatingsLoading] = useState<boolean>(false);
+    const [deleteRatingLoading, setDeleteRatingLoading] = useState<boolean>(false);
 
     const [book, setBook] = useState<IBook | null>(null);
     const [quantity, setQuantity] = useState<number>(1);
@@ -56,10 +58,11 @@ const BookDetailPage = () => {
 
     const refGallery = useRef<ImageGallery>(null);
     const baseUrl = `${import.meta.env.VITE_BACKEND_URL}`;
+    const currentUserAvatarUrl = `${baseUrl}/upload/avatar/${user?.avatar}`;
 
     const [meta, setMeta] = useState({
         current: 1,
-        pageSize: 5,
+        pageSize: 3,
         pages: 0,
         total: 0
     });
@@ -70,7 +73,7 @@ const BookDetailPage = () => {
             fetchBookDetailById(bookId);
             fetchListRatingsByBookId(bookId, 1);
             if (user && user.id) {
-                checkUserRating(user?.id, bookId);
+                fetchUserRating(user?.id, bookId);
             }
         }
     }, [id]);
@@ -113,7 +116,7 @@ const BookDetailPage = () => {
         }
     }
 
-    const checkUserRating = async (userId: number, bookId: number) => {
+    const fetchUserRating = async (userId: number, bookId: number) => {
         try {
             const getRatingByUserIdAndBookIdResponse = await getRatingByUserIdAndBookIdAPI(userId, bookId);
             if (getRatingByUserIdAndBookIdResponse.data) {
@@ -126,19 +129,78 @@ const BookDetailPage = () => {
     }
 
     const handleSubmitRating = async () => {
+        if (!user || !user.id) {
+            notification.warning({
+                message: "Chưa đăng nhập",
+                description: "Vui lòng đăng nhập để đánh giá sản phẩm",
+                duration: 3,
+                placement: "topRight",
+            });
+            setTimeout(() => {
+                navigate("/login");
+            }, 1000);
+            return;
+        }
+
+        if (!book) { return };
+
         try {
             setIsSubmitRating(true);
+            const dataSend = {
+                stars: newRatingStars,
+                comment: newRatingComment,
+                user: { id: user.id },
+                book: { id: book.id }
+            };
 
+            const createRatingResponse = await createRatingAPI(dataSend);
+            await new Promise((resolver) => setTimeout(resolver, 1000));
+
+            console.log("Check data rating>>>", createRatingResponse);
+            if (createRatingResponse.data) {
+                message.success("Bạn đã thêm đánh giá thành công, cảm ơn bạn!");
+                setNewRatingStars(0);
+                setNewRatingComment("");
+                await fetchListRatingsByBookId(parseInt(id!), 1);
+                await fetchUserRating(user.id, parseInt(id!));
+            }
         } catch (error: any) {
-
+            notification.error({
+                message: "Lỗi",
+                description: error?.message || "Không thể gửi đánh giá",
+                duration: 5,
+                placement: "topRight",
+            });
+            console.log("Check error rating>>>", error);
         } finally {
             setIsSubmitRating(false);
         }
     }
 
-    const handleDeleteRating = async (ratingId: number) => {
+    // const handleDeleteRating = async (ratingId: number) => {
+    //     if (!user) { return };
 
-    }
+    //     try {
+    //         setDeleteRatingLoading(true);
+    //         const deleteRatingResponse = await deleteRatingAPI(ratingId);
+    //         await new Promise((resolver) => setTimeout(resolver, 1000));
+
+    //         if (deleteRatingResponse) {
+    //             message.success("Xóa đánh giá thành công!");
+    //             await fetchListRatingsByBookId(parseInt(id!), 1);
+    //             await fetchUserRating(user.id, parseInt(id!));
+    //         }
+    //     } catch (error: any) {
+    //         notification.error({
+    //             message: "Lỗi",
+    //             description: error?.message || "Không thể gửi đánh giá",
+    //             duration: 5,
+    //             placement: "topRight",
+    //         });
+    //     } finally {
+    //         setDeleteRatingLoading(false);
+    //     }
+    // }
 
     const handleAddToCart = () => {
         // Kiểm tra đăng nhập
@@ -354,11 +416,11 @@ const BookDetailPage = () => {
         },
         {
             key: "3",
-            label: `Đánh giá ${totalRatings}`,
+            label: `Đánh giá (${totalRatings})`,
             children: (
                 <div className="reviews-content">
                     {/* Rating Form - Only show if user hasn't rated */}
-                    {user && !userRating && (
+                    {!userRating && (
                         <div className="rating-form">
                             <h3>Viết đánh giá của bạn</h3>
                             <div className="rating-stars">
@@ -373,8 +435,8 @@ const BookDetailPage = () => {
                                 placeholder="Chia sẻ cảm nhận của bạn về sản phẩm... (tối đa 200 ký tự)"
                                 value={newRatingComment}
                                 onChange={(e) => setNewRatingComment(e.target.value)}
-                                maxLength={200}
                                 showCount
+                                required
                             />
                             <Button
                                 type="primary"
@@ -396,23 +458,41 @@ const BookDetailPage = () => {
                             <div className="review-item user-review">
                                 <div className="review-header">
                                     <div className="reviewer-avatar">
-                                        <Avatar icon={<UserOutlined />} />
+                                        {user?.avatar ? (
+                                            <Avatar
+                                                src={currentUserAvatarUrl}
+                                                size={40}
+                                                alt={user.fullName || "User Avatar"}
+                                            />
+                                        ) : (
+                                            <Avatar icon={<UserOutlined />} />
+                                        )}
+
                                     </div>
                                     <div className="reviewer-info">
-                                        <div className="reviewer-name">{userRating.user}</div>
+                                        <div className="reviewer-name">{userRating.user.name}</div>
                                         <div className="review-date">
                                             {formatDate(userRating.createdAt)}
                                         </div>
                                     </div>
                                     <Rate disabled value={userRating.stars} />
-                                    <Button
-                                        danger
-                                        icon={<DeleteOutlined />}
-                                        onClick={() => handleDeleteRating(userRating.id)}
-                                        size="small"
+                                    {/* <Popconfirm
+                                        placement='topLeft'
+                                        title="Xóa đánh giá"
+                                        description="Bạn có muốn xóa đánh giá này?"
+                                        okText="Ok"
+                                        cancelText="Hủy"
+                                        onConfirm={() => handleDeleteRating(userRating.id)}
+                                        okButtonProps={{ loading: deleteRatingLoading }}
                                     >
-                                        Xóa
-                                    </Button>
+                                        <Button
+                                            danger
+                                            icon={<DeleteOutlined />}
+                                            size="small"
+                                        >
+                                            Xóa
+                                        </Button>
+                                    </Popconfirm> */}
                                 </div>
                                 <div className="review-text">{userRating.comment}</div>
                             </div>
@@ -427,23 +507,37 @@ const BookDetailPage = () => {
                         <Skeleton active paragraph={{ rows: 3 }} />
                     ) : ratings.length > 0 ? (
                         <>
-                            {ratings.map((rating) => (
-                                <div key={rating.id} className="review-item">
-                                    <div className="review-header">
-                                        <div className="reviewer-avatar">
-                                            <Avatar icon={<UserOutlined />} />
-                                        </div>
-                                        <div className="reviewer-info">
-                                            <div className="reviewer-name">{rating.user}</div>
-                                            <div className="review-date">
-                                                {formatDate(rating.createdAt)}
+                            {ratings.map((rating) => {
+                                const userAvatarUrl = rating.user?.avatar
+                                    ? `${baseUrl}/upload/avatar/${rating.user.avatar}`
+                                    : null;
+
+                                return (
+                                    <div key={rating.id} className="review-item">
+                                        <div className="review-header">
+                                            <div className="reviewer-avatar">
+                                                {rating.user?.avatar ? (
+                                                    <Avatar
+                                                        src={userAvatarUrl}
+                                                        size={40}
+                                                        alt={rating.user.name || "User Avatar"}
+                                                    />
+                                                ) : (
+                                                    <Avatar icon={<UserOutlined />} />
+                                                )}
                                             </div>
+                                            <div className="reviewer-info">
+                                                <div className="reviewer-name">{rating.user.name}</div>
+                                                <div className="review-date">
+                                                    {formatDate(rating.createdAt)}
+                                                </div>
+                                            </div>
+                                            <Rate disabled value={rating.stars} />
                                         </div>
-                                        <Rate disabled value={rating.stars} />
+                                        <div className="review-text">{rating.comment}</div>
                                     </div>
-                                    <div className="review-text">{rating.comment}</div>
-                                </div>
-                            ))}
+                                );
+                            })}
 
                             {/* Pagination */}
                             <div style={{ marginTop: 20, textAlign: "center" }}>

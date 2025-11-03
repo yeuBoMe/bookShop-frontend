@@ -279,18 +279,13 @@ export const deleteOrderAPI = (id: number) => {
 };
 
 // Module rating
-export const createRatingAPI = (
-  stars: number,
-  comment: string,
-  user: { id: number } | null,
-  book: { id: number } | null
-) => {
-  return axios.post<IBackendRes<IRating>>("/api/v1/ratings", {
-    stars,
-    comment,
-    user,
-    book,
-  });
+export const createRatingAPI = (data: {
+  stars: number;
+  comment: string;
+  user: { id: number } | null;
+  book: { id: number } | null;
+}) => {
+  return axios.post<IBackendRes<IRating>>("/api/v1/ratings", data);
 };
 
 export const fetchListRatingsByBookIdAPI = (bookId: number, query: string) => {

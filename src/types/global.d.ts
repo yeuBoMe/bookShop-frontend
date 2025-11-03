@@ -169,7 +169,11 @@ declare global {
     id: number;
     stars: number;
     comment: string;
-    user: string;
+    user: {
+      id: number;
+      name: string;
+      avatar: string;
+    };
     book: string;
     createdAt?: Date;
     updatedAt?: Date;
