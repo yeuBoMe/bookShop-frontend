@@ -299,6 +299,15 @@ export const fetchListRatingsByBookIdAPI = (bookId: number, query: string) => {
   );
 };
 
+export const getRatingByUserIdAndBookIdAPI = (
+  userId: number,
+  bookId: number
+) => {
+  return axios.get<IBackendRes<IRating>>(
+    `/api/v1/ratings/book/${bookId}/user/${userId}`
+  );
+};
+
 export const deleteRatingAPI = (id: number) => {
   return axios.delete<IBackendRes<IRating>>(`/api/v1/ratings/${id}`);
 };

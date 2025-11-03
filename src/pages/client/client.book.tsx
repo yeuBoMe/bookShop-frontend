@@ -41,18 +41,19 @@ const BookPage = () => {
 
     useEffect(() => {
         window.scrollTo({ top: 0, behavior: "smooth" });
-        const fetchCategories = async () => {
-            try {
-                const fetchAllCategoriesResponse = await fetchAllCategoriesSelectAPI();
-                if (fetchAllCategoriesResponse.data) {
-                    setCategories(fetchAllCategoriesResponse.data.result);
-                }
-            } catch (error: any) {
-                console.error("Failed to fetch categories:", error);
-            }
-        };
         fetchCategories();
     }, []);
+
+    const fetchCategories = async () => {
+        try {
+            const fetchAllCategoriesResponse = await fetchAllCategoriesSelectAPI();
+            if (fetchAllCategoriesResponse.data) {
+                setCategories(fetchAllCategoriesResponse.data.result);
+            }
+        } catch (error: any) {
+            console.error("Failed to fetch categories:", error);
+        }
+    };
 
     const buildQuery = (page: number) => {
         let query = `page=${page}&size=${meta.pageSize}`;

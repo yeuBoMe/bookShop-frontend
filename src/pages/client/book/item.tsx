@@ -8,19 +8,27 @@ import {
     Tabs,
     App,
     Divider,
-    Skeleton
+    Skeleton,
+    Pagination,
+    Empty,
+    Avatar,
+    Input
 } from "antd";
 import {
     ShoppingCartOutlined,
     SafetyOutlined,
-    HomeOutlined
+    HomeOutlined,
+    UserOutlined,
+    DeleteOutlined
 } from "@ant-design/icons";
 import ImageGallery from "react-image-gallery";
 import "react-image-gallery/styles/css/image-gallery.css";
 import "styles/client/book/book.detail.scss";
 import BookGalleryModal from "@/components/client/book/gallery.modal";
-import { getBookByIdAPI } from "@/services/api.service";
+import { fetchListRatingsByBookIdAPI, getBookByIdAPI, getRatingByUserIdAndBookIdAPI } from "@/services/api.service";
 import { useCurrentApp } from "@/components/context/app.context";
+
+const { TextArea } = Input;
 
 const BookDetailPage = () => {
     const { id } = useParams();
@@ -29,10 +37,19 @@ const BookDetailPage = () => {
 
     const { notification, message } = App.useApp();
 
-    const [loading, setLoading] = useState<boolean>(true);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [ratingsLoading, setRatingsLoading] = useState<boolean>(false);
+
     const [book, setBook] = useState<IBook | null>(null);
-    const [ratings, setRatings] = useState<IRating[]>([]);
     const [quantity, setQuantity] = useState<number>(1);
+
+    const [ratings, setRatings] = useState<IRating[]>([]);
+    const [totalRatings, setTotalRatings] = useState<number>(0);
+    const [userRating, setUserRating] = useState<IRating | null>(null);
+
+    const [newRatingStars, setNewRatingStars] = useState<number>(0);
+    const [newRatingComment, setNewRatingComment] = useState<string>("");
+    const [isSubmitRating, setIsSubmitRating] = useState<boolean>(false);
 
     const [modalGalleryOpen, setModalGalleryOpen] = useState<boolean>(false);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -40,10 +57,21 @@ const BookDetailPage = () => {
     const refGallery = useRef<ImageGallery>(null);
     const baseUrl = `${import.meta.env.VITE_BACKEND_URL}`;
 
+    const [meta, setMeta] = useState({
+        current: 1,
+        pageSize: 5,
+        pages: 0,
+        total: 0
+    });
+
     useEffect(() => {
         if (id) {
             const bookId = parseInt(id);
             fetchBookDetailById(bookId);
+            fetchListRatingsByBookId(bookId, 1);
+            if (user && user.id) {
+                checkUserRating(user?.id, bookId);
+            }
         }
     }, [id]);
 
@@ -67,6 +95,50 @@ const BookDetailPage = () => {
             setLoading(false);
         }
     };
+
+    const fetchListRatingsByBookId = async (bookId: number, page: number) => {
+        try {
+            setRatingsLoading(true);
+            const query = `page=${page}&size=${meta.pageSize}&sort=createdAt,desc`;
+            const fetchListRatingsByBookIdResponse = await fetchListRatingsByBookIdAPI(bookId, query);
+            if (fetchListRatingsByBookIdResponse.data) {
+                setMeta(fetchListRatingsByBookIdResponse.data.meta);
+                setRatings(fetchListRatingsByBookIdResponse.data.result);
+                setTotalRatings(fetchListRatingsByBookIdResponse.data.meta.total);
+            }
+        } catch (error: any) {
+            console.error("Failed to fetch ratings:", error);
+        } finally {
+            setRatingsLoading(false);
+        }
+    }
+
+    const checkUserRating = async (userId: number, bookId: number) => {
+        try {
+            const getRatingByUserIdAndBookIdResponse = await getRatingByUserIdAndBookIdAPI(userId, bookId);
+            if (getRatingByUserIdAndBookIdResponse.data) {
+                setUserRating(getRatingByUserIdAndBookIdResponse.data);
+            }
+        } catch (error: any) {
+            // User hasn't rated yet
+            setUserRating(null);
+        }
+    }
+
+    const handleSubmitRating = async () => {
+        try {
+            setIsSubmitRating(true);
+
+        } catch (error: any) {
+
+        } finally {
+            setIsSubmitRating(false);
+        }
+    }
+
+    const handleDeleteRating = async (ratingId: number) => {
+
+    }
 
     const handleAddToCart = () => {
         // Kiểm tra đăng nhập
@@ -120,6 +192,20 @@ const BookDetailPage = () => {
             setCarts(data);
         }
         message.success(`Đã thêm ${quantity} sản phẩm "${book.name}" vào giỏ hàng`);
+    };
+
+    const handlePageChange = (page: number) => {
+        fetchListRatingsByBookId(parseInt(id!), page);
+    }
+
+    const formatDate = (dateString?: string | Date) => {
+        return dateString ? new Date(dateString).toLocaleDateString("vi-VN", {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+        }) : "N/A";
     };
 
     if (loading) {
@@ -268,26 +354,112 @@ const BookDetailPage = () => {
         },
         {
             key: "3",
-            label: `Đánh giá (128)`,
+            label: `Đánh giá ${totalRatings}`,
             children: (
                 <div className="reviews-content">
-                    {[1, 2, 3].map((item) => (
-                        <div key={item} className="review-item">
-                            <div className="review-header">
-                                <div className="reviewer-avatar">N</div>
-                                <div className="reviewer-info">
-                                    <div className="reviewer-name">Nguyễn Văn A</div>
-                                    <div className="review-date">15/03/2024</div>
-                                </div>
-                                <Rate disabled defaultValue={5} />
+                    {/* Rating Form - Only show if user hasn't rated */}
+                    {user && !userRating && (
+                        <div className="rating-form">
+                            <h3>Viết đánh giá của bạn</h3>
+                            <div className="rating-stars">
+                                <span>Đánh giá:</span>
+                                <Rate
+                                    value={newRatingStars}
+                                    onChange={setNewRatingStars}
+                                />
                             </div>
-                            <div className="review-text">
-                                Cuốn sách rất hay, nội dung chi tiết và dễ hiểu. Rất phù hợp
-                                cho những ai muốn nâng cao kỹ năng lập trình. Giao hàng nhanh,
-                                đóng gói cẩn thận. Sẽ ủng hộ shop lần sau!
+                            <TextArea
+                                rows={4}
+                                placeholder="Chia sẻ cảm nhận của bạn về sản phẩm... (tối đa 200 ký tự)"
+                                value={newRatingComment}
+                                onChange={(e) => setNewRatingComment(e.target.value)}
+                                maxLength={200}
+                                showCount
+                            />
+                            <Button
+                                type="primary"
+                                onClick={handleSubmitRating}
+                                loading={isSubmitRating}
+                                style={{ marginTop: 10 }}
+                            >
+                                Gửi đánh giá
+                            </Button>
+                        </div>
+                    )}
+
+                    {/* User's existing rating */}
+                    {userRating && (
+                        <div className="user-rating-notice">
+                            <div className="notice-header">
+                                <span>✓ Bạn đã đánh giá sản phẩm này</span>
+                            </div>
+                            <div className="review-item user-review">
+                                <div className="review-header">
+                                    <div className="reviewer-avatar">
+                                        <Avatar icon={<UserOutlined />} />
+                                    </div>
+                                    <div className="reviewer-info">
+                                        <div className="reviewer-name">{userRating.user}</div>
+                                        <div className="review-date">
+                                            {formatDate(userRating.createdAt)}
+                                        </div>
+                                    </div>
+                                    <Rate disabled value={userRating.stars} />
+                                    <Button
+                                        danger
+                                        icon={<DeleteOutlined />}
+                                        onClick={() => handleDeleteRating(userRating.id)}
+                                        size="small"
+                                    >
+                                        Xóa
+                                    </Button>
+                                </div>
+                                <div className="review-text">{userRating.comment}</div>
                             </div>
                         </div>
-                    ))}
+                    )}
+
+                    <Divider />
+
+                    {/* All ratings */}
+                    <h3>Tất cả đánh giá</h3>
+                    {ratingsLoading ? (
+                        <Skeleton active paragraph={{ rows: 3 }} />
+                    ) : ratings.length > 0 ? (
+                        <>
+                            {ratings.map((rating) => (
+                                <div key={rating.id} className="review-item">
+                                    <div className="review-header">
+                                        <div className="reviewer-avatar">
+                                            <Avatar icon={<UserOutlined />} />
+                                        </div>
+                                        <div className="reviewer-info">
+                                            <div className="reviewer-name">{rating.user}</div>
+                                            <div className="review-date">
+                                                {formatDate(rating.createdAt)}
+                                            </div>
+                                        </div>
+                                        <Rate disabled value={rating.stars} />
+                                    </div>
+                                    <div className="review-text">{rating.comment}</div>
+                                </div>
+                            ))}
+
+                            {/* Pagination */}
+                            <div style={{ marginTop: 20, textAlign: "center" }}>
+                                <Pagination
+                                    current={meta.current}
+                                    total={totalRatings}
+                                    pageSize={meta.pageSize}
+                                    onChange={handlePageChange}
+                                    showSizeChanger={false}
+                                    responsive
+                                />
+                            </div>
+                        </>
+                    ) : (
+                        <Empty description="Chưa có đánh giá nào" />
+                    )}
                 </div>
             ),
         },
