@@ -34,6 +34,7 @@ import OrderPage from '@/pages/client/order.history';
 import BookDetailPage from '@/pages/client/book/item';
 import CheckoutPage from '@/pages/client/shop/checkout';
 import ManageCategoryPage from '@/pages/admin/manage.category';
+import ManageRatingPage from '@/pages/admin/manage.rating';
 
 const router = createBrowserRouter([
   {
@@ -107,6 +108,10 @@ const router = createBrowserRouter([
       {
         path: "order",
         element: <ManageOrderPage />,
+      },
+      {
+        path: "rating",
+        element: <ManageRatingPage />,
       },
       {
         path: "user",

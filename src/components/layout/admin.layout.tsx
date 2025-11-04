@@ -9,6 +9,7 @@ import {
     MenuFoldOutlined,
     MenuUnfoldOutlined,
     HomeOutlined,
+    StarOutlined,
 } from '@ant-design/icons';
 import { Layout, Menu, Dropdown, Space, Avatar, App } from 'antd';
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
@@ -91,6 +92,11 @@ const AdminLayout = () => {
             label: <Link to='/admin/category'>Manage Categories</Link>,
             key: '/admin/category',
             icon: <AppstoreOutlined />,
+        },
+        {
+            label: <Link to='/admin/rating'>Manage Ratings</Link>,
+            key: '/admin/rating',
+            icon: <StarOutlined />,
         },
     ];
 

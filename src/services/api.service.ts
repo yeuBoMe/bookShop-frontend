@@ -288,6 +288,12 @@ export const createRatingAPI = (data: {
   return axios.post<IBackendRes<IRating>>("/api/v1/ratings", data);
 };
 
+export const fetchAllRatingsAPI = (query: string) => {
+  return axios.get<IBackendRes<IModelPaginate<IRating>>>(
+    `/api/v1/ratings?${query}`
+  );
+};
+
 export const fetchListRatingsByBookIdAPI = (bookId: number, query: string) => {
   return axios.get<IBackendRes<IModelPaginate<IRating>>>(
     `/api/v1/ratings/book/${bookId}?${query}`
