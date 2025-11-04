@@ -132,6 +132,7 @@ const TableOrder = () => {
             title: 'Address',
             dataIndex: 'address',
             sorter: true,
+            ellipsis: true,
         },
         {
             title: 'Total Price',
@@ -141,6 +142,7 @@ const TableOrder = () => {
                 addonAfter: '₫',
             },
             sorter: true,
+            ellipsis: true,
             render: (_, entity) => {
                 return entity.totalPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
             }

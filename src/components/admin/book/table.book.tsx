@@ -234,6 +234,7 @@ const TableBook = () => {
                     }
 
                     const fetchAllBooksResponse = await fetchAllBooksAPI(query);
+                    console.log("Check query>>>", query)
 
                     if (fetchAllBooksResponse.data) {
                         setMeta(fetchAllBooksResponse.data.meta);

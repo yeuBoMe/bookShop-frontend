@@ -190,6 +190,42 @@ const DashBoardPage = () => {
                         </Link>
                     </Card>
                 </Col>
+
+                {/* Ratings Card */}
+                <Col xs={24} sm={12} md={12} lg={6} xl={6}>
+                    <Card hoverable>
+                        <Link to={"/admin/rating"}>
+                            <Statistic
+                                title={
+                                    <span style={{ fontSize: '16px', fontWeight: 500 }}>
+                                        Total Ratings
+                                    </span>
+                                }
+                                value={dashboardData?.countRatings || 0}
+                                prefix={<AppstoreOutlined style={{ color: '#d12e2eff' }} />}
+                                formatter={(value) => formatter(value as number)}
+                                valueStyle={{
+                                    color: '#d12e2eff',
+                                    fontSize: '32px',
+                                    fontWeight: 700
+                                }}
+                            />
+                            <div style={{
+                                marginTop: '16px',
+                                paddingTop: '16px',
+                                borderTop: '1px solid #f0f0f0',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px'
+                            }}>
+                                <RiseOutlined style={{ color: '#52c41a' }} />
+                                <span style={{ color: '#52c41a', fontSize: '14px' }}>
+                                    +5% from last month
+                                </span>
+                            </div>
+                        </Link>
+                    </Card>
+                </Col>
             </Row>
         </div>
     );

@@ -46,8 +46,6 @@ declare global {
     email: string;
     avatar?: string;
     phone: string;
-    // createdAt: string;
-    // createdBy: string;
     role?: {
       id: number;
       name: string;
@@ -90,11 +88,11 @@ declare global {
     email: string;
     avatar?: string;
     phone: string;
+    role?: { id: number; name: string };
     createdAt: Date;
     createdBy: string;
     updatedAt: Date;
     updatedBy: string;
-    role?: { id: number; name: string };
   }
 
   interface IResponseImportData<T> {
@@ -186,5 +184,6 @@ declare global {
     countBooks: number;
     countUsers: number;
     countCategories: number;
+    countRatings: number;
   }
 }

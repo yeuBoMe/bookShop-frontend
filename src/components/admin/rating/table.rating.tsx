@@ -9,6 +9,10 @@ import DetailRatingDrawer from 'components/admin/rating/detail.rating.drawer';
 import { dateRangeValidate } from '@/services/helper';
 
 type TSearch = {
+    stars: number;
+    comment: string;
+    user: string;
+    book: string;
     createdAtRange: string;
 }
 
@@ -64,10 +68,12 @@ const TableRating = () => {
             title: 'Id',
             dataIndex: 'id',
             sorter: true,
+            hideInSearch: true,
         },
         {
             title: 'Stars',
             dataIndex: 'stars',
+            valueType: "digit",
             sorter: true,
         },
         {
@@ -78,13 +84,20 @@ const TableRating = () => {
         },
         {
             title: 'User',
-            dataIndex: 'user.name',
+            dataIndex: 'user',
             sorter: true,
+            render(_, entity) {
+                return (
+                    <span>{entity.user.name}</span>
+                );
+            },
         },
         {
             title: 'Book',
             dataIndex: 'book',
             sorter: true,
+            ellipsis: true,
+            copyable: true,
         },
         {
             title: 'Created at',
@@ -145,6 +158,19 @@ const TableRating = () => {
 
                     let query = `page=${params.current}&size=${params.pageSize}`;
                     let filterConditions = [];
+
+                    if (params.stars) {
+                        filterConditions.push(`stars='${params.stars}'`);
+                    }
+                    if (params.comment) {
+                        filterConditions.push(`comment~~'${params.comment}'`);
+                    }
+                    if (params.user) {
+                        filterConditions.push(`user.fullName~~'${params.user}'`);
+                    }
+                    if (params.book) {
+                        filterConditions.push(`book.name~~'${params.book}'`);
+                    }
 
                     if (params.createdAtRange && params.createdAtRange[0] && params.createdAtRange[1]) {
                         const dateRangeResult = dateRangeValidate(params.createdAtRange);
@@ -251,7 +277,10 @@ const TableRating = () => {
                 ]}
             />
             <DetailRatingDrawer
-
+                isDrawerDetailOpen={isDrawerDetailOpen}
+                setIsDrawerDetailOpen={setIsDrawerDetailOpen}
+                dataDetail={dataDetail}
+                setDataDetail={setDataDetail}  
             />
         </>
     );

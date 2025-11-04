@@ -79,9 +79,9 @@ const CheckoutPage = () => {
             };
 
             const createOrderResponse = await createAnOrderAPI(orderData);
+            await new Promise((resolve) => setTimeout(resolve, 2000));
 
             if (createOrderResponse.data) {
-                await new Promise((resolve) => setTimeout(resolve, 2000));
                 console.log(">>> order data: ", createOrderResponse)
                 message.success("Thanh toán thành công!");
                 localStorage.removeItem("carts");

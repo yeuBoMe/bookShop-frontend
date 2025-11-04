@@ -7,13 +7,18 @@ import {
 import { App, ConfigProvider } from 'antd';
 import { AuthProvider } from '@/components/context/app.context';
 
+import ProtectedRoute from 'components/auth/private.route';
+
 import Layout from '@/layout';
 import AdminLayout from 'components/layout/admin.layout';
 
 import BookPage from '@/pages/client/client.book';
 import HomePage from 'pages/client/home';
 import AboutPage from 'pages/client/about';
-
+import ProfilePage from 'pages/client/profile';
+import OrderPage from '@/pages/client/order.history';
+import BookDetailPage from '@/pages/client/book/item';
+import CheckoutPage from '@/pages/client/shop/checkout';
 
 import LoginPage from 'pages/auth/login';
 import RegisterPage from 'pages/auth/register';
@@ -23,18 +28,13 @@ import DashBoardPage from '@/pages/admin/dashboard';
 import ManageBookPage from 'pages/admin/manage.book';
 import ManageOrderPage from 'pages/admin/manage.order';
 import ManageUserPage from 'pages/admin/manage.user';
-import ProtectedRoute from 'components/auth/private.route';
+import ManageCategoryPage from '@/pages/admin/manage.category';
+import ManageRatingPage from '@/pages/admin/manage.rating';
 
 import enUS from 'antd/locale/en_US';
 // import viVN from 'antd/locale/vi_VN';
 
 import "styles/global.scss";
-import ProfilePage from 'pages/client/profile';
-import OrderPage from '@/pages/client/order.history';
-import BookDetailPage from '@/pages/client/book/item';
-import CheckoutPage from '@/pages/client/shop/checkout';
-import ManageCategoryPage from '@/pages/admin/manage.category';
-import ManageRatingPage from '@/pages/admin/manage.rating';
 
 const router = createBrowserRouter([
   {
