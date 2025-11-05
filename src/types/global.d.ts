@@ -119,6 +119,7 @@ declare global {
     introduceText: string;
     description: string;
     reader: string;
+    averageStars: double;
     createdAt?: Date;
     updatedAt?: Date;
     createdBy?: string;

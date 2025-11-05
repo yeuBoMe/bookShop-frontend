@@ -160,7 +160,7 @@ const BookDetailPage = () => {
             };
 
             const createRatingResponse = await createRatingAPI(dataSend);
-            await new Promise((resolver) => setTimeout(resolver, 1000));
+            await new Promise((resolve) => setTimeout(resolve, 1000));
 
             console.log("Check data rating>>>", createRatingResponse);
             if (createRatingResponse.data) {
@@ -611,8 +611,8 @@ const BookDetailPage = () => {
                             {/* Rating */}
                             <div className="book-rating-section">
                                 <div className="rating-group">
-                                    <Rate disabled defaultValue={5} />
-                                    <span className="rating-number">5.0</span>
+                                    <Rate defaultValue={book.averageStars} allowHalf disabled />
+                                    <span className="rating-number">{book.averageStars}.0</span>
                                 </div>
                                 <span className="divider"></span>
                                 <span className="sold-count">Đã bán 1.2k</span>

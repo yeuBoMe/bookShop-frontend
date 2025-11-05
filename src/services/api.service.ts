@@ -260,18 +260,16 @@ export const getOrderHistoryAPI = () => {
 };
 
 export const fetchAllOrdersAPI = (query: string) => {
-  const ENDPOINT_FETCH_ALL_ORDERS = `/api/v1/orders?${query}`;
   return axios.get<IBackendRes<IModelPaginate<IOrder>>>(
-    ENDPOINT_FETCH_ALL_ORDERS
+    `/api/v1/orders?${query}`
   );
 };
 
 export const updateOrderAPI = (id: number, status: string) => {
-  const data = {
-    id: id,
-    status: status,
-  };
-  return axios.patch<IBackendRes<IOrder>>(`/api/v1/orders/${id}`, data);
+  return axios.patch<IBackendRes<IOrder>>(`/api/v1/orders/${id}`, {
+    id,
+    status,
+  });
 };
 
 export const deleteOrderAPI = (id: number) => {
