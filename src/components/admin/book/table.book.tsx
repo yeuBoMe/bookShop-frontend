@@ -204,7 +204,7 @@ const TableBook = () => {
                         filterConditions.push(`author~~'${params.author}'`);
                     }
                     if (params.price) {
-                        filterConditions.push(`price='${params.price}'`);
+                        filterConditions.push(`price=${params.price}`);
                     }
 
                     if (params.createdAtRange && params.createdAtRange[0] && params.createdAtRange[1]) {

@@ -238,7 +238,7 @@ const TableOrder = () => {
                         filterConditions.push(`address~~'${params.address}'`);
                     }
                     if (params.totalPrice) {
-                        filterConditions.push(`totalPrice='${params.totalPrice}'`);
+                        filterConditions.push(`totalPrice=${params.totalPrice}`);
                     }
                     if (params.status) {
                         filterConditions.push(`status~~'${params.status}'`);
