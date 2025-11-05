@@ -85,6 +85,15 @@ export const fetchAllBooksAPI = (query: string) => {
   );
 };
 
+export const fetchAllBooksWithAverageRatingAPI = (
+  minRating: number,
+  query: string
+) => {
+  return axios.get<IBackendRes<IModelPaginate<IBook>>>(
+    `/api/v1/books/average-rating?minRating=${minRating}&${query}`
+  );
+};
+
 export const createBookAPI = (
   name: string,
   author: string,

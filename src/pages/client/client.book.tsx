@@ -2,7 +2,7 @@ import { FilterTwoTone, ReloadOutlined, ShoppingCartOutlined } from "@ant-design
 import { Col, Form, Row, Checkbox, Divider, InputNumber, Button, Rate, Tabs, Pagination, Spin, Empty, App } from "antd";
 import type { FormProps, TabsProps } from "antd";
 import { useEffect, useState } from "react";
-import { fetchAllBooksAPI, fetchAllCategoriesSelectAPI } from "@/services/api.service";
+import { fetchAllBooksAPI, fetchAllBooksWithAverageRatingAPI, fetchAllCategoriesSelectAPI } from "@/services/api.service";
 import "styles/client/book/client.book.scss";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { useCurrentApp } from "@/components/context/app.context";
@@ -13,6 +13,7 @@ interface FilterValues {
         from?: number;
         to?: number;
     }
+    rating?: number;
 }
 
 const BookPage = () => {
@@ -88,11 +89,20 @@ const BookPage = () => {
         try {
             setLoading(true);
             const queryBuilt = buildQuery(page);
-            const fetchAllBooksResponse = await fetchAllBooksAPI(queryBuilt);
-            if (fetchAllBooksResponse.data) {
-                console.log("Check query >>> ", queryBuilt);
-                setBooks(fetchAllBooksResponse.data.result);
-                setMeta(fetchAllBooksResponse.data.meta);
+
+            if (filter.rating) {
+                const fetchAllBooksWithAverageRatingResponse = await fetchAllBooksWithAverageRatingAPI(filter.rating, queryBuilt);
+                if (fetchAllBooksWithAverageRatingResponse.data) {
+                    setBooks(fetchAllBooksWithAverageRatingResponse.data.result);
+                    setMeta(fetchAllBooksWithAverageRatingResponse.data.meta);
+                }
+            } else {
+                const fetchAllBooksResponse = await fetchAllBooksAPI(queryBuilt);
+                if (fetchAllBooksResponse.data) {
+                    console.log("Check query >>> ", queryBuilt);
+                    setBooks(fetchAllBooksResponse.data.result);
+                    setMeta(fetchAllBooksResponse.data.meta);
+                }
             }
         } catch (error: any) {
             console.error("Failed to fetch books:", error);
@@ -142,6 +152,19 @@ const BookPage = () => {
                 break;
             default:
                 break;
+        }
+    };
+
+    const handleRatingClick = (rating: number) => {
+        const currentRating = form.getFieldValue('rating');
+        if (currentRating === rating) {
+            // Nếu click vào rating đang active, bỏ chọn
+            form.setFieldValue('rating', undefined);
+            setFilter({ ...filter, rating: undefined });
+        } else {
+            // Set rating mới
+            form.setFieldValue('rating', rating);
+            setFilter({ ...filter, rating });
         }
     };
 
@@ -279,7 +302,12 @@ const BookPage = () => {
                             <Form.Item label={<strong>Đánh giá</strong>}>
                                 <div className="rating-options">
                                     {[5, 4, 3, 2, 1].map((rating) => (
-                                        <div key={rating} className="rating-item">
+                                        <div
+                                            key={rating}
+                                            className="rating-item"
+                                            onClick={() => handleRatingClick(rating)}
+                                            style={{ cursor: 'pointer' }}
+                                        >
                                             <Rate value={rating} disabled />
                                             {rating < 5 && <span className="rating-text">trở lên</span>}
                                         </div>
