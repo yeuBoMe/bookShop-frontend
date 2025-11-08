@@ -1,5 +1,5 @@
 import { updateOrderAPI } from "@/services/api.service";
-import { CheckCircleOutlined, ClockCircleOutlined, CloseCircleOutlined, TruckOutlined } from "@ant-design/icons";
+import { CheckCircleOutlined, ClockCircleOutlined, CloseCircleOutlined, DollarCircleOutlined, TruckOutlined } from "@ant-design/icons";
 import {
     App,
     Col,
@@ -46,7 +46,7 @@ const UpdateOrderModal = (props: UpdateOrderProps) => {
 
     const handleUpdateBook: FormProps<OrderUpdateValues>['onFinish'] = async (values) => {
         if (!dataUpdate) return;
-        
+
         try {
             setIsLoading(true);
             const { status } = values;
@@ -109,6 +109,15 @@ const UpdateOrderModal = (props: UpdateOrderProps) => {
                 <span>
                     <CloseCircleOutlined style={{ color: "red", marginRight: 8 }} />
                     CANCEL
+                </span>
+            ),
+        },
+        {
+            value: "PAID",
+            label: (
+                <span>
+                    <DollarCircleOutlined style={{ color: "blue", marginRight: 8 }} />
+                    PAID
                 </span>
             ),
         },

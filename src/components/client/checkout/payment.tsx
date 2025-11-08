@@ -196,6 +196,15 @@ const Payment = (props: PaymentProps) => {
                                             </div>
                                         </div>
                                     </Radio>
+                                    <Radio value="vnpay" className="payment-radio">
+                                        <div className="payment-option">
+                                            <CreditCardOutlined style={{ fontSize: 20 }} />
+                                            <div>
+                                                <strong>Ví VNPay</strong>
+                                                <p>Thanh toán trực tuyến qua cổng VNPay</p>
+                                            </div>
+                                        </div>
+                                    </Radio>
                                 </Radio.Group>
                             </Form.Item>
 
@@ -280,7 +289,7 @@ const Payment = (props: PaymentProps) => {
                         </div>
                     </div>
                 </div>
-            </div>
+            </div >
 
             <Modal
                 open={isModalQROpen}

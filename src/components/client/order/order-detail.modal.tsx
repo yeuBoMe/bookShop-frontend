@@ -1,4 +1,4 @@
-import { ShoppingOutlined, ClockCircleOutlined, CheckCircleOutlined, CloseCircleOutlined, TruckOutlined } from '@ant-design/icons'
+import { ShoppingOutlined, ClockCircleOutlined, CheckCircleOutlined, CloseCircleOutlined, TruckOutlined, DollarCircleOutlined } from '@ant-design/icons'
 import { Button, Descriptions, Modal, Tag } from 'antd'
 import type { JSX } from 'react';
 import "styles/client/order/order-detail.scss";
@@ -56,7 +56,12 @@ const OrderDetailModal = (props: OrderDetailModalProps) => {
                 text: "Đã huỷ",
                 color: "red",
                 icon: <CloseCircleOutlined />
-            }
+            },
+            PAID: {
+                text: "Đã thanh toán",
+                color: "blue",
+                icon: <DollarCircleOutlined />
+            },
         };
         return configs[status] || configs.PENDING;
     };

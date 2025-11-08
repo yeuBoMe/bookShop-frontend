@@ -2,7 +2,8 @@ import {
     ClockCircleOutlined,
     CheckCircleOutlined,
     CloseCircleOutlined,
-    TruckOutlined
+    TruckOutlined,
+    DollarCircleOutlined
 } from '@ant-design/icons';
 import { Drawer, Tag, Divider, Descriptions, Badge } from "antd";
 import type { JSX } from 'react';
@@ -66,6 +67,11 @@ const DetailOrderDrawer = (props: DrawerOrderProps) => {
                 text: "CANCEL",
                 color: "red",
                 icon: <CloseCircleOutlined />,
+            },
+            PAID: {
+                text: "PAID",
+                color: "blue",
+                icon: <DollarCircleOutlined />
             },
         };
 
