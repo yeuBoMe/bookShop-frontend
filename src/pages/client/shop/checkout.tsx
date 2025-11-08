@@ -28,6 +28,7 @@ const CheckoutPage = () => {
     const [totalPrice, setTotalPrice] = useState<number>(0);
     const [currentStep, setCurrentStep] = useState<number>(0);
     const [isPaymentLoading, setIsPaymentLoading] = useState<boolean>(false);
+    const finalTotalPrice = totalPrice + (totalPrice >= 150000 ? 0 : 30000);
 
     console.log("Check cart >>> ", carts)
 
@@ -62,7 +63,6 @@ const CheckoutPage = () => {
         try {
             setIsPaymentLoading(true);
 
-            const finalTotalPrice = totalPrice + (totalPrice >= 150000 ? 0 : 30000);
             const orderData = {
                 name: values.name,
                 email: values.email,
@@ -190,6 +190,7 @@ const CheckoutPage = () => {
                 <Payment
                     carts={carts}
                     totalPrice={totalPrice}
+                    finalTotalPrice={finalTotalPrice}
                     isPaymentLoading={isPaymentLoading}
                     onBackToCart={handleBackToCart}
                     onPaymentSubmit={handlePaymentSubmit}

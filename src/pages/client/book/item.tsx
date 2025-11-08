@@ -169,6 +169,7 @@ const BookDetailPage = () => {
                 setNewRatingComment("");
                 await fetchListRatingsByBookId(parseInt(id!), 1);
                 await fetchUserRating(user.id, parseInt(id!));
+                setLoading(true);
             }
         } catch (error: any) {
             notification.error({
@@ -180,6 +181,7 @@ const BookDetailPage = () => {
             console.log("Check error rating>>>", error);
         } finally {
             setIsSubmitRating(false);
+            setLoading(false);
         }
     }
 
