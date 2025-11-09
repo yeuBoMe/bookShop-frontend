@@ -3,6 +3,7 @@ import { App, Button, Form, Input, Modal, Radio, type FormProps } from "antd";
 import { ShoppingOutlined, CreditCardOutlined } from "@ant-design/icons";
 import "styles/client/checkout/payment.scss";
 import { useCurrentApp } from "@/components/context/app.context";
+import { createAnOrderAPI, createVnpayUrlAPI } from "@/services/api.service";
 
 interface UserCheckoutValues {
     name: string;
@@ -17,17 +18,19 @@ interface PaymentProps {
     totalPrice: number;
     finalTotalPrice: number;
     isPaymentLoading: boolean;
+    setIsPaymentLoading: (v: boolean) => void;
     onBackToCart: () => void;
     onPaymentSubmit: (values: UserCheckoutValues) => void;
 }
 
 const Payment = (props: PaymentProps) => {
-    const { user } = useCurrentApp();
+    const { user, setCarts } = useCurrentApp();
     const {
         carts,
         totalPrice,
         finalTotalPrice,
         isPaymentLoading,
+        setIsPaymentLoading,
         onBackToCart,
         onPaymentSubmit
     } = props;
@@ -56,14 +59,61 @@ const Payment = (props: PaymentProps) => {
     };
 
     const handlePayment: FormProps<UserCheckoutValues>['onFinish'] = async (values) => {
+        if (!carts) return;
+
+        if (values.paymentMethod === "vnpay") {
+            try {
+                setIsPaymentLoading(true);
+
+                const orderData = {
+                    name: values.name,
+                    email: values.email,
+                    phone: values.phone,
+                    address: values.address,
+                    paymentMethod: values.paymentMethod,
+                    totalPrice: finalTotalPrice,
+                    status: "PENDING",
+                    detail: carts.map((item) => ({
+                        book: { id: item.id },
+                        quantity: item.quantity,
+                        bookName: item.detail.name
+                    }))
+                };
+
+                const createOrderResponse = await createAnOrderAPI(orderData);
+                await new Promise((resolve) => setTimeout(resolve, 1000));
+
+                if (createOrderResponse.data) {
+                    localStorage.removeItem("carts");
+                    setCarts([]);
+
+                    const createVnPayUrl = await createVnpayUrlAPI(createOrderResponse.data.id);
+                    window.location.href = createVnPayUrl;
+                }
+            } catch (error: any) {
+                notification.error({
+                    message: "Error",
+                    description: error?.message || "An error happens when handle payment",
+                    duration: 5,
+                    placement: "topRight",
+                });
+                console.log("error order >>>", error);
+            } finally {
+                setIsPaymentLoading(false);
+            }
+            return;
+        }
+
         if (values.paymentMethod === "banking") {
             const dynamicMessage = `Thanh toan don hang ${Date.now()}`;
             setQrMessage(dynamicMessage);
             setIsModalQROpen(true);
-        } else {
+            return;
+        }
+
+        if (values.paymentMethod === "cod") {
             // COD
             onPaymentSubmit(values);
-            form.resetFields();
         }
     };
 
@@ -72,7 +122,6 @@ const Payment = (props: PaymentProps) => {
             const values = form.getFieldsValue();
             setIsModalQROpen(false);
             onPaymentSubmit(values);
-            form.resetFields();
             message.success("Đơn hàng đã được tạo ở trạng thái PENDING");
         } catch (error: any) {
             notification.error({

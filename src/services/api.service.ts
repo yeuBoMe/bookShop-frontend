@@ -285,6 +285,11 @@ export const deleteOrderAPI = (id: number) => {
   return axios.delete<IBackendRes<IOrder>>(`/api/v1/orders/${id}`);
 };
 
+// Module vnpay
+export const createVnpayUrlAPI = (orderId: number) => {
+  return axios.get<string>(`/api/v1/vnpay/create/${orderId}`);
+};
+
 // Module rating
 export const createRatingAPI = (data: {
   stars: number;

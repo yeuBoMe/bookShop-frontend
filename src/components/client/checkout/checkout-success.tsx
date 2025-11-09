@@ -1,10 +1,20 @@
-import { useNavigate } from "react-router-dom";
-import { Button } from "antd";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { App, Button } from "antd";
 import { CreditCardOutlined } from "@ant-design/icons";
 import "styles/client/checkout/order-success.scss";
+import { useEffect } from "react";
 
 const CheckoutSuccess = () => {
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const {message} = App.useApp();
+
+    useEffect(() => {
+        if (searchParams.get("vnp_ResponseCode") === "00") {
+            // thành công từ VNPAY return
+            message.success("Thanh toán VNPAY thành công!");
+        }
+    }, []);
 
     return (
         <div className="order-success-container">

@@ -59,6 +59,7 @@ const CheckoutPage = () => {
         // Logic thanh toán sẽ được thêm vào đây
         // console.log(">>> data order ", values);
         if (!carts) return;
+        if (values.paymentMethod === "vnpay") return;
 
         try {
             setIsPaymentLoading(true);
@@ -110,7 +111,7 @@ const CheckoutPage = () => {
         { title: "Thanh toán" },
     ];
 
-    if (!carts || carts.length === 0) {
+    if ((!carts || carts.length === 0) && currentStep !== 2) {
         return (
             <div className="cart-page-container">
                 <div className="cart-empty">
@@ -171,14 +172,14 @@ const CheckoutPage = () => {
                     )}
                 </h1>
                 {currentStep === 0 && (
-                    <p className="cart-count">({carts.length} sản phẩm)</p>
+                    <p className="cart-count">({carts ? carts.length : 0} sản phẩm)</p>
                 )}
             </div>
 
             {/* Bước 1: Giỏ hàng */}
             {currentStep === 0 && (
                 <Cart
-                    carts={carts}
+                    carts={carts || []}
                     setCarts={setCarts}
                     totalPrice={totalPrice}
                     onContinueToPayment={handleContinueToPayment}
@@ -188,10 +189,11 @@ const CheckoutPage = () => {
             {/* Bước 2: Đặt hàng */}
             {currentStep === 1 && (
                 <Payment
-                    carts={carts}
+                    carts={carts || []}
                     totalPrice={totalPrice}
                     finalTotalPrice={finalTotalPrice}
                     isPaymentLoading={isPaymentLoading}
+                    setIsPaymentLoading={setIsPaymentLoading}
                     onBackToCart={handleBackToCart}
                     onPaymentSubmit={handlePaymentSubmit}
                 />

@@ -35,6 +35,8 @@ import enUS from 'antd/locale/en_US';
 // import viVN from 'antd/locale/vi_VN';
 
 import "styles/global.scss";
+import CheckoutSuccess from '@/components/client/checkout/checkout-success';
+import CheckoutFail from '@/components/client/checkout/checkout-fail';
 
 const router = createBrowserRouter([
   {
@@ -69,6 +71,10 @@ const router = createBrowserRouter([
             <CheckoutPage />
           </ProtectedRoute>
         ),
+      },
+      {
+        path: "/checkout/fail",
+        element: <CheckoutFail />,
       },
       {
         path: "/profile",

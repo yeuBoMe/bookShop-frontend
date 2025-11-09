@@ -117,7 +117,9 @@ const OrderDetailModal = (props: OrderDetailModalProps) => {
                     <Descriptions.Item label="Phương thức thanh toán">
                         {selectedOrder.paymentMethod === "cod"
                             ? "Thanh toán khi nhận hàng (COD)"
-                            : "Chuyển khoản ngân hàng"}
+                            : selectedOrder.paymentMethod === "vnpay"
+                                ? "Thanh toán bằng ví VNPay"
+                                : "Chuyển khoản ngân hàng"}
                     </Descriptions.Item>
                 </Descriptions>
 
