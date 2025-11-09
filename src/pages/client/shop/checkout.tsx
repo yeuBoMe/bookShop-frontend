@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { App, Button, Empty, Steps } from "antd";
+import { Button, Empty, Steps } from "antd";
 import {
     ShoppingCartOutlined,
     SolutionOutlined,
@@ -11,20 +11,10 @@ import "styles/client/checkout/checkout.scss";
 import CheckoutSuccess from "@/components/client/checkout/checkout-success";
 import Cart from "@/components/client/checkout/cart";
 import Payment from "@/components/client/checkout/payment";
-import { createAnOrderAPI } from "@/services/api.service";
-
-interface UserCheckoutValues {
-    name: string;
-    email: string;
-    phone: string;
-    address: string;
-    paymentMethod: string;
-}
 
 const CheckoutPage = () => {
     const navigate = useNavigate();
     const { carts, setCarts } = useCurrentApp();
-    const { notification, message } = App.useApp();
     const [totalPrice, setTotalPrice] = useState<number>(0);
     const [currentStep, setCurrentStep] = useState<number>(0);
     const [isPaymentLoading, setIsPaymentLoading] = useState<boolean>(false);
@@ -53,56 +43,6 @@ const CheckoutPage = () => {
     const handleBackToCart = () => {
         setCurrentStep(0);
         window.scrollTo({ top: 0, behavior: "smooth" });
-    };
-
-    const handlePaymentSubmit = async (values: UserCheckoutValues) => {
-        // Logic thanh toán sẽ được thêm vào đây
-        // console.log(">>> data order ", values);
-        if (!carts) return;
-        if (values.paymentMethod === "vnpay") return;
-
-        try {
-            setIsPaymentLoading(true);
-
-            const orderData = {
-                name: values.name,
-                email: values.email,
-                phone: values.phone,
-                address: values.address,
-                paymentMethod: values.paymentMethod,
-                totalPrice: finalTotalPrice,
-                status: "PENDING",
-                detail: carts.map((item) => ({
-                    book: { id: item.id },
-                    quantity: item.quantity,
-                    bookName: item.detail.name
-                }))
-            };
-
-            const createOrderResponse = await createAnOrderAPI(orderData);
-            await new Promise((resolve) => setTimeout(resolve, 2000));
-
-            if (createOrderResponse.data) {
-                console.log(">>> order data: ", createOrderResponse)
-                message.success("Thanh toán thành công!");
-                localStorage.removeItem("carts");
-                setCarts([]);
-
-                // Giả lập thanh toán thành công
-                setCurrentStep(2);
-                window.scrollTo({ top: 0, behavior: "smooth" });
-            }
-        } catch (error: any) {
-            notification.error({
-                message: "Error",
-                description: error?.message || "An error happens when handle payment",
-                duration: 5,
-                placement: "topRight",
-            });
-            console.log("error order >>>", error);
-        } finally {
-            setIsPaymentLoading(false);
-        }
     };
 
     const steps = [
@@ -194,8 +134,8 @@ const CheckoutPage = () => {
                     finalTotalPrice={finalTotalPrice}
                     isPaymentLoading={isPaymentLoading}
                     setIsPaymentLoading={setIsPaymentLoading}
+                    setCurrentStep={setCurrentStep}
                     onBackToCart={handleBackToCart}
-                    onPaymentSubmit={handlePaymentSubmit}
                 />
             )}
 

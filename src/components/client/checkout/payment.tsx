@@ -19,8 +19,8 @@ interface PaymentProps {
     finalTotalPrice: number;
     isPaymentLoading: boolean;
     setIsPaymentLoading: (v: boolean) => void;
+    setCurrentStep: (v: number) => void;
     onBackToCart: () => void;
-    onPaymentSubmit: (values: UserCheckoutValues) => void;
 }
 
 const Payment = (props: PaymentProps) => {
@@ -31,8 +31,8 @@ const Payment = (props: PaymentProps) => {
         finalTotalPrice,
         isPaymentLoading,
         setIsPaymentLoading,
+        setCurrentStep,
         onBackToCart,
-        onPaymentSubmit
     } = props;
     const { notification, message } = App.useApp();
     const [form] = Form.useForm<UserCheckoutValues>();
@@ -58,62 +58,67 @@ const Payment = (props: PaymentProps) => {
         }).format(price);
     };
 
+    const createOrderAndSuccess = async (values: UserCheckoutValues, successMessage: string) => {
+        const orderData = {
+            name: values.name,
+            email: values.email,
+            phone: values.phone,
+            address: values.address,
+            paymentMethod: values.paymentMethod,
+            totalPrice: finalTotalPrice,
+            status: "PENDING",
+            detail: carts.map((item) => ({
+                book: { id: item.id },
+                quantity: item.quantity,
+                bookName: item.detail.name
+            }))
+        };
+
+        const createOrderResponse = await createAnOrderAPI(orderData);
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+
+        if (createOrderResponse.data) {
+            localStorage.removeItem("carts");
+            setCarts([]);
+            message.success(successMessage);
+            setCurrentStep(2);
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+    }
+
     const handlePayment: FormProps<UserCheckoutValues>['onFinish'] = async (values) => {
         if (!carts) return;
 
-        if (values.paymentMethod === "vnpay") {
-            try {
-                setIsPaymentLoading(true);
+        try {
+            setIsPaymentLoading(true);
 
-                const orderData = {
-                    name: values.name,
-                    email: values.email,
-                    phone: values.phone,
-                    address: values.address,
-                    paymentMethod: values.paymentMethod,
-                    totalPrice: finalTotalPrice,
-                    status: "PENDING",
-                    detail: carts.map((item) => ({
-                        book: { id: item.id },
-                        quantity: item.quantity,
-                        bookName: item.detail.name
-                    }))
-                };
-
-                const createOrderResponse = await createAnOrderAPI(orderData);
-                await new Promise((resolve) => setTimeout(resolve, 1000));
-
-                if (createOrderResponse.data) {
-                    localStorage.removeItem("carts");
-                    setCarts([]);
-
-                    const createVnPayUrl = await createVnpayUrlAPI(createOrderResponse.data.id);
-                    window.location.href = createVnPayUrl;
+            if (values.paymentMethod === "vnpay") {
+                const vnPayUrl = await createVnpayUrlAPI(finalTotalPrice);
+                if (vnPayUrl.data) {
+                    window.location.replace(vnPayUrl.data.paymentUrl);
                 }
-            } catch (error: any) {
-                notification.error({
-                    message: "Error",
-                    description: error?.message || "An error happens when handle payment",
-                    duration: 5,
-                    placement: "topRight",
-                });
-                console.log("error order >>>", error);
-            } finally {
-                setIsPaymentLoading(false);
+                return;
             }
-            return;
-        }
 
-        if (values.paymentMethod === "banking") {
-            const dynamicMessage = `Thanh toan don hang ${Date.now()}`;
-            setQrMessage(dynamicMessage);
-            setIsModalQROpen(true);
-            return;
-        }
+            if (values.paymentMethod === "banking") {
+                const dynamicMessage = `Thanh toan don hang ${Date.now()}`;
+                setQrMessage(dynamicMessage);
+                setIsModalQROpen(true);
+            }
 
-        if (values.paymentMethod === "cod") {
-            // COD
-            onPaymentSubmit(values);
+            if (values.paymentMethod === "cod") {
+                await createOrderAndSuccess(values, "Thanh toán COD thành công!");
+            }
+        } catch (error: any) {
+            notification.error({
+                message: "Error",
+                description: error?.message || "An error happens when handle payment",
+                duration: 5,
+                placement: "topRight",
+            });
+            console.log("error order >>>", error);
+        } finally {
+            setIsPaymentLoading(false);
         }
     };
 
@@ -121,8 +126,7 @@ const Payment = (props: PaymentProps) => {
         try {
             const values = form.getFieldsValue();
             setIsModalQROpen(false);
-            onPaymentSubmit(values);
-            message.success("Đơn hàng đã được tạo ở trạng thái PENDING");
+            createOrderAndSuccess(values, "Thanh toán mã QR thành công!");
         } catch (error: any) {
             notification.error({
                 message: "Error",

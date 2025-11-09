@@ -187,4 +187,8 @@ declare global {
     countCategories: number;
     countRatings: number;
   }
+
+  interface IVnPay {
+    paymentUrl: string;
+  }
 }

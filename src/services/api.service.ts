@@ -286,8 +286,16 @@ export const deleteOrderAPI = (id: number) => {
 };
 
 // Module vnpay
-export const createVnpayUrlAPI = (orderId: number) => {
-  return axios.get<string>(`/api/v1/vnpay/create/${orderId}`);
+export const createVnpayUrlAPI = (totalPrice: number) => {
+  return axios.post<IBackendRes<IVnPay>>(
+    "/api/v1/vnpay/create-url",
+    totalPrice, // gửi JSON object
+    {
+      headers: {
+        "Content-Type": "application/json", // bắt buộc
+      },
+    }
+  );
 };
 
 // Module rating

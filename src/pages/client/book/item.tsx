@@ -167,9 +167,10 @@ const BookDetailPage = () => {
                 message.success("Bạn đã thêm đánh giá thành công, cảm ơn bạn!");
                 setNewRatingStars(0);
                 setNewRatingComment("");
-                await fetchListRatingsByBookId(parseInt(id!), 1);
-                await fetchUserRating(user.id, parseInt(id!));
-                setLoading(true);
+                window.location.reload();
+                // await fetchListRatingsByBookId(parseInt(id!), 1);
+                // await fetchUserRating(user.id, parseInt(id!));
+                // setLoading(true);
             }
         } catch (error: any) {
             notification.error({
