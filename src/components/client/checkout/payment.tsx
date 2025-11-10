@@ -94,6 +94,7 @@ const Payment = (props: PaymentProps) => {
 
             if (values.paymentMethod === "vnpay") {
                 const vnPayUrl = await createVnpayUrlAPI(finalTotalPrice);
+                await new Promise((resolve) => setTimeout(resolve, 1000));
                 if (vnPayUrl.data) {
                     window.location.replace(vnPayUrl.data.paymentUrl);
                 }

@@ -168,9 +168,9 @@ const BookDetailPage = () => {
                 setNewRatingStars(0);
                 setNewRatingComment("");
                 window.location.reload();
+                // await fetchBookDetailById(parseInt(id!));
                 // await fetchListRatingsByBookId(parseInt(id!), 1);
                 // await fetchUserRating(user.id, parseInt(id!));
-                // setLoading(true);
             }
         } catch (error: any) {
             notification.error({

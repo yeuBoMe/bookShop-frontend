@@ -289,12 +289,12 @@ export const deleteOrderAPI = (id: number) => {
 export const createVnpayUrlAPI = (totalPrice: number) => {
   return axios.post<IBackendRes<IVnPay>>(
     "/api/v1/vnpay/create-url",
-    totalPrice, // gửi JSON object
-    {
-      headers: {
-        "Content-Type": "application/json", // bắt buộc
-      },
-    }
+    { amount: totalPrice }
+    // {
+    //   headers: {
+    //     "Content-Type": "application/json", // bắt buộc khi gửi number
+    //   },
+    // }
   );
 };
 
