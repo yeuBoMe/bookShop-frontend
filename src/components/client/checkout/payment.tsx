@@ -93,7 +93,6 @@ const Payment = (props: PaymentProps) => {
             setIsPaymentLoading(true);
 
             if (values.paymentMethod === "vnpay") {
-                // Tạo order info để gửi lên VNPay và nhận lại khi return
                 const orderInfo = JSON.stringify({
                     name: values.name,
                     email: values.email,
@@ -115,7 +114,7 @@ const Payment = (props: PaymentProps) => {
                 const vnPayUrl = await createVnpayUrlAPI(finalTotalPrice, `Order_${Date.now()}`);
                 await new Promise((resolve) => setTimeout(resolve, 1000));
 
-                if (vnPayUrl.data?.paymentUrl) {
+                if (vnPayUrl.data) {
                     window.location.href = vnPayUrl.data.paymentUrl;
                 }
                 return;

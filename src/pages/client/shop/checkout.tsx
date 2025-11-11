@@ -25,90 +25,92 @@ const CheckoutPage = () => {
     // THÊM: Ref để track đã xử lý VNPay callback chưa
     const hasProcessedVnpay = useRef(false);
 
-    // Xử lý VNPay return callback
     useEffect(() => {
-        const handleVnpayCallback = async () => {
-            const hash = window.location.hash.slice(1);
+        handleVnpayCallback();
+    }, []);
 
-            // Kiểm tra đã xử lý chưa
-            if (hasProcessedVnpay.current) {
-                return;
-            }
+    const handleVnpayCallback = async () => {
+        const hash = window.location.hash.slice(1); // trả về phần sau dấu # trong URL và bỏ kí tự đầu.
 
-            if (hash === 'vnpay-success') {
-                // Đánh dấu đang xử lý
-                hasProcessedVnpay.current = true;
+        // Kiểm tra đã xử lý chưa
+        if (hasProcessedVnpay.current) {
+            return;
+        }
 
-                try {
-                    setIsPaymentLoading(true);
-                    const pending = localStorage.getItem('pendingVnpayOrder');
+        if (hash === 'vnpay-success') {
+            // Đánh dấu đang xử lý
+            hasProcessedVnpay.current = true;
 
-                    if (!pending) {
-                        throw new Error('Không tìm thấy thông tin đơn hàng');
-                    }
+            try {
+                setIsPaymentLoading(true);
+                const pending = localStorage.getItem('pendingVnpayOrder');
 
-                    const orderData = JSON.parse(pending);
-
-                    // Xóa pending ngay để tránh retry
-                    localStorage.removeItem('pendingVnpayOrder');
-
-                    const response = await createAnOrderAPI(orderData);
-
-                    if (response.data) {
-                        localStorage.removeItem('carts');
-                        setCarts([]);
-                        setCurrentStep(2);
-                        notification.success({
-                            message: 'Thanh toán thành công!',
-                            description: 'Đơn hàng của bạn đã được tạo thành công.'
-                        });
-                    }
-                } catch (err: any) {
-                    // Reset flag nếu lỗi để có thể retry
-                    hasProcessedVnpay.current = false;
-
-                    notification.error({
-                        message: 'Lỗi tạo đơn hàng',
-                        description: err.message || 'Có lỗi xảy ra khi tạo đơn hàng'
-                    });
-                } finally {
-                    setIsPaymentLoading(false);
-                    // Xóa hash khỏi URL
-                    window.history.replaceState({}, '', '/checkout');
+                if (!pending) {
+                    throw new Error('Không tìm thấy thông tin đơn hàng');
                 }
-            } else if (hash.startsWith('vnpay-cancel')) {
-                // Đánh dấu đã xử lý
-                hasProcessedVnpay.current = true;
 
-                const code = hash.split(':')[1];
-                const errorMessages: Record<string, string> = {
-                    '07': 'Giao dịch bị nghi ngờ gian lận',
-                    '09': 'Giao dịch chưa đăng ký InternetBanking',
-                    '10': 'Xác thực thông tin không chính xác quá 3 lần',
-                    '11': 'Hết thời gian thanh toán',
-                    '12': 'Tài khoản bị khóa',
-                    '13': 'Sai mật khẩu OTP',
-                    '24': 'Khách hàng hủy giao dịch',
-                    '51': 'Tài khoản không đủ số dư',
-                    '65': 'Vượt quá số lần nhập mã OTP',
-                    '75': 'Ngân hàng đang bảo trì',
-                    '79': 'Giao dịch vượt quá số tiền cho phép',
-                    '97': 'Chữ ký không hợp lệ'
-                };
+                const orderData = JSON.parse(pending);
+
+                // Xóa pending ngay để tránh retry
+                localStorage.removeItem('pendingVnpayOrder');
+
+                const response = await createAnOrderAPI(orderData);
+
+                if (response.data) {
+                    localStorage.removeItem('carts');
+                    setCarts([]);
+                    setCurrentStep(2);
+                    notification.success({
+                        message: 'Thanh toán thành công!',
+                        description: 'Đơn hàng của bạn đã được tạo thành công.'
+                    });
+                }
+            } catch (err: any) {
+                // Reset flag nếu lỗi để có thể retry
+                hasProcessedVnpay.current = false;
 
                 notification.error({
-                    message: 'Thanh toán thất bại',
-                    description: code ? (errorMessages[code] || `Mã lỗi: ${code}`) : 'Giao dịch không thành công'
+                    message: 'Lỗi tạo đơn hàng',
+                    description: err.message || 'Có lỗi xảy ra khi tạo đơn hàng'
                 });
-
-                // Xóa hash và pending order
-                localStorage.removeItem('pendingVnpayOrder');
+            } finally {
+                setIsPaymentLoading(false);
+                // Xóa hash khỏi URL
                 window.history.replaceState({}, '', '/checkout');
             }
-        };
+        } else if (hash.startsWith('vnpay-cancel')) {
+            // Đánh dấu đã xử lý
+            hasProcessedVnpay.current = true;
 
-        handleVnpayCallback();
-    }, []); // Empty dependency array - chỉ chạy 1 lần
+            const code = hash.split(':')[1];
+            // hash lúc này là "vnp_ResponseCode:00".
+            // .split(':') tách chuỗi thành mảng: ["vnp_ResponseCode", "00"].
+            // Lấy phần tử[1] chính là "00" → mã kết quả thanh toán.
+            const errorMessages: Record<string, string> = {
+                '07': 'Giao dịch bị nghi ngờ gian lận',
+                '09': 'Giao dịch chưa đăng ký InternetBanking',
+                '10': 'Xác thực thông tin không chính xác quá 3 lần',
+                '11': 'Hết thời gian thanh toán',
+                '12': 'Tài khoản bị khóa',
+                '13': 'Sai mật khẩu OTP',
+                '24': 'Khách hàng hủy giao dịch',
+                '51': 'Tài khoản không đủ số dư',
+                '65': 'Vượt quá số lần nhập mã OTP',
+                '75': 'Ngân hàng đang bảo trì',
+                '79': 'Giao dịch vượt quá số tiền cho phép',
+                '97': 'Chữ ký không hợp lệ'
+            };
+
+            notification.error({
+                message: 'Thanh toán thất bại',
+                description: code ? (errorMessages[code] || `Mã lỗi: ${code}`) : 'Giao dịch không thành công'
+            });
+
+            // Xóa hash và pending order
+            localStorage.removeItem('pendingVnpayOrder');
+            window.history.replaceState({}, '', '/checkout');
+        }
+    };
 
     useEffect(() => {
         window.scrollTo({ top: 0, behavior: "smooth" });
