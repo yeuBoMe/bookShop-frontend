@@ -286,16 +286,24 @@ export const deleteOrderAPI = (id: number) => {
 };
 
 // Module vnpay
-export const createVnpayUrlAPI = (totalPrice: number) => {
-  return axios.post<IBackendRes<IVnPay>>(
-    "/api/v1/vnpay/create-url",
-    { amount: totalPrice }
-    // {
-    //   headers: {
-    //     "Content-Type": "application/json", // bắt buộc khi gửi number
-    //   },
-    // }
-  );
+// export const createVnpayUrlAPI = (totalPrice: number) => {
+//   return axios.post<IBackendRes<IVnPay>>(
+//     "/api/v1/vnpay/create-url",
+//     { amount: totalPrice }
+//     // {
+//     //   headers: {
+//     //     "Content-Type": "application/json", // bắt buộc khi gửi number
+//     //   },
+//     // }
+//   );
+// };
+
+// Module vnpay
+export const createVnpayUrlAPI = (totalPrice: number, orderInfo: string) => {
+  return axios.post<IBackendRes<IVnPay>>("/api/v1/vnpay/create-url", {
+    amount: totalPrice,
+    orderInfo: orderInfo, 
+  });
 };
 
 // Module rating

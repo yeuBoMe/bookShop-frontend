@@ -125,7 +125,9 @@ const DetailOrderDrawer = (props: DrawerOrderProps) => {
                         status={dataDetail.paymentMethod === "cod" ? "warning" : "success"}
                         text={dataDetail.paymentMethod === "cod"
                             ? "Cash on Delivery (COD)"
-                            : "Bank Transfer"}
+                            : dataDetail.paymentMethod === "vnpay"
+                                ? "VN Pay"
+                                : "Bank Transfer"}
                     />
                 ),
                 span: 2,

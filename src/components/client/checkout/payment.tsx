@@ -93,10 +93,30 @@ const Payment = (props: PaymentProps) => {
             setIsPaymentLoading(true);
 
             if (values.paymentMethod === "vnpay") {
-                const vnPayUrl = await createVnpayUrlAPI(finalTotalPrice);
+                // Tạo order info để gửi lên VNPay và nhận lại khi return
+                const orderInfo = JSON.stringify({
+                    name: values.name,
+                    email: values.email,
+                    phone: values.phone,
+                    address: values.address,
+                    paymentMethod: values.paymentMethod,
+                    totalPrice: finalTotalPrice,
+                    status: "PAID",
+                    detail: carts.map((item) => ({
+                        book: { id: item.id },
+                        quantity: item.quantity,
+                        bookName: item.detail.name
+                    }))
+                });
+
+                // Lưu thông tin đơn hàng vào localStorage để xử lý sau khi return
+                localStorage.setItem("pendingVnpayOrder", orderInfo);
+
+                const vnPayUrl = await createVnpayUrlAPI(finalTotalPrice, `Order_${Date.now()}`);
                 await new Promise((resolve) => setTimeout(resolve, 1000));
-                if (vnPayUrl.data) {
-                    window.location.replace(vnPayUrl.data.paymentUrl);
+
+                if (vnPayUrl.data?.paymentUrl) {
+                    window.location.href = vnPayUrl.data.paymentUrl;
                 }
                 return;
             }
@@ -127,7 +147,7 @@ const Payment = (props: PaymentProps) => {
         try {
             const values = form.getFieldsValue();
             setIsModalQROpen(false);
-            createOrderAndSuccess(values, "Thanh toán mã QR thành công!");
+            await createOrderAndSuccess(values, "Thanh toán mã QR thành công!");
         } catch (error: any) {
             notification.error({
                 message: "Error",
@@ -343,7 +363,7 @@ const Payment = (props: PaymentProps) => {
                         </div>
                     </div>
                 </div>
-            </div >
+            </div>
 
             <Modal
                 open={isModalQROpen}
