@@ -19,9 +19,9 @@ const RegisterPage = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const handleRegisterRequest: FormProps<RegisterValues>['onFinish'] = async (values) => {
-    setIsLoading(true);
-
     try {
+      setIsLoading(true);
+
       const { fullName, email, password, phone } = values;
       const registerResponse = await registerAPI(fullName, email, password, phone);
 
@@ -119,13 +119,17 @@ const RegisterPage = () => {
             </Form.Item>
 
             <Form.Item className="register-button">
-              <Button
-                type="primary"
-                htmlType="submit"
-                loading={isLoading}
-              >
-                Đăng ký
-              </Button>
+              <div className="register-buttons-wrapper">
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  loading={isLoading}
+                  size="large"
+                  className="register-submit-button"
+                >
+                  Đăng ký
+                </Button>
+              </div>
             </Form.Item>
           </Form>
 
