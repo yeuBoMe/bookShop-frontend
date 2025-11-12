@@ -146,7 +146,7 @@ const Payment = (props: PaymentProps) => {
         try {
             const values = form.getFieldsValue();
             setIsModalQROpen(false);
-            await createOrderAndSuccess(values, "Thanh toán mã QR thành công!");
+            await createOrderAndSuccess(values, "Thủ tục thanh toán mã QR sẽ được kiểm tra, bạn chờ lát nhé!");
         } catch (error: any) {
             notification.error({
                 message: "Error",

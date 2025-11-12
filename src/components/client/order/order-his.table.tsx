@@ -1,5 +1,5 @@
 import { updateOrderAPI } from "@/services/api.service";
-import { EyeOutlined, DeleteOutlined, ClockCircleOutlined, CheckCircleOutlined, CloseCircleOutlined, TruckOutlined, DollarCircleOutlined } from "@ant-design/icons";
+import { EyeOutlined, DeleteOutlined, ClockCircleOutlined, CheckCircleOutlined, CloseCircleOutlined, TruckOutlined, DollarCircleOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
 import { Button, Table, Tag, Space, type TableProps, Popconfirm, App } from "antd";
 import { useState, type JSX } from "react";
 import "styles/client/order/order-his.table.scss";
@@ -68,7 +68,12 @@ const OrderHistoryTable = (props: OrderHistoryTableProps) => {
                 text: "Đã thanh toán",
                 color: "blue",
                 icon: <DollarCircleOutlined />
-            }
+            },
+            UNPAID: {
+                text: "UNPAID",
+                color: "magenta",
+                icon: <ExclamationCircleOutlined />,
+            },
         };
         return configs[status] || configs.PENDING;
     };

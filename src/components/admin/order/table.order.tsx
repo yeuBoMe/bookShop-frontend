@@ -1,6 +1,6 @@
 import { deleteOrderAPI, fetchAllOrdersAPI } from '@/services/api.service';
 import { dateRangeValidate } from '@/services/helper';
-import { CheckCircleOutlined, ClockCircleOutlined, CloseCircleOutlined, DeleteOutlined, DollarCircleOutlined, EditOutlined, ExportOutlined, ReadOutlined, TruckOutlined } from '@ant-design/icons';
+import { CheckCircleOutlined, ClockCircleOutlined, CloseCircleOutlined, DeleteOutlined, DollarCircleOutlined, EditOutlined, ExclamationCircleOutlined, ExportOutlined, ReadOutlined, TruckOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
 import { App, Button, Popconfirm, Space, Tag } from 'antd';
@@ -90,6 +90,11 @@ const TableOrder = () => {
                 text: "PAID",
                 color: "blue",
                 icon: <DollarCircleOutlined />
+            },
+            UNPAID: {
+                text: "UNPAID",
+                color: "magenta",
+                icon: <ExclamationCircleOutlined />,
             },
         };
 
