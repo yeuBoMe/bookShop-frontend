@@ -112,7 +112,7 @@ const Payment = (props: PaymentProps) => {
                 localStorage.setItem("pendingVnpayOrder", orderInfo);
 
                 const vnPayUrl = await createVnpayUrlAPI(finalTotalPrice, `Order_${Date.now()}`);
-                await new Promise((resolve) => setTimeout(resolve, 1000));
+                await new Promise((resolve) => setTimeout(resolve, 500));
 
                 if (vnPayUrl.data) {
                     window.location.href = vnPayUrl.data.paymentUrl;

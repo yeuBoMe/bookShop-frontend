@@ -64,21 +64,8 @@ const LoginPage = () => {
     }
   };
 
-  const handleGoogleLogin = async () => {
-    setIsGoogleLoading(true);
-    try {
-      // TODO: Implement Google OAuth login logic here
-      message.info("Chức năng đăng nhập Google đang được phát triển");
-    } catch (error: any) {
-      notification.error({
-        message: "Error",
-        description: "Đăng nhập Google thất bại",
-        duration: 5,
-        placement: 'topRight'
-      });
-    } finally {
-      setIsGoogleLoading(false);
-    }
+  const handleGoogleLogin = () => {
+    window.location.href = 'http://localhost:8080/oauth2/authorization/google';
   };
 
   return (
