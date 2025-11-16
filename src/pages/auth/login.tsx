@@ -65,7 +65,8 @@ const LoginPage = () => {
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = 'http://localhost:8080/api/v1/auth/google';
+    setIsGoogleLoading(true);
+    window.location.href = 'http://localhost:8080/api/v1/auth/login/google';
   };
 
   return (
