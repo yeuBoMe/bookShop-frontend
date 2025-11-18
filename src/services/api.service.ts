@@ -300,7 +300,15 @@ export const deleteOrderAPI = (id: number) => {
 
 // Module vnpay
 export const createVnpayUrlAPI = (totalPrice: number, orderInfo: string) => {
-  return axios.post<IBackendRes<IVnPay>>("/api/v1/vnpay/create-url", {
+  return axios.post<IBackendRes<IPay>>("/api/v1/vnpay/create-url", {
+    amount: totalPrice,
+    orderInfo: orderInfo, 
+  });
+};
+
+// Module momo pay
+export const createMomopayUrlAPI = (totalPrice: number, orderInfo: string) => {
+  return axios.post<IBackendRes<IPay>>("/api/v1/momo/create-url", {
     amount: totalPrice,
     orderInfo: orderInfo, 
   });

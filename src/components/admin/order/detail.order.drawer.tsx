@@ -133,7 +133,7 @@ const DetailOrderDrawer = (props: DrawerOrderProps) => {
                             ? "Cash on Delivery (COD)"
                             : dataDetail.paymentMethod === "vnpay"
                                 ? "VN Pay"
-                                : "Bank Transfer"}
+                                : "MoMo QR Pay"}
                     />
                 ),
                 span: 2,

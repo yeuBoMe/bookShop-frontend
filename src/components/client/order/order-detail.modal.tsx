@@ -124,7 +124,7 @@ const OrderDetailModal = (props: OrderDetailModalProps) => {
                             ? "Thanh toán khi nhận hàng (COD)"
                             : selectedOrder.paymentMethod === "vnpay"
                                 ? "Thanh toán bằng ví VNPay"
-                                : "Chuyển khoản ngân hàng"}
+                                : "Thanh toán MoMo QR"}
                     </Descriptions.Item>
                 </Descriptions>
 

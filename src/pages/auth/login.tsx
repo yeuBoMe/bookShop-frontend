@@ -50,11 +50,17 @@ const LoginPage = () => {
       }
     } catch (error: any) {
       console.log("Check data error >>> ", error);
+      // notification.error({
+      //   message: "Error",
+      //   description: error?.message && Array.isArray(error.message)
+      //     ? error.message[0]
+      //     : error.message,
+      //   duration: 5,
+      //   placement: 'topRight'
+      // });
       notification.error({
         message: "Error",
-        description: error?.message && Array.isArray(error.message)
-          ? error.message[0]
-          : error.message,
+        description: "Tài khoản đăng nhập không chính xác",
         duration: 5,
         placement: 'topRight'
       });

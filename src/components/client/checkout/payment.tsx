@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { App, Button, Form, Input, Modal, Radio, type FormProps } from "antd";
+import { App, Button, Form, Input, Radio, type FormProps } from "antd";
 import { ShoppingOutlined, CreditCardOutlined } from "@ant-design/icons";
 import "styles/client/checkout/payment.scss";
 import { useCurrentApp } from "@/components/context/app.context";
-import { createAnOrderAPI, createVnpayUrlAPI } from "@/services/api.service";
+import { createAnOrderAPI, createMomopayUrlAPI, createVnpayUrlAPI } from "@/services/api.service";
 
 interface UserCheckoutValues {
     name: string;
@@ -37,8 +37,6 @@ const Payment = (props: PaymentProps) => {
     const { notification, message } = App.useApp();
     const [form] = Form.useForm<UserCheckoutValues>();
     const [paymentMethod, setPaymentMethod] = useState<string>("cod");
-    const [isModalQROpen, setIsModalQROpen] = useState<boolean>(false);
-    const [qrMessage, setQrMessage] = useState<string>("");
     const baseUrl = `${import.meta.env.VITE_BACKEND_URL}`;
 
     useEffect(() => {
@@ -120,10 +118,32 @@ const Payment = (props: PaymentProps) => {
                 return;
             }
 
-            if (values.paymentMethod === "banking") {
-                const dynamicMessage = `Thanh toan don hang ${Date.now()}`;
-                setQrMessage(dynamicMessage);
-                setIsModalQROpen(true);
+            if (values.paymentMethod === "momo") {
+                const orderInfo = JSON.stringify({
+                    name: values.name,
+                    email: values.email,
+                    phone: values.phone,
+                    address: values.address,
+                    paymentMethod: values.paymentMethod,
+                    totalPrice: finalTotalPrice,
+                    status: "PAID",
+                    detail: carts.map((item) => ({
+                        book: { id: item.id },
+                        quantity: item.quantity,
+                        bookName: item.detail.name
+                    }))
+                });
+
+                // Lưu thông tin đơn hàng vào localStorage để xử lý sau khi return
+                localStorage.setItem("pendingMomoOrder", orderInfo);
+
+                const momoPayUrl = await createMomopayUrlAPI(finalTotalPrice, `Order_${Date.now()}`);
+                await new Promise((resolve) => setTimeout(resolve, 500));
+
+                if (momoPayUrl.data) {
+                    window.location.href = momoPayUrl.data.paymentUrl;
+                }
+                return;
             }
 
             if (values.paymentMethod === "cod") {
@@ -139,22 +159,6 @@ const Payment = (props: PaymentProps) => {
             console.log("error order >>>", error);
         } finally {
             setIsPaymentLoading(false);
-        }
-    };
-
-    const handleConfirmTransfer = async () => {
-        try {
-            const values = form.getFieldsValue();
-            setIsModalQROpen(false);
-            await createOrderAndSuccess(values, "Thủ tục thanh toán mã QR sẽ được kiểm tra, bạn chờ lát nhé!");
-        } catch (error: any) {
-            notification.error({
-                message: "Error",
-                description: error?.message || "Lỗi khi xác nhận thanh toán!",
-                duration: 5,
-                placement: "topRight",
-            });
-            console.log("error order banking >>>", error);
         }
     };
 
@@ -260,12 +264,12 @@ const Payment = (props: PaymentProps) => {
                                             </div>
                                         </div>
                                     </Radio>
-                                    <Radio value="banking" className="payment-radio">
+                                    <Radio value="momo" className="payment-radio">
                                         <div className="payment-option">
                                             <CreditCardOutlined style={{ fontSize: 20 }} />
                                             <div>
-                                                <strong>Chuyển khoản ngân hàng</strong>
-                                                <p>Chuyển khoản qua tài khoản ngân hàng</p>
+                                                <strong>Thanh toán bằng MoMo</strong>
+                                                <p>Quét mã QR với MoMo</p>
                                             </div>
                                         </div>
                                     </Radio>
@@ -364,7 +368,7 @@ const Payment = (props: PaymentProps) => {
                 </div>
             </div>
 
-            <Modal
+            {/* <Modal
                 open={isModalQROpen}
                 width={"50vw"}
                 className="qr-payment-modal"
@@ -409,9 +413,12 @@ const Payment = (props: PaymentProps) => {
                         </div>
                     </div>
                 </div>
-            </Modal>
+            </Modal> */}
         </>
     );
 };
 
 export default Payment;
+
+
+

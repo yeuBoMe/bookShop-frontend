@@ -374,7 +374,7 @@ const BookPage = () => {
 
                                                     <div className="book-rating">
                                                         <Rate value={book.averageStars} allowHalf disabled />
-                                                        <span className="sold-count">Đã bán 29</span>
+                                                        <span className="sold-count">Đã bán 1.2k</span>
                                                     </div>
 
                                                     <Button

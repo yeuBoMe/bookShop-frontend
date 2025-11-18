@@ -24,10 +24,42 @@ const CheckoutPage = () => {
 
     // THÊM: Ref để track đã xử lý VNPay callback chưa
     const hasProcessedVnpay = useRef(false);
+    const hasProcessedMomopay = useRef(false);
 
     useEffect(() => {
         handleVnpayCallback();
+        handleMomoCallback();
     }, []);
+
+    const handleMomoCallback = async () => {
+        const hash = window.location.hash.slice(1);
+
+        if (hasProcessedMomopay.current) return;
+
+        if (hash === "momo-success") {
+            hasProcessedMomopay.current = true;
+            const pending = localStorage.getItem("pendingMomoOrder");
+            if (pending) {
+                const orderData = JSON.parse(pending);
+                localStorage.removeItem("pendingMomoOrder");
+                createAnOrderAPI(orderData).then(() => {
+                    localStorage.removeItem("carts");
+                    setCarts([]);
+                    setCurrentStep(2);
+                    notification.success({ message: "Thanh toán MoMo thành công!" });
+                }).catch(() => {
+                    hasProcessedMomopay.current = false;
+                }).finally(() => {
+                    window.history.replaceState({}, "", "/checkout");
+                });
+            }
+        } else if (hash === "momo-fail") {
+            hasProcessedMomopay.current = true;
+            localStorage.removeItem("pendingMomoOrder");
+            notification.error({ message: "Thanh toán MoMo thất bại" });
+            window.history.replaceState({}, "", "/checkout");
+        }
+    }
 
     const handleVnpayCallback = async () => {
         const hash = window.location.hash.slice(1); // trả về phần sau dấu # trong URL và bỏ kí tự đầu.
