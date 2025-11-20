@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { App, Button, Form, Input, Radio, type FormProps } from "antd";
-import { ShoppingOutlined, CreditCardOutlined } from "@ant-design/icons";
+import { ShoppingOutlined, CreditCardOutlined, QrcodeOutlined } from "@ant-design/icons";
 import "styles/client/checkout/payment.scss";
 import { useCurrentApp } from "@/components/context/app.context";
 import { createAnOrderAPI, createMomopayUrlAPI, createVnpayUrlAPI } from "@/services/api.service";
@@ -266,7 +266,7 @@ const Payment = (props: PaymentProps) => {
                                     </Radio>
                                     <Radio value="momo" className="payment-radio">
                                         <div className="payment-option">
-                                            <CreditCardOutlined style={{ fontSize: 20 }} />
+                                            <QrcodeOutlined style={{ fontSize: 20 }} />
                                             <div>
                                                 <strong>Thanh toán bằng MoMo</strong>
                                                 <p>Quét mã QR với MoMo</p>
@@ -367,53 +367,6 @@ const Payment = (props: PaymentProps) => {
                     </div>
                 </div>
             </div>
-
-            {/* <Modal
-                open={isModalQROpen}
-                width={"50vw"}
-                className="qr-payment-modal"
-                title="Quét mã QR để thanh toán"
-                closable={false}
-                maskClosable={false}
-                onCancel={() => setIsModalQROpen(false)}
-                footer={[
-                    <Button key="cancel" onClick={() => setIsModalQROpen(false)}>
-                        Đóng
-                    </Button>,
-                    <Button
-                        key="confirm"
-                        type="primary"
-                        onClick={handleConfirmTransfer}
-                        loading={isPaymentLoading}
-                    >
-                        Tôi đã chuyển khoản
-                    </Button>,
-                ]}
-            >
-                <div className="qr-modal-content">
-                    <div className="qr-image-wrapper">
-                        <img
-                            src={`https://img.vietqr.io/image/970415-888850105888-compact2.png?amount=${finalTotalPrice}&addInfo=${encodeURIComponent(qrMessage)}&accountName=LY%20HOAI%20NINH`}
-                            alt="QR VietQR"
-                            className="qr-image"
-                        />
-                    </div>
-                    <div className="qr-info">
-                        <div className="qr-info-item">
-                            <strong>Số tiền:</strong>
-                            <span className="amount">{formatPrice(finalTotalPrice)}</span>
-                        </div>
-                        <div className="qr-info-item">
-                            <strong>Lời nhắn:</strong>
-                            <span>{qrMessage}</span>
-                        </div>
-                        <div className="qr-info-item">
-                            <strong>Ngân hàng:</strong>
-                            <span>Vietinbank - LY HOAI NINH</span>
-                        </div>
-                    </div>
-                </div>
-            </Modal> */}
         </>
     );
 };

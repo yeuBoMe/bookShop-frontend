@@ -62,7 +62,7 @@ const Header = (props: HeaderProps) => {
             <header className="header">
                 {/* Top announcement bar */}
                 <div className="announcementBar">
-                    Miễn phí vận chuyển cho đơn hàng từ 50$ trở lên | Nhập mã <strong>WELCOME10</strong> để giảm 10%
+                    Miễn phí vận chuyển cho đơn hàng từ 5$ trở lên | Nhập mã <strong>WELCOME10</strong> để giảm 10%
                 </div>
 
                 {/* Main header */}
