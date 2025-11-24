@@ -1,4 +1,3 @@
-import { message } from "antd";
 import axios from "services/axios.customize";
 
 // Module user
