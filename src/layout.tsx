@@ -5,6 +5,7 @@ import { useEffect, useState, useRef } from "react";
 import { App } from "antd";
 import { useCurrentApp } from "@/components/context/app.context";
 import { getAccountInfoAPI } from "@/services/api.service";
+import ChatbotPopup from "@/components/client/chatbot/chatbot";
 
 const Layout = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -16,7 +17,7 @@ const Layout = () => {
 
   useEffect(() => {
     handleGoogleLogin();
-  }, []); 
+  }, []);
 
   const handleGoogleLogin = async () => {
     const accessToken = searchParams.get('access_token');
@@ -77,6 +78,7 @@ const Layout = () => {
         setSearchTerm={setSearchTerm}
       />
       <Outlet context={[searchTerm, setSearchTerm]} />
+      <ChatbotPopup />
       <Footer />
     </>
   );
