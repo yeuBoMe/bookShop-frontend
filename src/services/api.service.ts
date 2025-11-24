@@ -1,3 +1,4 @@
+import { message } from "antd";
 import axios from "services/axios.customize";
 
 // Module user
@@ -302,7 +303,7 @@ export const deleteOrderAPI = (id: number) => {
 export const createVnpayUrlAPI = (totalPrice: number, orderInfo: string) => {
   return axios.post<IBackendRes<IPay>>("/api/v1/vnpay/create-url", {
     amount: totalPrice,
-    orderInfo: orderInfo, 
+    orderInfo: orderInfo,
   });
 };
 
@@ -310,8 +311,13 @@ export const createVnpayUrlAPI = (totalPrice: number, orderInfo: string) => {
 export const createMomopayUrlAPI = (totalPrice: number, orderInfo: string) => {
   return axios.post<IBackendRes<IPay>>("/api/v1/momo/create-url", {
     amount: totalPrice,
-    orderInfo: orderInfo, 
+    orderInfo: orderInfo,
   });
+};
+
+// Module chatbot
+export const chatbotAPI = (message: string) => {
+  return axios.post<IBackendRes<IChatBot>>("/api/v1/chatbot", { message });
 };
 
 // Module rating

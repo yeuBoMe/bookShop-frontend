@@ -191,4 +191,8 @@ declare global {
   interface IPay {
     paymentUrl: string;
   }
+
+  interface IChatBot {
+    message: string;
+  }
 }
