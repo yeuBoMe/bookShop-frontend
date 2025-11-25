@@ -42,8 +42,10 @@ const ChatbotPopup = () => {
             const chatbotResponse = await chatbotAPI(userText);
             const botReply = chatbotResponse.data?.message || "Mình chưa hiểu, hỏi lại nhé!";
 
+            setLoading(false);
             // Streaming effect
             setMessages(prev => [...prev, { from: "bot", text: "" }]);
+            
             let displayed = "";
             for (let i = 0; i < botReply.length; i++) {
                 if (controller.signal.aborted) break;
@@ -63,7 +65,7 @@ const ChatbotPopup = () => {
                 setMessages(prev => [...prev, { from: "bot", text: "Oops! Bot đang ngủ gật rồi!" }]);
             }
         } finally {
-            setLoading(false);
+
             controllerRef.current = null;
         }
     };
