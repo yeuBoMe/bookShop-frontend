@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef } from "react";
-import { Button, Input, FloatButton, Spin } from "antd";
+import { Button, Input, FloatButton, Spin, App } from "antd";
 import { MessageOutlined, SendOutlined, CloseOutlined } from "@ant-design/icons";
 import { chatbotAPI } from "@/services/api.service";
+import { useCurrentApp } from "@/components/context/app.context";
+import { useNavigate } from "react-router-dom";
 import "@/styles/chatbot.scss";
 
 interface Message {
@@ -10,6 +12,9 @@ interface Message {
 }
 
 const ChatbotPopup = () => {
+    const { user } = useCurrentApp();
+    const navigate = useNavigate();
+    const { notification } = App.useApp();
     const [open, setOpen] = useState(false);
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState("");
@@ -35,7 +40,6 @@ const ChatbotPopup = () => {
 
         try {
             const chatbotResponse = await chatbotAPI(userText);
-
             const botReply = chatbotResponse.data?.message || "Mình chưa hiểu, hỏi lại nhé!";
 
             // Streaming effect
@@ -64,13 +68,29 @@ const ChatbotPopup = () => {
         }
     };
 
+    const handleOpenPopUp = () => {
+        if (!user || !user.id) {
+            notification.warning({
+                message: "Chưa đăng nhập",
+                description: "Vui lòng đăng nhập để trò chuyện với BookShop AI nhé",
+                duration: 3,
+                placement: "topRight"
+            });
+            setTimeout(() => {
+                navigate("/login");
+            }, 1000);
+            return;
+        }
+        setOpen(true);
+    }
+
     return (
         <>
             <FloatButton
                 icon={<MessageOutlined />}
                 type="primary"
                 className="chatbot-trigger"
-                onClick={() => setOpen(true)}
+                onClick={handleOpenPopUp}
             />
 
             {open && (
@@ -94,9 +114,9 @@ const ChatbotPopup = () => {
                                 </div>
                             )}
 
-                            {messages.map((m, i) => (
-                                <div key={i} className={`msg ${m.from}`}>
-                                    <p>{m.text}</p>
+                            {messages.map((message, index) => (
+                                <div key={index} className={`msg ${message.from}`}>
+                                    <p>{message.text}</p>
                                 </div>
                             ))}
 
