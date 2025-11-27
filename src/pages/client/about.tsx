@@ -1,7 +1,12 @@
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import "styles/client/about.scss";
 
 const AboutPage = () => {
+    useEffect(() => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    }, []);
+
     const stats = [
         { number: "15+", label: "Năm kinh nghiệm" },
         { number: "50,000+", label: "Đầu sách" },

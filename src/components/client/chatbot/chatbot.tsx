@@ -34,7 +34,7 @@ const ChatbotPopup = () => {
         setMessages(prev => [...prev, { from: "user", text: userText }]);
         setLoading(true);
 
-        controllerRef.current?.abort();
+        controllerRef.current?.abort(); // Hủy request cũ
         const controller = new AbortController();
         controllerRef.current = controller;
 
@@ -45,7 +45,7 @@ const ChatbotPopup = () => {
             setLoading(false);
             // Streaming effect
             setMessages(prev => [...prev, { from: "bot", text: "" }]);
-            
+
             let displayed = "";
             for (let i = 0; i < botReply.length; i++) {
                 if (controller.signal.aborted) break;
