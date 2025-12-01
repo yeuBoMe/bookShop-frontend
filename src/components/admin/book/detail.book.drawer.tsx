@@ -32,7 +32,7 @@ const getBase64 = (file: FileType): Promise<string> =>
 
 const DetailBookDrawer = (props: DrawerBookProps) => {
     const { isDrawerOpen, setIsDrawerOpen, dataDetail, setDataDetail } = props;
-    const baseUrl = `${import.meta.env.VITE_BACKEND_URL}`;
+    const baseImageUrl = `${import.meta.env.VITE_IMAGE_URL}`;
 
     const [previewOpen, setPreviewOpen] = useState<boolean>(false);
     const [previewImage, setPreviewImage] = useState("");
@@ -75,7 +75,7 @@ const DetailBookDrawer = (props: DrawerBookProps) => {
                     uid: uuidv4(),
                     name: img,
                     status: 'done',
-                    url: `${baseUrl}/upload/book/${img}`,
+                    url: `${baseImageUrl}/${img}`,
                 }))
             }
 

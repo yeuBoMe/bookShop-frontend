@@ -14,7 +14,7 @@ const Cart = (props: CartProps) => {
     const { carts, setCarts, totalPrice, onContinueToPayment } = props;
     const navigate = useNavigate();
     const { message } = App.useApp();
-    const baseUrl = `${import.meta.env.VITE_BACKEND_URL}`;
+    const baseImageUrl = `${import.meta.env.VITE_IMAGE_URL}`;
 
     const handleUpdateQuantity = (bookId: number, newQuantity: number) => {
         if (!carts) return;
@@ -72,7 +72,7 @@ const Cart = (props: CartProps) => {
                                     src={
                                         item.detail.images &&
                                             item.detail.images.length > 0
-                                            ? `${baseUrl}/upload/book/${item.detail.images[0]}`
+                                            ? `${baseImageUrl}/${item.detail.images[0]}`
                                             : "https://via.placeholder.com/100x130?text=No+Image"
                                     }
                                     alt={item.detail.name}

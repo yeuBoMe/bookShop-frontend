@@ -63,8 +63,8 @@ const BookDetailPage = () => {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
     const refGallery = useRef<ImageGallery>(null);
-    const baseUrl = `${import.meta.env.VITE_BACKEND_URL}`;
-    const currentUserAvatarUrl = `${baseUrl}/upload/avatar/${user?.avatar}`;
+    const baseImageUrl = `${import.meta.env.VITE_IMAGE_URL}`;
+    const currentUserAvatarUrl = `${baseImageUrl}/upload/avatar/${user?.avatar}`;
 
     const [meta, setMeta] = useState({
         current: 1,
@@ -385,9 +385,11 @@ const BookDetailPage = () => {
     }
 
     const images = (book?.images ?? []).map((img) => ({
-        original: `${baseUrl}/upload/book/${img}`,
-        thumbnail: `${baseUrl}/upload/book/${img}`,
+        original: `${baseImageUrl}/${img}`,
+        thumbnail: `${baseImageUrl}/${img}`,
     })) || [];
+
+    console.log("Check book image: >>> ", images); 
 
     const tabItems = [
         {
@@ -518,7 +520,7 @@ const BookDetailPage = () => {
                         <>
                             {ratings.map((rating) => {
                                 const userAvatarUrl = rating.user?.avatar
-                                    ? `${baseUrl}/upload/avatar/${rating.user.avatar}`
+                                    ? `${baseImageUrl}/${rating.user.avatar}`
                                     : null;
 
                                 return (

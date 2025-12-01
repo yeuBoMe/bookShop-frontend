@@ -1,4 +1,4 @@
-import { createBookAPI, fetchAllCategoriesSelectAPI, updateBookMultipleImagesAPI } from "@/services/api.service";
+import { createBookAPI, fetchAllCategoriesSelectAPI, updateBookMultipleImagesToCloudAPI } from "@/services/api.service";
 import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
 import {
     App,
@@ -160,7 +160,7 @@ const CreateBookModal = (props: CreateBookProps) => {
 
                     if (files.length > 0) {
                         setImageLoading(true);
-                        await updateBookMultipleImagesAPI(createBookResponse.data.id, files);
+                        await updateBookMultipleImagesToCloudAPI(createBookResponse.data.id, files);
                     }
                 }
 

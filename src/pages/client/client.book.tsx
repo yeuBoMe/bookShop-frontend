@@ -31,7 +31,7 @@ const BookPage = () => {
     const [filter, setFilter] = useState<FilterValues>({});
     const [sort, setSort] = useState<string>("updatedAt,desc");
 
-    const baseUrl = `${import.meta.env.VITE_BACKEND_URL}`;
+    const baseImageUrl = `${import.meta.env.VITE_IMAGE_URL}`;
 
     const [meta, setMeta] = useState({
         current: 1,
@@ -349,7 +349,7 @@ const BookPage = () => {
                                                     <img
                                                         src={
                                                             book.images && book.images.length > 0
-                                                                ? `${baseUrl}/upload/book/${book.images[0]}`
+                                                                ? `${baseImageUrl}/${book.images[0]}`
                                                                 : "https://via.placeholder.com/200x280?text=No+Image"
                                                         }
                                                         alt={book.name}

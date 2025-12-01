@@ -11,7 +11,7 @@ interface DrawerUserProps {
 
 const DetailUserDrawer = (props: DrawerUserProps) => {
     const { isDrawerOpen, setIsDrawerOpen, dataDetail, setDataDetail } = props;
-    const urlAvatar = `${import.meta.env.VITE_BACKEND_URL}/upload/avatar/${dataDetail?.avatar}`
+    const urlAvatar = `${import.meta.env.VITE_IMAGE_URL}/${dataDetail?.avatar}`
     console.log("Check user avatar >>> ", urlAvatar)
 
     const formatDateTime = (value?: string | Date) => {

@@ -5,7 +5,12 @@ import type { FormProps, GetProp, UploadFile, UploadProps } from "antd";
 import { v4 as uuidv4 } from 'uuid';
 import "styles/client/profile.scss";
 import { useCurrentApp } from "@/components/context/app.context";
-import { deleteUserAvatarAPI, updateUserAPI, updateUserAvatarAPI, updateUserPasswordAPI } from "@/services/api.service";
+import {
+    deleteUserAvatarInCloudAPI,
+    updateUserAPI,
+    updateUserAvatarToCloudAPI,
+    updateUserPasswordAPI
+} from "@/services/api.service";
 
 interface InfoValues {
     email: string;
@@ -51,8 +56,7 @@ const ProfilePage = () => {
     const [isUpdateInfoLoading, setIsUpdateInfoLoading] = useState<boolean>(false);
     const [isUpdatePassLoading, setIsUpdatePassLoading] = useState<boolean>(false);
 
-    const baseUrl = `${import.meta.env.VITE_BACKEND_URL}`;
-    const urlAvatar = user?.avatar ? `${baseUrl}/upload/avatar/${user.avatar}` : '';
+    const urlAvatar = user?.avatar ? `${import.meta.env.VITE_IMAGE_URL}/${user.avatar}` : '';
 
     useEffect(() => {
         if (isModalOpen === true && user && user.id) {
@@ -102,7 +106,7 @@ const ProfilePage = () => {
             if (deletedImage) {
                 try {
                     setImageLoading(true);
-                    await deleteUserAvatarAPI(user.id, deletedImage);
+                    await deleteUserAvatarInCloudAPI(user.id, deletedImage);
                     console.log(`Deleted ${deletedImage.length} image`);
                 } catch (error: any) {
                     console.error('Check error delete image >>> ', error);
@@ -116,9 +120,9 @@ const ProfilePage = () => {
             if (newAvatar) {
                 try {
                     setImageLoading(true);
-                    const updateUserAvatarResponse = await updateUserAvatarAPI(user.id, newAvatar);
-                    if (updateUserAvatarResponse.data) {
-                        updatedAvatar = updateUserAvatarResponse.data.avatar;
+                    const updateUserAvatarToCloudResponse = await updateUserAvatarToCloudAPI(user.id, newAvatar);
+                    if (updateUserAvatarToCloudResponse.data) {
+                        updatedAvatar = updateUserAvatarToCloudResponse.data.avatar;
                     }
                 } catch (error: any) {
                     console.error('Check error update image >>> ', error);

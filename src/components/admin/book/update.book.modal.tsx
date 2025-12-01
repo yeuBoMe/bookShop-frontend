@@ -1,8 +1,8 @@
 import {
     fetchAllCategoriesSelectAPI,
     updateBookAPI,
-    updateBookMultipleImagesAPI,
-    deleteBookMultipleImagesAPI
+    deleteBookMultipleImagesInCloudAPI,
+    updateBookMultipleImagesToCloudAPI
 } from "@/services/api.service";
 import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
 import {
@@ -71,7 +71,7 @@ const UpdateBookModal = (props: UpdateBookProps) => {
         refreshTable
     } = props;
 
-    const baseUrl = `${import.meta.env.VITE_BACKEND_URL}`;
+    const baseImageUrl = `${import.meta.env.VITE_BACKEND_URL}`;
 
     const [form] = Form.useForm<BookUpdateValues>();
     const { notification, message } = App.useApp();
@@ -114,7 +114,7 @@ const UpdateBookModal = (props: UpdateBookProps) => {
                     uid: uuidv4(),
                     name: img,
                     status: 'done',
-                    url: `${baseUrl}/upload/book/${img}`,
+                    url: `${baseImageUrl}/${img}`,
                 }));
             }
             setFileList(imgFiles);
@@ -214,7 +214,7 @@ const UpdateBookModal = (props: UpdateBookProps) => {
             if (deletedImages.length > 0) {
                 setImageLoading(true);
                 try {
-                    await deleteBookMultipleImagesAPI(dataUpdate.id, deletedImages);
+                    await deleteBookMultipleImagesInCloudAPI(dataUpdate.id, deletedImages);
                     console.log(`Deleted ${deletedImages.length} images`);
                 } catch (error: any) {
                     console.error('Check error delete image >>> ', error);
@@ -231,7 +231,7 @@ const UpdateBookModal = (props: UpdateBookProps) => {
             if (newFiles.length > 0) {
                 setImageLoading(true);
                 try {
-                    await updateBookMultipleImagesAPI(dataUpdate.id, newFiles);
+                    await updateBookMultipleImagesToCloudAPI(dataUpdate.id, newFiles);
                     console.log(`Uploaded ${newFiles.length} images`);
                 } catch (error: any) {
                     console.error('Check error update image >>> ', error);

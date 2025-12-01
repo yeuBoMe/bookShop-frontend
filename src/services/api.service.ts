@@ -50,8 +50,27 @@ export const updateUserAvatarAPI = (id: number, file: File) => {
   );
 };
 
+export const updateUserAvatarToCloudAPI = (id: number, file: File) => {
+  const formData = new FormData();
+  formData.append("fileName", file);
+
+  return axios.patch<IBackendRes<IUser>>(
+    `/api/v1/users/${id}/cloud-avatar`,
+    formData,
+    {
+      headers: { "Content-Type": "multipart/form-data" },
+    }
+  );
+};
+
 export const deleteUserAvatarAPI = (id: number, fileName: string) => {
   return axios.delete<IBackendRes<IUser>>(`/api/v1/users/${id}/avatar`, {
+    params: { fileName },
+  });
+};
+
+export const deleteUserAvatarInCloudAPI = (id: number, fileName: string) => {
+  return axios.delete<IBackendRes<IUser>>(`/api/v1/users/${id}/cloud-avatar`, {
     params: { fileName },
   });
 };
@@ -161,6 +180,23 @@ export const updateBookSingleImageAPI = (id: number, file: File) => {
   );
 };
 
+export const updateBookSingleImageToCloudAPI = (id: number, file: File) => {
+  let config = {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  };
+
+  const formData = new FormData();
+  formData.append("file", file);
+
+  return axios.patch<IBackendRes<IBook>>(
+    `/api/v1/books/${id}/cloud-image`,
+    formData,
+    config
+  );
+};
+
 export const updateBookMultipleImagesAPI = (id: number, files: File[]) => {
   const formData = new FormData();
   files.forEach((file) => formData.append("files", file));
@@ -174,8 +210,33 @@ export const updateBookMultipleImagesAPI = (id: number, files: File[]) => {
   );
 };
 
+export const updateBookMultipleImagesToCloudAPI = (
+  id: number,
+  files: File[]
+) => {
+  const formData = new FormData();
+  files.forEach((file) => formData.append("files", file));
+
+  return axios.patch<IBackendRes<IBook>>(
+    `/api/v1/books/${id}/cloud-multiple-images`,
+    formData,
+    {
+      headers: { "Content-Type": "multipart/form-data" },
+    }
+  );
+};
+
 export const deleteBookSingleImageAPI = (id: number, imageName: string) => {
   return axios.delete<IBackendRes<IBook>>(`/api/v1/books/${id}/image`, {
+    params: { imageName },
+  });
+};
+
+export const deleteBookSingleImageInCloudAPI = (
+  id: number,
+  imageName: string
+) => {
+  return axios.delete<IBackendRes<IBook>>(`/api/v1/books/${id}/cloud-image`, {
     params: { imageName },
   });
 };
@@ -186,6 +247,18 @@ export const deleteBookMultipleImagesAPI = (
 ) => {
   return axios.delete<IBackendRes<IBook>>(
     `/api/v1/books/${id}/multiple-images`,
+    {
+      data: imageNames,
+    }
+  );
+};
+
+export const deleteBookMultipleImagesInCloudAPI = (
+  id: number,
+  imageNames: string[]
+) => {
+  return axios.delete<IBackendRes<IBook>>(
+    `/api/v1/books/${id}/cloud-multiple-images`,
     {
       data: imageNames,
     }

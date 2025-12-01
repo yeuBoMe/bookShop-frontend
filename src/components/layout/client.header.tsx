@@ -16,7 +16,7 @@ const Header = (props: HeaderProps) => {
     const { user, setUser, setIsAuthenticated, carts, setCarts } = useCurrentApp();
     const navigate = useNavigate();
     const { notification, message } = App.useApp();
-    const urlAvatar = user?.avatar ? `${import.meta.env.VITE_BACKEND_URL}/upload/avatar/${user.avatar}` : "";
+    const urlAvatar = user?.avatar ? `${import.meta.env.VITE_IMAGE_URL}/${user.avatar}` : "";
     const [drawerVisible, setDrawerVisible] = useState(false);
 
     const handleLogoutRequest = async () => {

@@ -29,7 +29,7 @@ const AdminLayout = () => {
     const { notification, message } = App.useApp();
     const navigate = useNavigate();
     const [activeMenu, setActiveMenu] = useState<string>('dashboard');
-    const urlAvatar = `${import.meta.env.VITE_BACKEND_URL}/upload/avatar/${user?.avatar}`;
+    const urlAvatar = `${import.meta.env.VITE_IMAGE_URL}/${user?.avatar}`;
 
     console.log(">>> ", location.pathname);
 
