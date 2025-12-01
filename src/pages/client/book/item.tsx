@@ -384,7 +384,7 @@ const BookDetailPage = () => {
         setCurrentImageIndex(refGallery.current?.getCurrentIndex() ?? 0)
     }
 
-    const images = book?.images.map((img) => ({
+    const images = (book?.images ?? []).map((img) => ({
         original: `${baseUrl}/upload/book/${img}`,
         thumbnail: `${baseUrl}/upload/book/${img}`,
     })) || [];

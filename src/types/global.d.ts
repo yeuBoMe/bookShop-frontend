@@ -182,8 +182,8 @@ declare global {
 
   interface IDashBoard {
     countOrders: number;
-    countBooks: number;
     countUsers: number;
+    countBooks: number;
     countCategories: number;
     countRatings: number;
   }

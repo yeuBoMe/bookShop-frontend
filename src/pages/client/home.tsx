@@ -45,13 +45,13 @@ const HomePage = () => {
             }
 
             // Fetch featured books (nổi bật)
-            const featuredRes = await fetchAllBooksAPI("page=1&size=8&sort=updatedAt,desc");
+            const featuredRes = await fetchAllBooksAPI("page=1&size=8&sort=updatedAt,asc");
             if (featuredRes.data) {
                 setFeaturedBooks(featuredRes.data.result);
             }
 
             // Fetch new arrivals (hàng mới)
-            const newRes = await fetchAllBooksAPI("page=1&size=4&sort=createdAt,desc");
+            const newRes = await fetchAllBooksAPI("page=1&size=4&sort=createdAt,asc");
             if (newRes.data) {
                 setNewArrivals(newRes.data.result);
             }

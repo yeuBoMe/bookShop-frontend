@@ -35,7 +35,7 @@ const BookPage = () => {
 
     const [meta, setMeta] = useState({
         current: 1,
-        pageSize: 9,
+        pageSize: 12,
         pages: 0,
         total: 0
     });
