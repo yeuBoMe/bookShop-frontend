@@ -147,7 +147,6 @@ const UpdateBookModal = (props: UpdateBookProps) => {
         if (!file.url && !file.preview) {
             file.preview = await getBase64(file.originFileObj as FileType);
         }
-
         setPreviewImage(file.url || (file.preview as string));
         setPreviewOpen(true);
     };

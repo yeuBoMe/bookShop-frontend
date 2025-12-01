@@ -115,7 +115,7 @@ const ProfilePage = () => {
             }
 
             let updatedAvatar: string | undefined = user.avatar;
-            const newAvatar = fileList[0].originFileObj;
+            const newAvatar = fileList.length > 0 && fileList[0].originFileObj;
 
             if (newAvatar) {
                 try {

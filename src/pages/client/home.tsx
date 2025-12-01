@@ -26,7 +26,7 @@ const HomePage = () => {
     const [bestSellers, setBestSellers] = useState<IBook[]>([]);
     const [categories, setCategories] = useState<ICategory[]>([]);
 
-    const baseUrl = `${import.meta.env.VITE_BACKEND_URL}`;
+    const baseImageUrl = `${import.meta.env.VITE_IMAGE_URL}`;
 
     // Scroll to top when component mounts
     useEffect(() => {
@@ -148,7 +148,7 @@ const HomePage = () => {
                 <img
                     src={
                         book.images && book.images.length > 0
-                            ? `${baseUrl}/upload/book/${book.images[0]}`
+                            ? `${baseImageUrl}/${book.images[0]}`
                             : "https://via.placeholder.com/200x280?text=No+Image"
                     }
                     alt={book.name}
