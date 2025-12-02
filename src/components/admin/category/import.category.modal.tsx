@@ -28,7 +28,7 @@ const ImportCategoryModal = (props: CategoryImportProps) => {
         multiple: false,
         maxCount: 1, // if upload more than 1, keep the last file
         accept: ".csv, .xls, .xlsx, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        customRequest({ file, onSuccess }) {
+        customRequest({ file: _file, onSuccess }) {
             setTimeout(() => {
                 if (onSuccess) onSuccess("ok");
             }, 1000);

@@ -33,7 +33,7 @@ const ImportUserModal = (props: UserImportProps) => {
         maxCount: 1, // if upload more than 1, keep the last file
         accept: ".csv, .xls, .xlsx, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         // action: 'https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload',
-        customRequest({ file, onSuccess }) {
+        customRequest({ file: _file, onSuccess }) {
             setTimeout(() => {
                 if (onSuccess) onSuccess("ok");
             }, 1000);

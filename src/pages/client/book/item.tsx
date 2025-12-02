@@ -13,14 +13,12 @@ import {
     Empty,
     Avatar,
     Input,
-    Popconfirm
 } from "antd";
 import {
     ShoppingCartOutlined,
     SafetyOutlined,
     HomeOutlined,
     UserOutlined,
-    DeleteOutlined
 } from "@ant-design/icons";
 import ImageGallery from "react-image-gallery";
 import "react-image-gallery/styles/css/image-gallery.css";
@@ -28,7 +26,6 @@ import "styles/client/book/book.detail.scss";
 import BookGalleryModal from "@/components/client/book/gallery.modal";
 import {
     createRatingAPI,
-    deleteRatingAPI,
     fetchListRatingsByBookIdAPI,
     getBookByIdAPI,
     getRatingByUserIdAndBookIdAPI
@@ -46,7 +43,7 @@ const BookDetailPage = () => {
 
     const [loading, setLoading] = useState<boolean>(false);
     const [ratingsLoading, setRatingsLoading] = useState<boolean>(false);
-    const [deleteRatingLoading, setDeleteRatingLoading] = useState<boolean>(false);
+    const [_deleteRatingLoading, _setDeleteRatingLoading] = useState<boolean>(false);
 
     const [book, setBook] = useState<IBook | null>(null);
     const [quantity, setQuantity] = useState<number>(1);

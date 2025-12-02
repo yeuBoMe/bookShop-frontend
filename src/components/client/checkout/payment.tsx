@@ -36,7 +36,7 @@ const Payment = (props: PaymentProps) => {
     } = props;
     const { notification, message } = App.useApp();
     const [form] = Form.useForm<UserCheckoutValues>();
-    const [paymentMethod, setPaymentMethod] = useState<string>("cod");
+    const [_paymentMethod, setPaymentMethod] = useState<string>("cod");
     const baseUrl = `${import.meta.env.VITE_BACKEND_URL}`;
 
     useEffect(() => {
