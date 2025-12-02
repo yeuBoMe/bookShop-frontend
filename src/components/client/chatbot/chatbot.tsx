@@ -11,6 +11,8 @@ interface Message {
     text: string;
 }
 
+const CHAT_STORAGE_KEY = "bookshop_chat_history";
+
 const ChatbotPopup = () => {
     const { user } = useCurrentApp();
     const navigate = useNavigate();
@@ -21,6 +23,26 @@ const ChatbotPopup = () => {
     const [loading, setLoading] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const controllerRef = useRef<AbortController | null>(null);
+
+    // Lưu + khôi phục lịch sử chat theo user
+    useEffect(() => {
+        if (!user?.id) return;
+
+        const saved = localStorage.getItem(CHAT_STORAGE_KEY);
+        if (saved) {
+            const all = JSON.parse(saved);
+            if (all[user.id]) {
+                setMessages(all[user.id]);
+            }
+        }
+    }, [user?.id]);
+
+    useEffect(() => {
+        if (!user?.id || messages.length === 0) return;
+        const all = JSON.parse(localStorage.getItem(CHAT_STORAGE_KEY) || "{}");
+        all[user.id] = messages;
+        localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(all));
+    }, [messages, user?.id]);
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -34,16 +56,14 @@ const ChatbotPopup = () => {
         setMessages(prev => [...prev, { from: "user", text: userText }]);
         setLoading(true);
 
-        controllerRef.current?.abort(); // Hủy request cũ
+        controllerRef.current?.abort();
         const controller = new AbortController();
         controllerRef.current = controller;
 
         try {
-            const chatbotResponse = await chatbotAPI(userText);
-            const botReply = chatbotResponse.data?.message || "Mình chưa hiểu, hỏi lại nhé!";
+            const res = await chatbotAPI(userText);
+            const botReply = res.data?.message || "Mình chưa hiểu, hỏi lại nhé!";
 
-            setLoading(false);
-            // Streaming effect
             setMessages(prev => [...prev, { from: "bot", text: "" }]);
 
             let displayed = "";
@@ -54,7 +74,7 @@ const ChatbotPopup = () => {
                     const copy = [...prev];
                     copy[copy.length - 1] = {
                         from: "bot",
-                        text: displayed + (i < botReply.length - 1 ? "▋" : ""),
+                        text: displayed + (i < botReply.length - 1 ? "cursor" : ""),
                     };
                     return copy;
                 });
@@ -65,26 +85,23 @@ const ChatbotPopup = () => {
                 setMessages(prev => [...prev, { from: "bot", text: "Oops! Bot đang ngủ gật rồi!" }]);
             }
         } finally {
-
+            setLoading(false);
             controllerRef.current = null;
         }
     };
 
     const handleOpenPopUp = () => {
-        if (!user || !user.id) {
+        if (!user?.id) {
             notification.warning({
                 message: "Chưa đăng nhập",
                 description: "Vui lòng đăng nhập để trò chuyện với BookShop AI nhé",
-                duration: 3,
-                placement: "topRight"
+                placement: "topRight",
             });
-            setTimeout(() => {
-                navigate("/login");
-            }, 1000);
+            setTimeout(() => navigate("/login"), 1000);
             return;
         }
         setOpen(true);
-    }
+    };
 
     return (
         <>
@@ -103,8 +120,8 @@ const ChatbotPopup = () => {
                             <span>BookShop AI</span>
                             <Button
                                 type="text"
-                                style={{ color: "white" }}
                                 icon={<CloseOutlined />}
+                                style={{ color: "white" }}
                                 onClick={() => setOpen(false)}
                             />
                         </div>
@@ -116,9 +133,9 @@ const ChatbotPopup = () => {
                                 </div>
                             )}
 
-                            {messages.map((message, index) => (
-                                <div key={index} className={`msg ${message.from}`}>
-                                    <p>{message.text}</p>
+                            {messages.map((msg, i) => (
+                                <div key={i} className={`msg ${msg.from}`}>
+                                    <p>{msg.text}</p>
                                 </div>
                             ))}
 
@@ -136,13 +153,13 @@ const ChatbotPopup = () => {
                                 placeholder="Nhập tin nhắn..."
                                 value={input}
                                 onChange={e => setInput(e.target.value)}
+                                onPressEnter={handleSend}
                                 disabled={loading}
                                 allowClear
                             />
                             <Button
                                 type="primary"
                                 shape="circle"
-                                style={{ paddingLeft: "3px" }}
                                 icon={<SendOutlined />}
                                 onClick={handleSend}
                                 loading={loading}

@@ -12,7 +12,7 @@ interface HeaderProps {
 }
 
 const Header = (props: HeaderProps) => {
-    const {searchTerm, setSearchTerm} = props;
+    const { searchTerm, setSearchTerm } = props;
     const { user, setUser, setIsAuthenticated, carts, setCarts } = useCurrentApp();
     const navigate = useNavigate();
     const { notification, message } = App.useApp();
@@ -20,6 +20,11 @@ const Header = (props: HeaderProps) => {
     const [drawerVisible, setDrawerVisible] = useState(false);
 
     const handleLogoutRequest = async () => {
+        if (user?.id) {
+            const allChats = JSON.parse(localStorage.getItem("bookshop_chat_history") || "{}");
+            delete allChats[user.id];                    // ← xóa chỉ của user này
+            localStorage.setItem("bookshop_chat_history", JSON.stringify(allChats));
+        }
         try {
             const logoutResponse = await logoutAPI();
             if (logoutResponse) {
@@ -184,7 +189,7 @@ const Header = (props: HeaderProps) => {
                                             <div className="userInfo">
                                                 <p>Hello, {user.fullName}</p>
                                             </div>
-                                            
+
                                             {user.role?.name === "ADMIN" && (
                                                 <>
                                                     <Link to="/admin">Trang quản trị</Link>

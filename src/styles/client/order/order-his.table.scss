@@ -1,518 +1,238 @@
-$primary-color: #1890ff;
-$success-color: #52c41a;
-$warning-color: #faad14;
-$error-color: #ff4d4f;
-$text-color: #262626;
-$text-secondary: #8c8c8c;
-$border-color: #e8e8e8;
-$bg-gray: #fafafa;
-$shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
-$shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+/* ==================== VARIABLES ==================== */
+$primary: #1890ff;
+$error: #ff4d4f;
+$border: #e8e8e8;
+$text-sec: #8c8c8c;
 $mobile: 576px;
 $tablet: 768px;
-$desktop: 1200px;
 
-.order-history-table {
-  width: 100%;
-  overflow: hidden;
+/* ==================== MOBILE CARD (≤768px) – Ưu tiên cao nhất ==================== */
+.order-history-mobile {
+  padding: 12px;
+  background: #f9f9f9;
 
-  // Table container
-  .ant-table-wrapper {
-    border-radius: 8px;
-    box-shadow: $shadow-sm;
-    background: white;
-
-    @media (max-width: $desktop) {
-      border-radius: 6px;
-    }
-
-    @media (max-width: $mobile) {
-      border-radius: 4px;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
-    }
-  }
-
-  // Main table
-  .ant-table {
-    border-radius: 8px;
+  .mobile-order-card {
+    margin-bottom: 16px;
+    border-radius: 16px;
     overflow: hidden;
+    background: white;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1);
+    transition: transform 0.25s ease;
 
-    @media (max-width: $tablet) {
-      font-size: 13px;
+    &:hover {
+      transform: translateY(-4px);
     }
 
-    @media (max-width: $mobile) {
-      font-size: 12px;
+    .ant-card-body {
+      padding: 16px !important;
     }
 
-    // Table header
-    .ant-table-thead > tr > th {
-      background: linear-gradient(135deg, $bg-gray 0%, #f5f5f5 100%);
-      font-weight: 600;
-      color: $text-color;
-      border-bottom: 2px solid $primary-color;
-      padding: 14px 12px;
-      font-size: 14px;
-      white-space: nowrap;
-      text-align: center;
-      transition: background 0.3s ease;
-
-      &:hover {
-        background: linear-gradient(135deg, #f0f0f0 0%, #e8e8e8 100%);
+    /* Header */
+    > div:first-child {
+      strong {
+        font-size: 19px;
+        color: $primary;
+        font-weight: 700;
       }
-
-      @media (max-width: $desktop) {
-        padding: 12px 10px;
+      .ant-tag {
         font-size: 13px;
-      }
-
-      @media (max-width: $tablet) {
-        padding: 10px 8px;
-        font-size: 12px;
-      }
-
-      @media (max-width: $mobile) {
-        padding: 8px 4px;
-        font-size: 11px;
-      }
-
-      // Sort icons
-      .ant-table-column-sorter {
-        margin-left: 4px;
+        padding: 5px 13px;
+        border-radius: 20px;
+        font-weight: 600;
       }
     }
 
-    // Table body rows
-    .ant-table-tbody > tr {
-      transition: all 0.3s ease;
-
-      &:hover {
-        background: #f0f7ff;
-        box-shadow: inset 0 0 0 1px $primary-color;
-        transform: scale(1.002);
-      }
-
-      &:nth-child(even) {
-        background: #fafafa;
-
-        &:hover {
-          background: #f0f7ff;
-        }
-      }
-
-      > td {
-        padding: 12px;
-        font-size: 14px;
-        border-bottom: 1px solid $border-color;
-        vertical-align: middle;
-        transition: all 0.2s ease;
-
-        @media (max-width: $desktop) {
-          padding: 10px 8px;
-          font-size: 13px;
-        }
-
-        @media (max-width: $tablet) {
-          padding: 8px 6px;
-          font-size: 12px;
-        }
-
-        @media (max-width: $mobile) {
-          padding: 6px 4px;
-          font-size: 11px;
-        }
-
-        // STT column
-        &:first-child {
-          font-weight: 600;
-          color: $text-secondary;
-          text-align: center;
-
-          @media (max-width: $tablet) {
-            position: sticky;
-            left: 0;
-            background: inherit;
-            z-index: 10;
-            box-shadow: 2px 0 4px rgba(0, 0, 0, 0.05);
-          }
-        }
-
-        // Order ID
-        strong {
-          color: $primary-color;
-          font-weight: 600;
-
-          @media (max-width: $mobile) {
-            font-size: 12px;
-          }
-        }
+    /* Ngày */
+    > div:nth-child(2) {
+      font-size: 13.5px;
+      color: #666;
+      margin: 10px 0;
+      .anticon {
+        margin-right: 6px;
+        color: #999;
       }
     }
 
-    // Products list in table
-    .order-item {
-      margin-bottom: 6px;
-      line-height: 1.6;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-
-      &:last-child {
-        margin-bottom: 0;
-      }
-
-      @media (max-width: $tablet) {
-        margin-bottom: 4px;
-        gap: 4px;
-      }
-
-      @media (max-width: $mobile) {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 2px;
-        font-size: 11px;
-      }
-
-      .item-quantity {
-        color: $text-secondary;
-        margin-left: 6px;
-        font-weight: 500;
-        background: #f0f0f0;
-        padding: 2px 6px;
-        border-radius: 4px;
-        font-size: 12px;
-
-        @media (max-width: $mobile) {
-          margin-left: 0;
-          font-size: 10px;
-          padding: 1px 4px;
-        }
-      }
-    }
-
-    // Total price
-    .total-price {
-      color: $error-color;
-      font-weight: 700;
-      font-size: 15px;
-
-      @media (max-width: $tablet) {
-        font-size: 14px;
-      }
-
-      @media (max-width: $mobile) {
-        font-size: 13px;
-      }
-    }
-
-    // Status tags
-    .ant-tag {
-      margin: 0;
-      padding: 4px 10px;
-      font-size: 13px;
-      font-weight: 500;
+    /* Danh sách sách */
+    > div:nth-child(3) {
+      background: #f8fbff;
+      padding: 14px;
       border-radius: 12px;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
+      margin-bottom: 16px;
 
-      @media (max-width: $tablet) {
-        padding: 3px 8px;
-        font-size: 12px;
-      }
+      > div {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+        font-size: 14.5px;
+        font-weight: 500;
 
-      @media (max-width: $mobile) {
-        padding: 2px 6px;
-        font-size: 10px;
-        border-radius: 8px;
-
-        .anticon {
-          font-size: 10px;
-        }
-      }
-    }
-
-    // Action buttons
-    .ant-space {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-      justify-content: center;
-
-      @media (max-width: $mobile) {
-        gap: 4px;
-      }
-    }
-
-    .ant-btn {
-      border-radius: 6px;
-      font-size: 13px;
-      padding: 4px 12px;
-      height: auto;
-      line-height: 1.5;
-      transition: all 0.3s ease;
-      font-weight: 500;
-
-      &:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-      }
-
-      &:active {
-        transform: translateY(0);
-      }
-
-      @media (max-width: $tablet) {
-        font-size: 12px;
-        padding: 3px 10px;
-      }
-
-      @media (max-width: $mobile) {
-        font-size: 11px;
-        padding: 2px 8px;
-        border-radius: 4px;
-
-        .anticon {
-          font-size: 11px;
+        &:last-child {
+          margin-bottom: 0;
         }
 
         span:last-child {
-          display: none; // Hide text on mobile, show only icon
+          background: white;
+          color: $primary;
+          padding: 4px 12px;
+          border-radius: 8px;
+          font-weight: 700;
+          font-size: 13px;
         }
       }
     }
 
-    .ant-btn-primary {
-      background: linear-gradient(135deg, $primary-color 0%, #096dd9 100%);
-      border: none;
+    /* Footer */
+    > div:last-child {
+      strong {
+        font-size: 20px !important;
+        color: $error;
+        font-weight: 700;
+      }
 
-      &:hover {
-        background: linear-gradient(135deg, #096dd9 0%, $primary-color 100%);
+      .ant-space {
+        gap: 12px !important;
+        .ant-btn {
+          height: 42px;
+          border-radius: 12px;
+          font-weight: 600;
+          font-size: 14px;
+          padding: 0 18px;
+
+          &.ant-btn-primary {
+            background: linear-gradient(135deg, $primary, #096dd9);
+          }
+          &.ant-btn-dangerous {
+            background: linear-gradient(135deg, $error, #cf1322);
+          }
+        }
       }
     }
 
-    .ant-btn-dangerous {
-      background: linear-gradient(135deg, $error-color 0%, #cf1322 100%);
-      border: none;
-
-      &:hover {
-        background: linear-gradient(135deg, #cf1322 0%, $error-color 100%);
-      }
-    }
-  }
-
-  // Pagination
-  .ant-pagination {
-    margin-top: 20px;
-    padding: 0 12px;
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 8px;
-
-    @media (max-width: $tablet) {
-      margin-top: 16px;
-      padding: 0 8px;
-      justify-content: center;
-    }
-
-    @media (max-width: $mobile) {
-      margin-top: 12px;
-      padding: 0 4px;
-      gap: 4px;
-    }
-
-    .ant-pagination-total-text {
-      margin-right: auto;
-      font-size: 14px;
-      color: $text-secondary;
-
-      @media (max-width: $tablet) {
-        font-size: 13px;
-      }
-
-      @media (max-width: $mobile) {
-        font-size: 12px;
-        width: 100%;
-        text-align: center;
-        margin-bottom: 8px;
-      }
-    }
-
-    .ant-pagination-options {
-      @media (max-width: $mobile) {
+    /* Siêu nhỏ: chỉ hiện icon */
+    @media (max-width: 450px) {
+      .ant-btn span:not(.anticon) {
         display: none;
       }
-    }
-
-    .ant-pagination-item,
-    .ant-pagination-prev,
-    .ant-pagination-next,
-    .ant-pagination-jump-prev,
-    .ant-pagination-jump-next {
-      min-width: 32px;
-      height: 32px;
-      line-height: 30px;
-      font-size: 14px;
-      border-radius: 6px;
-      transition: all 0.3s ease;
-
-      &:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      }
-
-      @media (max-width: $tablet) {
-        min-width: 30px;
-        height: 30px;
-        line-height: 28px;
-        font-size: 13px;
-      }
-
-      @media (max-width: $mobile) {
-        min-width: 28px;
-        height: 28px;
-        line-height: 26px;
-        font-size: 12px;
-        border-radius: 4px;
+      .ant-btn {
+        padding: 0 14px !important;
       }
     }
+  }
 
-    .ant-pagination-item-active {
-      background: $primary-color;
-      border-color: $primary-color;
+  /* Empty + Footer info */
+  > div[style*="textAlign: center"] {
+    padding: 80px 20px;
+    font-size: 17px;
+    color: #999;
+  }
+  > div:last-child[style*="backgroundColor"] {
+    margin: 20px 12px 0;
+    padding: 16px;
+    background: white;
+    border-radius: 12px;
+    font-size: 14.5px;
+    font-weight: 500;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  }
+}
+
+/* ==================== DESKTOP TABLE (>768px) – Không ép min-width ==================== */
+.order-history-table {
+  padding: 12px;
+  background: #f9f9f9;
+
+  .ant-table-wrapper {
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    background: white;
+  }
+
+  /* Chỉ bật scroll ngang khi thật sự cần (trên màn hình nhỏ hơn nội dung) */
+  .ant-table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: #c1c1c1 #f1f1f1;
+
+    &::-webkit-scrollbar {
+      height: 8px;
+    }
+    &::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 4px;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 4px;
+    }
+  }
+
+  .ant-table {
+    background: white;
+
+    .ant-table-thead > tr > th {
+      background: linear-gradient(135deg, #f8f9fa, #f0f2f5);
+      font-weight: 700;
+      color: #1f1f1f;
+      text-align: center;
+      padding: 16px 12px !important;
+      font-size: 15px;
+      border-bottom: 3px solid $primary;
+    }
+
+    .ant-table-tbody > tr:hover > td {
+      background: #e6f7ff !important;
+    }
+
+    .ant-table-tbody > tr > td {
+      padding: 14px 12px;
+      font-size: 14.5px;
+    }
+
+    /* Cố định cột trái nếu cần */
+    .ant-table-cell-fix-left {
+      background: white !important;
+    }
+
+    .ant-tag {
+      border-radius: 20px;
+      padding: 5px 14px;
       font-weight: 600;
+      font-size: 13px;
+    }
 
-      a {
-        color: white;
-      }
+    .ant-btn {
+      border-radius: 10px;
+      height: 38px;
+      font-weight: 600;
+    }
 
-      &:hover {
-        background: #096dd9;
-        border-color: #096dd9;
-      }
+    strong[style*="color: #ff4d4f"] {
+      font-size: 16px;
+      font-weight: 700;
     }
   }
 
-  // Responsive table scroll for tablet and mobile
-  @media (max-width: $tablet) {
-    .ant-table-wrapper {
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-
-      // Custom scrollbar
-      &::-webkit-scrollbar {
-        height: 8px;
-      }
-
-      &::-webkit-scrollbar-track {
-        background: #f1f1f1;
-        border-radius: 10px;
-      }
-
-      &::-webkit-scrollbar-thumb {
-        background: #c1c1c1;
-        border-radius: 10px;
-
-        &:hover {
-          background: #a8a8a8;
-        }
-      }
-    }
-
-    .ant-table {
-      min-width: 800px; // Ensure table doesn't collapse too much
-    }
-  }
-
-  @media (max-width: $mobile) {
-    .ant-table {
-      min-width: 600px;
-    }
-  }
-
-  // Empty state
-  .ant-empty {
-    padding: 40px 0;
-
-    @media (max-width: $mobile) {
-      padding: 30px 0;
-    }
-
-    .ant-empty-image {
-      height: 80px;
-
-      @media (max-width: $mobile) {
-        height: 60px;
-      }
-    }
-
-    .ant-empty-description {
-      font-size: 14px;
-      color: $text-secondary;
-
-      @media (max-width: $mobile) {
-        font-size: 13px;
-      }
-    }
-  }
-
-  // Loading state
-  .ant-spin-nested-loading {
-    min-height: 300px;
-
-    @media (max-width: $mobile) {
-      min-height: 200px;
+  .ant-pagination {
+    margin: 28px 0;
+    justify-content: center;
+    .ant-pagination-total-text {
+      font-size: 15px;
+      color: #555;
+      font-weight: 500;
     }
   }
 }
 
-// Modal confirm styles
-.ant-modal-confirm {
-  .ant-modal-body {
-    padding: 24px;
-
-    @media (max-width: $mobile) {
-      padding: 20px;
-    }
-  }
-
-  .ant-modal-confirm-title {
-    font-size: 16px;
-    font-weight: 600;
-
-    @media (max-width: $mobile) {
-      font-size: 15px;
-    }
-  }
-
-  .ant-modal-confirm-content {
-    font-size: 14px;
-    margin-top: 12px;
-
-    @media (max-width: $mobile) {
-      font-size: 13px;
-    }
-  }
-
-  .ant-modal-confirm-btns {
-    margin-top: 24px;
-
-    @media (max-width: $mobile) {
-      margin-top: 20px;
-    }
-
-    .ant-btn {
-      min-width: 80px;
-      height: 36px;
-      font-size: 14px;
-
-      @media (max-width: $mobile) {
-        min-width: 70px;
-        height: 32px;
-        font-size: 13px;
-      }
-    }
+/* Tablet: card căn giữa đẹp hơn */
+@media (min-width: 577px) and (max-width: $tablet) {
+  .order-history-mobile {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 16px;
   }
 }

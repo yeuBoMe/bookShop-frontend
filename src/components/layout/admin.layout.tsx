@@ -39,6 +39,11 @@ const AdminLayout = () => {
     }, [location]);
 
     const handleLogoutRequest = async () => {
+        if (user?.id) {
+            const allChats = JSON.parse(localStorage.getItem("bookshop_chat_history") || "{}");
+            delete allChats[user.id];                    // ← xóa chỉ của user này
+            localStorage.setItem("bookshop_chat_history", JSON.stringify(allChats));
+        }
         try {
             const logoutResponse = await logoutAPI();
             if (logoutResponse) {
