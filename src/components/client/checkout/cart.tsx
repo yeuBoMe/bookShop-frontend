@@ -14,7 +14,7 @@ const Cart = (props: CartProps) => {
     const { carts, setCarts, totalPrice, onContinueToPayment } = props;
     const navigate = useNavigate();
     const { message } = App.useApp();
-    const baseImageUrl = `${import.meta.env.VITE_IMAGE_URL}`;
+    const baseImageUrl = import.meta.env.VITE_IMAGE_URL || "https://res.cloudinary.com/dvglvfask/image/upload";
 
     const handleUpdateQuantity = (bookId: number, newQuantity: number) => {
         if (!carts) return;

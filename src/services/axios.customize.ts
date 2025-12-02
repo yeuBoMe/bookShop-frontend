@@ -3,7 +3,7 @@ import axios from "axios";
 const baseURL = import.meta.env.VITE_BACKEND_URL;
 
 const instance = axios.create({
-  baseURL,
+  baseURL: baseURL || 'https://bookshop-backend-f0g0.onrender.com',
   withCredentials: true,
 });
 

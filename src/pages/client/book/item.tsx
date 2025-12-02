@@ -60,8 +60,8 @@ const BookDetailPage = () => {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
     const refGallery = useRef<ImageGallery>(null);
-    const baseImageUrl = `${import.meta.env.VITE_IMAGE_URL}`;
-    const currentUserAvatarUrl = `${baseImageUrl}/upload/avatar/${user?.avatar}`;
+    const baseImageUrl = import.meta.env.VITE_IMAGE_URL || "https://res.cloudinary.com/dvglvfask/image/upload";
+    const currentUserAvatarUrl = `${baseImageUrl}/${user?.avatar}`;
 
     const [meta, setMeta] = useState({
         current: 1,

@@ -11,7 +11,8 @@ interface DrawerUserProps {
 
 const DetailUserDrawer = (props: DrawerUserProps) => {
     const { isDrawerOpen, setIsDrawerOpen, dataDetail, setDataDetail } = props;
-    const urlAvatar = `${import.meta.env.VITE_IMAGE_URL}/${dataDetail?.avatar}`
+    const baseImageUrl = import.meta.env.VITE_IMAGE_URL || "https://res.cloudinary.com/dvglvfask/image/upload";
+    const urlAvatar = `${baseImageUrl}/${dataDetail?.avatar}`
     console.log("Check user avatar >>> ", urlAvatar)
 
     const formatDateTime = (value?: string | Date) => {

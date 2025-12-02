@@ -32,7 +32,7 @@ const getBase64 = (file: FileType): Promise<string> =>
 
 const DetailBookDrawer = (props: DrawerBookProps) => {
     const { isDrawerOpen, setIsDrawerOpen, dataDetail, setDataDetail } = props;
-    const baseImageUrl = `${import.meta.env.VITE_IMAGE_URL}`;
+    const baseImageUrl = import.meta.env.VITE_IMAGE_URL || "https://res.cloudinary.com/dvglvfask/image/upload";
 
     const [previewOpen, setPreviewOpen] = useState<boolean>(false);
     const [previewImage, setPreviewImage] = useState("");

@@ -16,7 +16,8 @@ const Header = (props: HeaderProps) => {
     const { user, setUser, setIsAuthenticated, carts, setCarts } = useCurrentApp();
     const navigate = useNavigate();
     const { notification, message } = App.useApp();
-    const urlAvatar = user?.avatar ? `${import.meta.env.VITE_IMAGE_URL}/${user.avatar}` : "";
+    const baseImageUrl = import.meta.env.VITE_IMAGE_URL || "https://res.cloudinary.com/dvglvfask/image/upload";
+    const urlAvatar = user?.avatar ? `${baseImageUrl}/${user.avatar}` : "";
     const [drawerVisible, setDrawerVisible] = useState(false);
 
     const handleLogoutRequest = async () => {

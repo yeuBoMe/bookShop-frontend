@@ -18,6 +18,7 @@ const LoginPage = () => {
   const { notification, message } = App.useApp();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState<boolean>(false);
+  const baseBackendUrl = import.meta.env.VITE_BACKEND_URL || 'https://bookshop-backend-f0g0.onrender.com';
 
   const handleLoginRequest: FormProps<LoginValues>['onFinish'] = async (values) => {
     try {
@@ -72,7 +73,7 @@ const LoginPage = () => {
 
   const handleGoogleLogin = () => {
     setIsGoogleLoading(true);
-    window.location.href = 'http://localhost:8080/api/v1/auth/login/google';
+    window.location.href = `${baseBackendUrl}/api/v1/auth/login/google`;
   };
 
   return (

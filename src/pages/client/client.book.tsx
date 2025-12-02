@@ -31,7 +31,7 @@ const BookPage = () => {
     const [filter, setFilter] = useState<FilterValues>({});
     const [sort, setSort] = useState<string>("updatedAt,desc");
 
-    const baseImageUrl = `${import.meta.env.VITE_IMAGE_URL}`;
+    const baseImageUrl = import.meta.env.VITE_IMAGE_URL || "https://res.cloudinary.com/dvglvfask/image/upload";
 
     const [meta, setMeta] = useState({
         current: 1,

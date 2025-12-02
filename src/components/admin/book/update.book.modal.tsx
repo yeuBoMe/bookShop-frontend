@@ -71,7 +71,7 @@ const UpdateBookModal = (props: UpdateBookProps) => {
         refreshTable
     } = props;
 
-    const baseImageUrl = `${import.meta.env.VITE_BACKEND_URL}`;
+    const baseImageUrl = import.meta.env.VITE_IMAGE_URL || "https://res.cloudinary.com/dvglvfask/image/upload";
 
     const [form] = Form.useForm<BookUpdateValues>();
     const { notification, message } = App.useApp();

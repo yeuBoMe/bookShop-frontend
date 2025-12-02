@@ -56,7 +56,8 @@ const ProfilePage = () => {
     const [isUpdateInfoLoading, setIsUpdateInfoLoading] = useState<boolean>(false);
     const [isUpdatePassLoading, setIsUpdatePassLoading] = useState<boolean>(false);
 
-    const urlAvatar = user?.avatar ? `${import.meta.env.VITE_IMAGE_URL}/${user.avatar}` : '';
+    const baseImageUrl = import.meta.env.VITE_IMAGE_URL || "https://res.cloudinary.com/dvglvfask/image/upload";
+    const urlAvatar = user?.avatar ? `${baseImageUrl}/${user.avatar}` : '';
 
     useEffect(() => {
         if (isModalOpen === true && user && user.id) {

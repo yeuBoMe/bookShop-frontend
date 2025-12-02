@@ -26,7 +26,7 @@ const HomePage = () => {
     const [bestSellers, setBestSellers] = useState<IBook[]>([]);
     const [categories, setCategories] = useState<ICategory[]>([]);
 
-    const baseImageUrl = `${import.meta.env.VITE_IMAGE_URL}`;
+    const baseImageUrl = import.meta.env.VITE_IMAGE_URL || "https://res.cloudinary.com/dvglvfask/image/upload";
 
     // Scroll to top when component mounts
     useEffect(() => {

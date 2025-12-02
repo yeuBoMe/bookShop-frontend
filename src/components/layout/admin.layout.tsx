@@ -29,7 +29,8 @@ const AdminLayout = () => {
     const { notification, message } = App.useApp();
     const navigate = useNavigate();
     const [activeMenu, setActiveMenu] = useState<string>('dashboard');
-    const urlAvatar = `${import.meta.env.VITE_IMAGE_URL}/${user?.avatar}`;
+    const baseImageUrl = import.meta.env.VITE_IMAGE_URL || "https://res.cloudinary.com/dvglvfask/image/upload";
+    const urlAvatar = `${baseImageUrl}/${user?.avatar}`;
 
     console.log(">>> ", location.pathname);
 
