@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button, Empty, Steps, App } from "antd";
 import {
     ShoppingCartOutlined,
@@ -15,6 +15,7 @@ import Payment from "@/components/client/checkout/payment";
 
 const CheckoutPage = () => {
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
     const { notification } = App.useApp();
     const { carts, setCarts } = useCurrentApp();
     const [totalPrice, setTotalPrice] = useState<number>(0);
@@ -22,59 +23,43 @@ const CheckoutPage = () => {
     const [isPaymentLoading, setIsPaymentLoading] = useState<boolean>(false);
     const finalTotalPrice = totalPrice + (totalPrice >= 150000 ? 0 : 30000);
 
-    // THÊM: Ref để track đã xử lý VNPay callback chưa
-    const hasProcessedVnpay = useRef(false);
-    const hasProcessedMomopay = useRef(false);
+    const hasProcessedCallback = useRef(false);
 
     useEffect(() => {
-        handleVnpayCallback();
-        handleMomoCallback();
-    }, []);
+        handlePaymentCallback();
+    }, [searchParams]);
 
-    const handleMomoCallback = async () => {
-        const hash = window.location.hash.slice(1);
+    const handlePaymentCallback = async () => {
+        // Lấy params từ URL
+        const payment = searchParams.get('payment');
+        const status = searchParams.get('status');
+        const code = searchParams.get('code');
 
-        if (hasProcessedMomopay.current) return;
-
-        if (hash === "momo-success") {
-            hasProcessedMomopay.current = true;
-            const pending = localStorage.getItem("pendingMomoOrder");
-            if (pending) {
-                const orderData = JSON.parse(pending);
-                localStorage.removeItem("pendingMomoOrder");
-                createAnOrderAPI(orderData).then(() => {
-                    localStorage.removeItem("carts");
-                    setCarts([]);
-                    setCurrentStep(2);
-                    notification.success({ message: "Thanh toán MoMo thành công!" });
-                }).catch(() => {
-                    hasProcessedMomopay.current = false;
-                }).finally(() => {
-                    window.history.replaceState({}, "", "/checkout");
-                });
-            }
-        } else if (hash === "momo-fail") {
-            hasProcessedMomopay.current = true;
-            localStorage.removeItem("pendingMomoOrder");
-            notification.error({ message: "Thanh toán MoMo thất bại" });
-            window.history.replaceState({}, "", "/checkout");
-        }
-    }
-
-    const handleVnpayCallback = async () => {
-        const hash = window.location.hash.slice(1); // trả về phần sau dấu # trong URL và bỏ kí tự đầu.
-
-        // Kiểm tra đã xử lý chưa
-        if (hasProcessedVnpay.current) {
+        // Nếu không có payment param hoặc đã xử lý rồi thì return
+        if (!payment || hasProcessedCallback.current) {
             return;
         }
 
-        if (hash === 'vnpay-success') {
-            // Đánh dấu đang xử lý
-            hasProcessedVnpay.current = true;
+        // Đánh dấu đang xử lý
+        hasProcessedCallback.current = true;
+
+        try {
+            if (payment === 'vnpay') {
+                await handleVnpayCallback(status, code);
+            } else if (payment === 'momo') {
+                await handleMomoCallback(status, code);
+            }
+        } finally {
+            // Xóa query params khỏi URL, giữ lại /checkout sạch
+            window.history.replaceState({}, '', '/checkout');
+        }
+    };
+
+    const handleVnpayCallback = async (status: string | null, code: string | null) => {
+        if (status === 'success') {
+            setIsPaymentLoading(true);
 
             try {
-                setIsPaymentLoading(true);
                 const pending = localStorage.getItem('pendingVnpayOrder');
 
                 if (!pending) {
@@ -82,8 +67,6 @@ const CheckoutPage = () => {
                 }
 
                 const orderData = JSON.parse(pending);
-
-                // Xóa pending ngay để tránh retry
                 localStorage.removeItem('pendingVnpayOrder');
 
                 const response = await createAnOrderAPI(orderData);
@@ -93,31 +76,20 @@ const CheckoutPage = () => {
                     setCarts([]);
                     setCurrentStep(2);
                     notification.success({
-                        message: 'Thanh toán thành công!',
+                        message: 'Thanh toán VNPay thành công!',
                         description: 'Đơn hàng của bạn đã được tạo thành công.'
                     });
                 }
             } catch (err: any) {
-                // Reset flag nếu lỗi để có thể retry
-                hasProcessedVnpay.current = false;
-
+                hasProcessedCallback.current = false;
                 notification.error({
                     message: 'Lỗi tạo đơn hàng',
                     description: err.message || 'Có lỗi xảy ra khi tạo đơn hàng'
                 });
             } finally {
                 setIsPaymentLoading(false);
-                // Xóa hash khỏi URL
-                window.history.replaceState({}, '', '/checkout');
             }
-        } else if (hash.startsWith('vnpay-cancel')) {
-            // Đánh dấu đã xử lý
-            hasProcessedVnpay.current = true;
-
-            const code = hash.split(':')[1];
-            // hash lúc này là "vnp_ResponseCode:00".
-            // .split(':') tách chuỗi thành mảng: ["vnp_ResponseCode", "00"].
-            // Lấy phần tử[1] chính là "00" → mã kết quả thanh toán.
+        } else if (status === 'fail') {
             const errorMessages: Record<string, string> = {
                 '07': 'Giao dịch bị nghi ngờ gian lận',
                 '09': 'Giao dịch chưa đăng ký InternetBanking',
@@ -133,14 +105,62 @@ const CheckoutPage = () => {
                 '97': 'Chữ ký không hợp lệ'
             };
 
+            localStorage.removeItem('pendingVnpayOrder');
+
             notification.error({
-                message: 'Thanh toán thất bại',
+                message: 'Thanh toán VNPay thất bại',
                 description: code ? (errorMessages[code] || `Mã lỗi: ${code}`) : 'Giao dịch không thành công'
             });
+        }
+    };
 
-            // Xóa hash và pending order
-            localStorage.removeItem('pendingVnpayOrder');
-            window.history.replaceState({}, '', '/checkout');
+    const handleMomoCallback = async (status: string | null, code: string | null) => {
+        if (status === 'success') {
+            const pending = localStorage.getItem("pendingMomoOrder");
+
+            if (pending) {
+                const orderData = JSON.parse(pending);
+                localStorage.removeItem("pendingMomoOrder");
+
+                try {
+                    await createAnOrderAPI(orderData);
+                    localStorage.removeItem("carts");
+                    setCarts([]);
+                    setCurrentStep(2);
+                    notification.success({
+                        message: "Thanh toán MoMo thành công!",
+                        description: 'Đơn hàng của bạn đã được tạo thành công.'
+                    });
+                } catch (err) {
+                    hasProcessedCallback.current = false;
+                    notification.error({
+                        message: "Lỗi tạo đơn hàng",
+                        description: "Có lỗi xảy ra khi tạo đơn hàng"
+                    });
+                }
+            }
+        } else if (status === 'fail') {
+            const errorMessages: Record<string, string> = {
+                '1': 'Giao dịch thất bại',
+                '2': 'Giao dịch bị từ chối',
+                '9': 'Giao dịch bị hủy',
+                '10': 'Khách hàng hủy giao dịch',
+                '1001': 'Giao dịch đã được xử lý',
+                '1002': 'Giao dịch không hợp lệ',
+                '1003': 'Số tiền không hợp lệ',
+                '1004': 'Số tiền vượt quá hạn mức',
+                '1005': 'URL không hợp lệ',
+                '1006': 'Không tìm thấy giao dịch',
+                '1007': 'Chữ ký không hợp lệ',
+                '99': 'Lỗi không xác định'
+            };
+
+            localStorage.removeItem("pendingMomoOrder");
+
+            notification.error({
+                message: "Thanh toán MoMo thất bại",
+                description: code ? (errorMessages[code] || `Mã lỗi: ${code}`) : 'Giao dịch không thành công'
+            });
         }
     };
 

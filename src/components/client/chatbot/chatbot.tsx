@@ -64,6 +64,7 @@ const ChatbotPopup = () => {
             const res = await chatbotAPI(userText);
             const botReply = res.data?.message || "Mình chưa hiểu, hỏi lại nhé!";
 
+            setLoading(false);
             setMessages(prev => [...prev, { from: "bot", text: "" }]);
 
             let displayed = "";
@@ -85,7 +86,6 @@ const ChatbotPopup = () => {
                 setMessages(prev => [...prev, { from: "bot", text: "Oops! Bot đang ngủ gật rồi!" }]);
             }
         } finally {
-            setLoading(false);
             controllerRef.current = null;
         }
     };
