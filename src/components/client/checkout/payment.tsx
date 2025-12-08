@@ -37,7 +37,7 @@ const Payment = (props: PaymentProps) => {
     const { notification, message } = App.useApp();
     const [form] = Form.useForm<UserCheckoutValues>();
     const [_paymentMethod, setPaymentMethod] = useState<string>("cod");
-    const baseUrl = `${import.meta.env.VITE_BACKEND_URL}`;
+    const baseImageUrl = import.meta.env.VITE_IMAGE_URL || "https://res.cloudinary.com/dvglvfask/image/upload";
 
     useEffect(() => {
         if (user) {
@@ -314,7 +314,7 @@ const Payment = (props: PaymentProps) => {
                                         src={
                                             item.detail.images &&
                                                 item.detail.images.length > 0
-                                                ? `${baseUrl}/upload/book/${item.detail.images[0]}`
+                                                ? `${baseImageUrl}/${item.detail.images[0]}`
                                                 : "https://via.placeholder.com/50x65?text=No+Image"
                                         }
                                         alt={item.detail.name}
