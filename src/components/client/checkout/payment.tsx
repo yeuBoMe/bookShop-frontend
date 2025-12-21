@@ -246,7 +246,7 @@ const Payment = (props: PaymentProps) => {
                             </Form.Item>
 
                             <Form.Item<UserCheckoutValues>
-                                label="Hình thức thanh toán"
+                                label="Hình thức thanh toán:"
                                 name="paymentMethod"
                             >
                                 <Radio.Group
