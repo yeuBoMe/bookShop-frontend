@@ -24,7 +24,6 @@ const AdminChatWebSocket = () => {
   const notificationRef = useRef(notification);
 
   const baseImageUrl = import.meta.env.VITE_IMAGE_URL || "https://res.cloudinary.com/dvglvfask/image/upload";
-  const userAvatar = `${baseImageUrl}/${user?.avatar}`;
 
   // ✅ Keep refs in sync
   useEffect(() => {
@@ -57,14 +56,13 @@ const AdminChatWebSocket = () => {
     }
   }, [conversations]);
 
-  // ==================== CONNECT (CHỈ CHẠY MỘT LẦN) ====================
+  // ==================== CONNECT ====================
   useEffect(() => {
     if (!user?.email || hasConnected.current) return;
 
     console.log("🔗 [ADMIN] Connecting...", user.email);
     hasConnected.current = true;
 
-    // ✅ Handler dùng ref để không cần dependency
     const handleNewMessage = (event: Event) => {
       const customEvent = event as CustomEvent<IWebSocket>;
       const data = customEvent.detail;
@@ -73,11 +71,11 @@ const AdminChatWebSocket = () => {
       console.log("📩 [ADMIN] WebSocket Event:");
       console.log("  From:", data.from);
       console.log("  Sender:", data.sender);
+      console.log("  userAvatar:", data.userAvatar); // ✅ Log avatar
       console.log("  Content:", data.content);
       console.log("  Timestamp:", data.timestamp);
       console.log("========================================");
 
-      // ✅ Chống duplicate
       const messageKey = `${data.sender}-${data.content}-${data.timestamp}`;
 
       if (processedMessages.current.has(messageKey)) {
@@ -102,7 +100,6 @@ const AdminChatWebSocket = () => {
 
         console.log("💬 [ADMIN] Processing USER message from:", data.sender);
 
-        // ✅ Dùng ref để check selected user
         const currentSelected = selectedUserRef.current;
         const shouldNotify = currentSelected !== data.sender;
 
@@ -127,20 +124,22 @@ const AdminChatWebSocket = () => {
             return [conv, ...updated];
           } else {
             console.log("✨ [ADMIN] Creating new conversation");
+            console.log("   userAvatar from message:", data.userAvatar); // ✅ Debug
             const newConv: IAdminConversation = {
               userEmail: data.sender,
               userName: data.sender.split("@")[0],
+              userAvatar: data.userAvatar, // ✅ Lưu avatar từ message
               lastMessage: data.content,
               lastMessageTime: data.timestamp || new Date().toISOString(),
               unreadCount: 1,
               messages: [newMessage],
             };
+            console.log("   Saved conversation:", newConv); // ✅ Debug full object
 
             return [newConv, ...prev];
           }
         });
 
-        // ✅ Notification sau khi update state
         if (shouldNotify) {
           notificationRef.current.info({
             message: `💬 ${data.sender.split("@")[0]}`,
@@ -175,14 +174,13 @@ const AdminChatWebSocket = () => {
 
     window.addEventListener("chatMessageReceived", handleNewMessage);
 
-    // ✅ Cleanup CHỈ khi component unmount
     return () => {
       console.log("🔌 [ADMIN] Cleanup on unmount");
       window.removeEventListener("chatMessageReceived", handleNewMessage);
       websocketService.disconnect();
       hasConnected.current = false;
     };
-  }, [user?.email]); // ✅ CHỈ phụ thuộc user.email
+  }, [user?.email]);
 
   // ==================== AUTO SCROLL ====================
   useEffect(() => {
@@ -287,6 +285,17 @@ const AdminChatWebSocket = () => {
     }
   };
 
+  const getUserAvatarUrl = (conv: IAdminConversation) => {
+    if (conv.userAvatar) {
+      // Nếu tên file đã là public_id đầy đủ (không có folder)
+      const url = `${baseImageUrl}/${conv.userAvatar}`;
+
+      console.log("🖼 Final avatar URL:", url); // ← Debug để kiểm tra
+      return url;
+    }
+    return undefined;
+  };
+
   // ==================== FILTER ====================
   const filteredConversations = conversations.filter(
     (c) =>
@@ -336,7 +345,15 @@ const AdminChatWebSocket = () => {
                 onClick={() => handleSelectConversation(conv.userEmail)}
               >
                 <Badge count={conv.unreadCount} offset={[-5, 5]}>
-                  <Avatar size={48} src={userAvatar} />
+                  <Avatar
+                    size={48}
+                    icon={<UserOutlined />}
+                    src={getUserAvatarUrl(conv)}
+                    onError={() => {
+                      console.error("❌ Avatar load failed for:", conv.userEmail, getUserAvatarUrl(conv));
+                      return false; // fallback to icon
+                    }}
+                  />
                 </Badge>
 
                 <div className="conv-info">
@@ -356,7 +373,11 @@ const AdminChatWebSocket = () => {
         {selectedConv ? (
           <>
             <div className="chat-header">
-              <Avatar size={40} icon={<UserOutlined />} src={selectedConv.userAvatar} />
+              <Avatar
+                size={40}
+                icon={<UserOutlined />}
+                src={getUserAvatarUrl(selectedConv)}
+              />
               <div className="chat-header-info">
                 <h3>{selectedConv.userName}</h3>
                 <span className="user-id">{selectedConv.userEmail}</span>
@@ -366,7 +387,13 @@ const AdminChatWebSocket = () => {
             <div className="chat-messages">
               {selectedConv.messages.map((msg, i) => (
                 <div key={`${msg.timestamp}-${i}`} className={`message ${msg.from.toLowerCase()}`}>
-                  {msg.from === "USER" && <Avatar size={32} icon={<UserOutlined />} />}
+                  {msg.from === "USER" && (
+                    <Avatar
+                      size={32}
+                      icon={<UserOutlined />}
+                      src={getUserAvatarUrl(selectedConv)}
+                    />
+                  )}
                   <div className="message-bubble">
                     <p>{msg.text}</p>
                     <span className="message-time">

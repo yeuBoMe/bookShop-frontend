@@ -203,6 +203,7 @@ declare global {
     content: string;
     timestamp: string;
     from: "USER" | "ADMIN";
+    userAvatar?: string; 
   }
 
   // Admin Conversation

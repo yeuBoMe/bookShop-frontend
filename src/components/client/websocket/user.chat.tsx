@@ -179,6 +179,7 @@ const UserChatWebSocket = () => {
       content: userText,
       timestamp,
       from: "USER",
+      userAvatar: user?.avatar,
     };
 
     console.log("📤 [USER] Sending:", wsMessage);
