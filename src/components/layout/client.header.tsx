@@ -209,7 +209,7 @@ const Header = (props: HeaderProps) => {
                                 ) : (
                                     <Button
                                         type="primary"
-                                        style={{ borderRadius: "20px" }}
+                                        style={{ borderRadius: "20px", paddingBottom: "3px" }}
                                     >
                                         <Link to="/login">Đăng nhập</Link>
                                     </Button>

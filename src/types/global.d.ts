@@ -195,4 +195,39 @@ declare global {
   interface IChatBot {
     message: string;
   }
+
+  // WebSocket Message
+  interface IWebSocket {
+    sender: string; // EMAIL của người gửi
+    receiver: string; // EMAIL của người nhận
+    content: string;
+    timestamp: string;
+    from: "USER" | "ADMIN";
+  }
+
+  // Admin Conversation
+  interface IAdminConversation {
+    userEmail: string; // EMAIL - dùng để route message
+    userName: string; // Tên hiển thị
+    userAvatar?: string;
+    lastMessage: string;
+    lastMessageTime: string;
+    unreadCount: number;
+    messages: IAdminMessage[];
+  }
+
+  // Admin Message
+  interface IAdminMessage {
+    from: "USER" | "ADMIN";
+    text: string;
+    timestamp: string;
+    userEmail?: string; // EMAIL của user gửi
+  }
+
+  // User Message
+  interface IUserMessage {
+    from: "USER" | "ADMIN";
+    text: string;
+    timestamp: string;
+  }
 }

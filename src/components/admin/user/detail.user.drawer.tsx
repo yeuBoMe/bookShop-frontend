@@ -12,8 +12,7 @@ interface DrawerUserProps {
 const DetailUserDrawer = (props: DrawerUserProps) => {
     const { isDrawerOpen, setIsDrawerOpen, dataDetail, setDataDetail } = props;
     const baseImageUrl = import.meta.env.VITE_IMAGE_URL || "https://res.cloudinary.com/dvglvfask/image/upload";
-    const urlAvatar = `${baseImageUrl}/${dataDetail?.avatar}`
-    console.log("Check user avatar >>> ", urlAvatar)
+    const urlAvatar = `${baseImageUrl}/${dataDetail?.avatar}`;
 
     const formatDateTime = (value?: string | Date) => {
         return value ? dayjs(value).format("YYYY-MM-DD HH:mm:ss") : "N/A";

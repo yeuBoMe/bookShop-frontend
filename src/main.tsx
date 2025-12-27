@@ -31,6 +31,7 @@ import ManageOrderPage from 'pages/admin/manage.order';
 import ManageUserPage from 'pages/admin/manage.user';
 import ManageCategoryPage from '@/pages/admin/manage.category';
 import ManageRatingPage from '@/pages/admin/manage.rating';
+import AdminChatWebSocket from '@/components/admin/websocket/admin.chat';
 
 import enUS from 'antd/locale/en_US';
 // import viVN from 'antd/locale/vi_VN';
@@ -121,6 +122,10 @@ const router = createBrowserRouter([
       {
         path: "user",
         element: <ManageUserPage />,
+      },
+      {
+        path: "chat",
+        element: <AdminChatWebSocket />,
       },
     ]
   },

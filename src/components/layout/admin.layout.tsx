@@ -10,6 +10,7 @@ import {
     MenuUnfoldOutlined,
     HomeOutlined,
     StarOutlined,
+    MessageOutlined,
 } from '@ant-design/icons';
 import { Layout, Menu, Dropdown, Space, Avatar, App } from 'antd';
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
@@ -103,6 +104,11 @@ const AdminLayout = () => {
             label: <Link to='/admin/rating'>Manage Ratings</Link>,
             key: '/admin/rating',
             icon: <StarOutlined />,
+        },
+        {
+            label: <Link to='/admin/chat'>Manage Chats</Link>,
+            key: '/admin/chat',
+            icon: <MessageOutlined />,
         },
     ];
 

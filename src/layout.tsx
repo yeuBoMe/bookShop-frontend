@@ -6,8 +6,10 @@ import { App } from "antd";
 import { useCurrentApp } from "@/components/context/app.context";
 import { getAccountInfoAPI } from "@/services/api.service";
 import ChatbotPopup from "@/components/client/chatbot/chatbot";
+import UserChatWebSocket from "@/components/client/websocket/user.chat";
 
 const Layout = () => {
+  const { user } = useCurrentApp();
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [searchParams, setSearchParams] = useSearchParams();
   const { message } = App.useApp();
@@ -79,6 +81,13 @@ const Layout = () => {
       />
       <Outlet context={[searchTerm, setSearchTerm]} />
       <ChatbotPopup />
+      {
+        user && user.role?.name !== "ADMIN"
+          ? <>
+            <UserChatWebSocket />
+          </>
+          : <></>
+      }
       <Footer />
     </>
   );
