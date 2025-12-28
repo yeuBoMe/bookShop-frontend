@@ -7,21 +7,31 @@ import "@/styles/admin-chat.scss";
 
 const ADMIN_CONVERSATIONS_KEY = "bookshop_admin_conversations";
 
+// ✅ TIN NHẮN TỰ ĐỘNG KHI USER CHAT LẦN ĐẦU
+const AUTO_REPLY_MESSAGE = `Xin chào! 👋
+
+Cảm ơn bạn đã liên hệ với BookShop. Chúng tôi đã nhận được tin nhắn của bạn.
+
+🕐 Thời gian phản hồi: Admin sẽ cố gắng phản hồi sớm nhất có thể 
+📚 Hỗ trợ: Tư vấn sách, đơn hàng, thanh toán
+💬 Admin sẽ trả lời bạn ngay khi có thể!
+
+Vui lòng mô tả chi tiết vấn đề của bạn để được hỗ trợ tốt nhất.`;
+
 const AdminChatWebSocket = () => {
   const { user } = useCurrentApp();
   const { notification } = App.useApp();
-
   const [conversations, setConversations] = useState<IAdminConversation[]>([]);
   const [selectedUserEmail, setSelectedUserEmail] = useState<string | null>(null);
   const [input, setInput] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [isConnected, setIsConnected] = useState(false);
-
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const hasConnected = useRef(false);
   const processedMessages = useRef(new Set<string>());
   const selectedUserRef = useRef(selectedUserEmail);
   const notificationRef = useRef(notification);
+  const autoRepliedUsers = useRef(new Set<string>()); // ✅ Track users đã auto reply
 
   const baseImageUrl = import.meta.env.VITE_IMAGE_URL || "https://res.cloudinary.com/dvglvfask/image/upload";
 
@@ -41,6 +51,14 @@ const AdminChatWebSocket = () => {
       try {
         const data: IAdminConversation[] = JSON.parse(saved);
         setConversations(data);
+
+        // ✅ Load danh sách users đã được auto reply
+        data.forEach(conv => {
+          if (conv.messages.some(m => m.from === "ADMIN")) {
+            autoRepliedUsers.current.add(conv.userEmail);
+          }
+        });
+
         console.log("📂 [ADMIN] Loaded", data.length, "conversations");
       } catch (error) {
         console.error("❌ [ADMIN] Error loading:", error);
@@ -56,6 +74,54 @@ const AdminChatWebSocket = () => {
     }
   }, [conversations]);
 
+  // ✅ HÀM GỬI AUTO REPLY
+  const sendAutoReply = (userEmail: string) => {
+    // Kiểm tra xem đã gửi auto reply chưa
+    if (autoRepliedUsers.current.has(userEmail)) {
+      console.log("⚠️ [AUTO-REPLY] Already sent to:", userEmail);
+      return;
+    }
+
+    console.log("🤖 [AUTO-REPLY] Sending welcome message to:", userEmail);
+
+    const timestamp = new Date().toISOString();
+    const autoMessage: IAdminMessage = {
+      from: "ADMIN",
+      text: AUTO_REPLY_MESSAGE,
+      timestamp,
+    };
+
+    // ✅ Thêm auto reply vào conversation
+    setConversations((prev) =>
+      prev.map((c) =>
+        c.userEmail === userEmail
+          ? {
+            ...c,
+            messages: [...c.messages, autoMessage],
+            lastMessage: "Tin nhắn tự động",
+            lastMessageTime: timestamp,
+          }
+          : c
+      )
+    );
+
+    // ✅ Gửi qua WebSocket
+    const wsMessage: IWebSocket = {
+      sender: userEmail,
+      receiver: user?.email || "ninh@gmail.com",
+      content: AUTO_REPLY_MESSAGE,
+      timestamp,
+      from: "ADMIN",
+    };
+
+    websocketService.sendToUser(wsMessage);
+
+    // ✅ Đánh dấu đã auto reply
+    autoRepliedUsers.current.add(userEmail);
+
+    console.log("✅ [AUTO-REPLY] Sent successfully to:", userEmail);
+  };
+
   // ==================== CONNECT ====================
   useEffect(() => {
     if (!user?.email || hasConnected.current) return;
@@ -67,29 +133,23 @@ const AdminChatWebSocket = () => {
       const customEvent = event as CustomEvent<IWebSocket>;
       const data = customEvent.detail;
 
-      console.log("========================================");
-      console.log("📩 [ADMIN] WebSocket Event:");
-      console.log("  From:", data.from);
-      console.log("  Sender:", data.sender);
-      console.log("  userAvatar:", data.userAvatar); // ✅ Log avatar
-      console.log("  Content:", data.content);
-      console.log("  Timestamp:", data.timestamp);
-      console.log("========================================");
-
-      const messageKey = `${data.sender}-${data.content}-${data.timestamp}`;
+      // ✅ Key chống trùng lặp
+      const messageKey = `${data.sender}-${data.timestamp}-${data.content}`;
 
       if (processedMessages.current.has(messageKey)) {
-        console.log("⚠️ [ADMIN] Duplicate message detected, skipping");
+        console.log("⚠️ [ADMIN] Duplicate message detected, skipping:", messageKey);
         return;
       }
 
       processedMessages.current.add(messageKey);
 
-      if (processedMessages.current.size > 100) {
-        const keysArray = Array.from(processedMessages.current);
-        processedMessages.current = new Set(keysArray.slice(-100));
+      // Giới hạn size để tránh memory leak
+      if (processedMessages.current.size > 200) {
+        const keys = Array.from(processedMessages.current).slice(-200);
+        processedMessages.current = new Set(keys);
       }
 
+      // ✅ CHỈ XỬ LÝ MESSAGE TỪ USER
       if (data.from === "USER" && data.sender) {
         const newMessage: IAdminMessage = {
           from: "USER",
@@ -103,43 +163,72 @@ const AdminChatWebSocket = () => {
         const currentSelected = selectedUserRef.current;
         const shouldNotify = currentSelected !== data.sender;
 
+        // ✅ Kiểm tra và gửi auto-reply
         setConversations((prev) => {
           const existingIndex = prev.findIndex(
             (c) => c.userEmail === data.sender
           );
 
+          let updated: IAdminConversation[];
+          let shouldSendAutoReply = false;
+
           if (existingIndex >= 0) {
+            // Update existing conversation
             console.log("♻️ [ADMIN] Updating conversation");
-            const updated = [...prev];
 
-            updated[existingIndex].messages.push(newMessage);
-            updated[existingIndex].lastMessage = data.content;
-            updated[existingIndex].lastMessageTime = data.timestamp || new Date().toISOString();
-
-            if (currentSelected !== data.sender) {
-              updated[existingIndex].unreadCount += 1;
+            // ✅ Kiểm tra xem đã có tin nhắn từ ADMIN chưa
+            const hasAdminMessage = prev[existingIndex].messages.some(m => m.from === "ADMIN");
+            if (!hasAdminMessage && !autoRepliedUsers.current.has(data.sender)) {
+              shouldSendAutoReply = true;
+              console.log("🆕 [ADMIN] First message from this user - will auto-reply");
             }
 
+            updated = [...prev];
+            updated[existingIndex] = {
+              ...updated[existingIndex],
+              messages: [...updated[existingIndex].messages, newMessage],
+              lastMessage: data.content,
+              lastMessageTime: data.timestamp || new Date().toISOString(),
+              unreadCount: currentSelected !== data.sender
+                ? updated[existingIndex].unreadCount + 1
+                : updated[existingIndex].unreadCount
+            };
+
+            // Move to top
             const [conv] = updated.splice(existingIndex, 1);
-            return [conv, ...updated];
+            updated = [conv, ...updated];
           } else {
+            // Create new conversation - definitely send auto-reply
             console.log("✨ [ADMIN] Creating new conversation");
-            console.log("   userAvatar from message:", data.userAvatar); // ✅ Debug
+            console.log("userAvatar from message:", data.userAvatar);
+
+            shouldSendAutoReply = true;
+
             const newConv: IAdminConversation = {
               userEmail: data.sender,
               userName: data.sender.split("@")[0],
-              userAvatar: data.userAvatar, // ✅ Lưu avatar từ message
+              userAvatar: data.userAvatar,
               lastMessage: data.content,
               lastMessageTime: data.timestamp || new Date().toISOString(),
               unreadCount: 1,
               messages: [newMessage],
             };
-            console.log("   Saved conversation:", newConv); // ✅ Debug full object
 
-            return [newConv, ...prev];
+            console.log("Saved conversation:", newConv);
+            updated = [newConv, ...prev];
           }
+
+          // ✅ GỬI AUTO REPLY NGAY SAU KHI UPDATE STATE
+          if (shouldSendAutoReply) {
+            setTimeout(() => {
+              sendAutoReply(data.sender);
+            }, 500);
+          }
+
+          return updated;
         });
 
+        // Notification
         if (shouldNotify) {
           notificationRef.current.info({
             message: `💬 ${data.sender.split("@")[0]}`,
@@ -191,7 +280,6 @@ const AdminChatWebSocket = () => {
   const handleSelectConversation = (userEmail: string) => {
     console.log("👆 [ADMIN] Selected:", userEmail);
     setSelectedUserEmail(userEmail);
-
     setConversations((prev) =>
       prev.map((c) => (c.userEmail === userEmail ? { ...c, unreadCount: 0 } : c))
     );
@@ -250,9 +338,7 @@ const AdminChatWebSocket = () => {
   const formatTime = (timestamp: string) => {
     try {
       const date = new Date(timestamp);
-      if (isNaN(date.getTime())) {
-        return "Vừa xong";
-      }
+      if (isNaN(date.getTime())) return "Vừa xong";
 
       const now = new Date();
       const diff = now.getTime() - date.getTime();
@@ -273,9 +359,7 @@ const AdminChatWebSocket = () => {
   const formatMessageTime = (timestamp: string) => {
     try {
       const date = new Date(timestamp);
-      if (isNaN(date.getTime())) {
-        return "Vừa xong";
-      }
+      if (isNaN(date.getTime())) return "Vừa xong";
       return date.toLocaleTimeString("vi-VN", {
         hour: "2-digit",
         minute: "2-digit",
@@ -287,16 +371,11 @@ const AdminChatWebSocket = () => {
 
   const getUserAvatarUrl = (conv: IAdminConversation) => {
     if (conv.userAvatar) {
-      // Nếu tên file đã là public_id đầy đủ (không có folder)
-      const url = `${baseImageUrl}/${conv.userAvatar}`;
-
-      console.log("🖼 Final avatar URL:", url); // ← Debug để kiểm tra
-      return url;
+      return `${baseImageUrl}/${conv.userAvatar}`;
     }
     return undefined;
   };
 
-  // ==================== FILTER ====================
   const filteredConversations = conversations.filter(
     (c) =>
       c.userName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -305,7 +384,6 @@ const AdminChatWebSocket = () => {
 
   const selectedConv = conversations.find((c) => c.userEmail === selectedUserEmail);
 
-  // ==================== RENDER ====================
   return (
     <div className="admin-chat-page">
       <div className="chat-sidebar">
@@ -319,7 +397,6 @@ const AdminChatWebSocket = () => {
             )}
           </div>
         </div>
-
         <div className="sidebar-search">
           <Input
             placeholder="Tìm kiếm..."
@@ -329,7 +406,6 @@ const AdminChatWebSocket = () => {
             allowClear
           />
         </div>
-
         <div className="conversations-list">
           {filteredConversations.length === 0 ? (
             <Empty
@@ -349,13 +425,8 @@ const AdminChatWebSocket = () => {
                     size={48}
                     icon={<UserOutlined />}
                     src={getUserAvatarUrl(conv)}
-                    onError={() => {
-                      console.error("❌ Avatar load failed for:", conv.userEmail, getUserAvatarUrl(conv));
-                      return false; // fallback to icon
-                    }}
                   />
                 </Badge>
-
                 <div className="conv-info">
                   <div className="conv-header">
                     <span className="conv-name">{conv.userName}</span>
@@ -395,7 +466,7 @@ const AdminChatWebSocket = () => {
                     />
                   )}
                   <div className="message-bubble">
-                    <p>{msg.text}</p>
+                    <p style={{ whiteSpace: 'pre-line' }}>{msg.text}</p>
                     <span className="message-time">
                       {formatMessageTime(msg.timestamp)}
                     </span>

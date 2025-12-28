@@ -1,12 +1,16 @@
 import SockJS from "sockjs-client";
-import { Client } from "@stomp/stompjs";
-import type { IMessage } from "@stomp/stompjs";
+import { Client, type IMessage, type StompSubscription } from "@stomp/stompjs";
 
 class WebSocketService {
   private stompClient: Client | null = null;
-  private connected: boolean = false;
-  private currentUserEmail: string = "";
-  private isAdmin: boolean = false;
+
+  private connected = false;
+  private currentUserEmail = "";
+  private isAdmin = false;
+
+  // ✅ LƯU SUBSCRIPTION (QUAN TRỌNG)
+  private userSubscription?: StompSubscription;
+  private adminSubscription?: StompSubscription;
 
   connect(
     userEmail: string,
@@ -14,163 +18,175 @@ class WebSocketService {
     onError?: (error: any) => void,
     isAdminRole: boolean = false
   ): void {
-    // ✅ Tránh connect lại nếu đã connected với cùng user
+    // ✅ Nếu đã connect đúng user thì không làm gì
     if (this.connected && this.currentUserEmail === userEmail) {
       console.log("⚠️ Already connected as", userEmail);
-      if (onConnected) onConnected();
+      onConnected?.();
       return;
     }
 
     this.currentUserEmail = userEmail;
     this.isAdmin = isAdminRole;
 
-    const baseBackendUrl = import.meta.env.VITE_BACKEND_URL || "https://bookshop-backend-k6vv.onrender.com";
+    const baseBackendUrl =
+      import.meta.env.VITE_BACKEND_URL ||
+      "https://bookshop-backend-k6vv.onrender.com";
+
     const socket = new SockJS(`${baseBackendUrl}/chat-websocket`);
 
-    // ✅ Lấy JWT token từ localStorage
     const accessToken = localStorage.getItem("access_token");
 
     this.stompClient = new Client({
       webSocketFactory: () => socket as any,
-      debug: (str: string) => {
-        console.log("🔌 STOMP:", str);
-      },
       reconnectDelay: 5000,
       heartbeatIncoming: 4000,
       heartbeatOutgoing: 4000,
+
+      debug: (str) => console.log("🔌 STOMP:", str),
+
       connectHeaders: {
         "user-email": userEmail,
-        // ✅ Gửi JWT token để backend validate
         ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
       },
+
       onConnect: () => {
-        this.connected = true;
         console.log(
-          "✅ WebSocket Connected!",
+          "✅ WebSocket Connected",
           userEmail,
           isAdminRole ? "(ADMIN)" : "(USER)"
         );
 
-        // ✅ Luôn subscribe queue cá nhân
+        this.connected = true;
+
+        // ✅ SUBSCRIBE USER (1 LẦN DUY NHẤT)
         this.subscribeToUserMessages(userEmail);
 
-        // ✅ CHỈ subscribe topic admin.messages nếu isAdminRole = true
+        // ✅ ADMIN CHỈ SUBSCRIBE 1 LẦN
         if (isAdminRole) {
           this.subscribeToAdminMessages();
         }
 
-        if (onConnected) onConnected();
+        onConnected?.();
       },
-      onStompError: (frame: any) => {
+
+      onStompError: (frame) => {
         console.error("❌ STOMP error:", frame.headers["message"]);
-        console.error("Details:", frame.body);
         this.connected = false;
-        if (onError) onError(frame);
+        onError?.(frame);
       },
+
       onWebSocketClose: () => {
+        console.log("🔌 WebSocket closed");
         this.connected = false;
-        console.log("🔌 WebSocket connection closed");
       },
     });
 
     this.stompClient.activate();
   }
 
+  // ================= USER =================
   private subscribeToUserMessages(userEmail: string): void {
-    if (this.stompClient && this.connected) {
-      // ✅ Subscribe vào topic riêng của user (thay vì queue)
-      const userTopic = `/topic/user.${userEmail
-        .replace(/@/g, ".")
-        .replace(/\./g, "_")}`;
+    if (!this.stompClient || !this.connected) return;
 
-      this.stompClient.subscribe(userTopic, (message: IMessage) => {
-        console.log("📩 User topic received for", userEmail, ":", message.body);
+    // ✅ CHỐNG SUBSCRIBE TRÙNG
+    if (this.userSubscription) {
+      console.log("⚠️ User topic already subscribed");
+      return;
+    }
+
+    const userTopic = `/topic/user.${userEmail
+      .replace(/@/g, ".")
+      .replace(/\./g, "_")}`;
+
+    this.userSubscription = this.stompClient.subscribe(
+      userTopic,
+      (message: IMessage) => {
         const data: IWebSocket = JSON.parse(message.body);
+        data.timestamp ||= new Date().toISOString();
 
-        // ✅ Đảm bảo có timestamp
-        if (!data.timestamp) {
-          data.timestamp = new Date().toISOString();
-        }
+        window.dispatchEvent(
+          new CustomEvent("chatMessageReceived", { detail: data })
+        );
+      }
+    );
 
-        const event = new CustomEvent("chatMessageReceived", {
-          detail: data,
-        });
-        window.dispatchEvent(event);
-      });
-      console.log(`📬 Subscribed to ${userTopic}`);
-    }
+    console.log("📬 Subscribed:", userTopic);
   }
 
+  // ================= ADMIN =================
   private subscribeToAdminMessages(): void {
-    if (this.stompClient && this.connected) {
-      this.stompClient.subscribe(
-        "/topic/admin.messages",
-        (message: IMessage) => {
-          console.log("📩 Topic admin received:", message.body);
-          const data: IWebSocket = JSON.parse(message.body);
+    if (!this.stompClient || !this.connected) return;
 
-          // ✅ Đảm bảo có timestamp
-          if (!data.timestamp) {
-            data.timestamp = new Date().toISOString();
-          }
-
-          // Dispatch realtime
-          const event = new CustomEvent("chatMessageReceived", {
-            detail: data,
-          });
-          window.dispatchEvent(event);
-        }
-      );
-      console.log("📬 Subscribed to /topic/admin.messages (ADMIN mode)");
+    // ✅ CHỐNG SUBSCRIBE TRÙNG (CỐT LÕI FIX BUG)
+    if (this.adminSubscription) {
+      console.log("⚠️ Admin topic already subscribed");
+      return;
     }
+
+    this.adminSubscription = this.stompClient.subscribe(
+      "/topic/admin.messages",
+      (message: IMessage) => {
+        const data: IWebSocket = JSON.parse(message.body);
+        data.timestamp ||= new Date().toISOString();
+
+        window.dispatchEvent(
+          new CustomEvent("chatMessageReceived", { detail: data })
+        );
+      }
+    );
+
+    console.log("📬 Subscribed: /topic/admin.messages");
   }
 
+  // ================= SEND =================
   sendToAdmin(message: IWebSocket): void {
-    if (this.stompClient && this.connected) {
-      // ✅ Đảm bảo có timestamp và from
-      const finalMessage = {
+    if (!this.stompClient || !this.connected) {
+      console.error("❌ Not connected");
+      return;
+    }
+
+    this.stompClient.publish({
+      destination: "/app/chat.toAdmin",
+      body: JSON.stringify({
         ...message,
         timestamp: message.timestamp || new Date().toISOString(),
-        from: "USER" as const,
-      };
-
-      this.stompClient.publish({
-        destination: "/app/chat.toAdmin",
-        body: JSON.stringify(finalMessage),
-      });
-      console.log("📤 Sent to admin:", finalMessage);
-    } else {
-      console.error("❌ Not connected");
-    }
+        from: "USER",
+      }),
+    });
   }
 
   sendToUser(message: IWebSocket): void {
-    if (this.stompClient && this.connected) {
-      // ✅ Đảm bảo có timestamp và from
-      const finalMessage = {
+    if (!this.stompClient || !this.connected) {
+      console.error("❌ Not connected");
+      return;
+    }
+
+    this.stompClient.publish({
+      destination: "/app/chat.toUser",
+      body: JSON.stringify({
         ...message,
         timestamp: message.timestamp || new Date().toISOString(),
-        from: "ADMIN" as const,
-      };
-
-      this.stompClient.publish({
-        destination: "/app/chat.toUser",
-        body: JSON.stringify(finalMessage),
-      });
-      console.log("📤 Sent to user:", finalMessage);
-    } else {
-      console.error("❌ Not connected");
-    }
+        from: "ADMIN",
+      }),
+    });
   }
 
+  // ================= DISCONNECT =================
   disconnect(): void {
-    if (this.stompClient) {
-      this.stompClient.deactivate();
-      this.connected = false;
-      this.currentUserEmail = "";
-      this.isAdmin = false;
-      console.log("🔌 Disconnected");
-    }
+    console.log("🔌 Disconnecting WebSocket");
+
+    // ✅ UNSUBSCRIBE TRIỆT ĐỂ
+    this.userSubscription?.unsubscribe();
+    this.adminSubscription?.unsubscribe();
+
+    this.userSubscription = undefined;
+    this.adminSubscription = undefined;
+
+    this.stompClient?.deactivate();
+
+    this.connected = false;
+    this.currentUserEmail = "";
+    this.isAdmin = false;
   }
 
   isConnected(): boolean {
