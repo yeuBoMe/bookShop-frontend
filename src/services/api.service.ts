@@ -55,7 +55,7 @@ export const updateUserAvatarToCloudAPI = (id: number, file: File) => {
   formData.append("fileName", file);
 
   return axios.patch<IBackendRes<IUser>>(
-    `/api/v1/users/${id}/cloud-avatar`,
+    `/api/v1/users/${id}/avatar/cloud`,
     formData,
     {
       headers: { "Content-Type": "multipart/form-data" },
@@ -70,7 +70,7 @@ export const deleteUserAvatarAPI = (id: number, fileName: string) => {
 };
 
 export const deleteUserAvatarInCloudAPI = (id: number, fileName: string) => {
-  return axios.delete<IBackendRes<IUser>>(`/api/v1/users/${id}/cloud-avatar`, {
+  return axios.delete<IBackendRes<IUser>>(`/api/v1/users/${id}/avatar/cloud`, {
     params: { fileName },
   });
 };
@@ -191,7 +191,7 @@ export const updateBookSingleImageToCloudAPI = (id: number, file: File) => {
   formData.append("file", file);
 
   return axios.patch<IBackendRes<IBook>>(
-    `/api/v1/books/${id}/cloud-image`,
+    `/api/v1/books/${id}/image/cloud`,
     formData,
     config
   );
@@ -218,7 +218,7 @@ export const updateBookMultipleImagesToCloudAPI = (
   files.forEach((file) => formData.append("files", file));
 
   return axios.patch<IBackendRes<IBook>>(
-    `/api/v1/books/${id}/cloud-multiple-images`,
+    `/api/v1/books/${id}/multiple-images/cloud`,
     formData,
     {
       headers: { "Content-Type": "multipart/form-data" },
@@ -236,7 +236,7 @@ export const deleteBookSingleImageInCloudAPI = (
   id: number,
   imageName: string
 ) => {
-  return axios.delete<IBackendRes<IBook>>(`/api/v1/books/${id}/cloud-image`, {
+  return axios.delete<IBackendRes<IBook>>(`/api/v1/books/${id}/image/cloud`, {
     params: { imageName },
   });
 };
@@ -258,7 +258,7 @@ export const deleteBookMultipleImagesInCloudAPI = (
   imageNames: string[]
 ) => {
   return axios.delete<IBackendRes<IBook>>(
-    `/api/v1/books/${id}/cloud-multiple-images`,
+    `/api/v1/books/${id}/multiple-images/cloud`,
     {
       data: imageNames,
     }

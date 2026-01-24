@@ -153,7 +153,7 @@ const DetailOrderDrawer = (props: DrawerOrderProps) => {
 
     // Product list
     const productsItems: DescriptionsProps['items'] = dataDetail.detail.map((item, index) => ({
-        key: `product-${index}`,
+        key: `product-${item.id}`,
         label: `Product ${index + 1}`,
         children: (
             <div>

@@ -129,8 +129,8 @@ const OrderHistoryTable = (props: OrderHistoryTableProps) => {
             key: 'detail',
             render: (detail: IOrderDetail[]) => (
                 <div>
-                    {detail.map((item, index) => (
-                        <div key={index} style={{ marginBottom: 4 }}>
+                    {detail.map((item) => (
+                        <div key={item.id} style={{ marginBottom: 4 }}>
                             {item.bookName} <span style={{ color: '#999' }}>x{item.quantity}</span>
                         </div>
                     ))}
