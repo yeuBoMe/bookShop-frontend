@@ -429,7 +429,7 @@ export const deleteRatingAPI = (id: number) => {
 
 // Module dashboard
 export const getDashBoardInfoAPI = () => {
-  return axios.get<IBackendRes<IDashBoard>>("/api/v1/dashboards");
+  return axios.get<IBackendRes<IDashBoard>>("/api/v1/dashboard");
 };
 
 // Module auth
