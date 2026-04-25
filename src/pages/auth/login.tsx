@@ -51,14 +51,6 @@ const LoginPage = () => {
       }
     } catch (error: any) {
       console.log("Check data error >>> ", error);
-      // notification.error({
-      //   message: "Error",
-      //   description: error?.message && Array.isArray(error.message)
-      //     ? error.message[0]
-      //     : error.message,
-      //   duration: 5,
-      //   placement: 'topRight'
-      // });
       notification.error({
         message: "Error",
         description: "Tài khoản đăng nhập không chính xác",
@@ -77,86 +69,106 @@ const LoginPage = () => {
   };
 
   return (
-    <Row justify={"center"} className="login-page">
-      <Col xs={22} sm={20} md={16} lg={10} xl={8}>
-        <fieldset className="login-fieldset">
-          <legend className="login-legend">
-            Đăng nhập
-          </legend>
+    <div className="login-page-wrapper">
+      <main className="login-main">
+        <Row justify={"center"} className="login-page">
+          <Col xs={22} sm={20} md={16} lg={10} xl={8}>
+            <div className="login-card">
 
-          <Form
-            name="basic"
-            layout="vertical"
-            form={form}
-            onFinish={handleLoginRequest}
-            autoComplete="off"
-          >
-            <Form.Item<LoginValues>
-              label="Email:"
-              name="username"
-              rules={[
-                { required: true, message: 'Email is required' },
-                { max: 150, message: 'Email must not exceed 150 characters' },
-                {
-                  pattern: /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z]{2,6}$/,
-                  message: "Email format is invalid"
-                }
-              ]}
-            >
-              <Input size="large" placeholder="example@email.com" />
-            </Form.Item>
-
-            <Form.Item<LoginValues>
-              label="Mật khẩu:"
-              name="password"
-              rules={[
-                { required: true, message: 'Password is required' },
-                { min: 6, message: 'Password must be at least 6 characters' }
-              ]}
-            >
-              <Input.Password size="large" placeholder="••••••••" />
-            </Form.Item>
-
-            <Form.Item className="login-button">
-              <div className="login-buttons-wrapper">
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  loading={isLoading}
-                  size="large"
-                  className="login-submit-button"
-                >
-                  Đăng nhập
-                </Button>
-                <Button
-                  loading={isGoogleLoading}
-                  onClick={handleGoogleLogin}
-                  size="large"
-                  className="google-login-button"
-                  icon={
-                    <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
-                      <g fill="none" fillRule="evenodd">
-                        <path d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4" />
-                        <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" fill="#34A853" />
-                        <path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05" />
-                        <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335" />
-                      </g>
-                    </svg>
-                  }
-                />
+              <div className="login-logo">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="white">
+                  <path d="M20 3H4a1 1 0 0 0-1 1v13a1 1 0 0 0 1 1h3l-1 2h2l1-2h6l1 2h2l-1-2h3a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1zm-1 13H5V5h14z" />
+                </svg>
               </div>
-            </Form.Item>
-          </Form>
 
-          <Divider>Hoặc</Divider>
+              <h1 className="login-title">Chào mừng đến với Bookshop</h1>
+              <p className="login-subtitle">Đăng nhập để truy cập tài khoản của bạn</p>
 
-          <div className="login-register-link">
-            Chưa có tài khoản?
-            <Link to={"/register"}> Đăng ký</Link>
-          </div>
-        </fieldset>
-      </Col>
-    </Row>
+              <Form
+                name="basic"
+                layout="vertical"
+                form={form}
+                onFinish={handleLoginRequest}
+                autoComplete="off"
+              >
+                <Form.Item<LoginValues>
+                  label="Email:"
+                  name="username"
+                  rules={[
+                    { required: true, message: 'Email is required' },
+                    { max: 150, message: 'Email must not exceed 150 characters' },
+                    {
+                      pattern: /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z]{2,6}$/,
+                      message: "Email format is invalid"
+                    }
+                  ]}
+                >
+                  <Input size="large" placeholder="example@email.com" />
+                </Form.Item>
+
+                <Form.Item<LoginValues>
+                  label="Mật khẩu:"
+                  name="password"
+                  rules={[
+                    { required: true, message: 'Password is required' },
+                    { min: 6, message: 'Password must be at least 6 characters' }
+                  ]}
+                >
+                  <Input.Password size="large" placeholder="••••••••" />
+                </Form.Item>
+
+                <Form.Item className="login-button">
+                  <div className="login-buttons-wrapper">
+                    <Button
+                      type="primary"
+                      htmlType="submit"
+                      loading={isLoading}
+                      size="large"
+                      className="login-submit-button"
+                    >
+                      Đăng nhập
+                    </Button>
+                    <Button
+                      loading={isGoogleLoading}
+                      onClick={handleGoogleLogin}
+                      size="large"
+                      className="google-login-button"
+                      icon={
+                        <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+                          <g fill="none" fillRule="evenodd">
+                            <path d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4" />
+                            <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" fill="#34A853" />
+                            <path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05" />
+                            <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335" />
+                          </g>
+                        </svg>
+                      }
+                    />
+                  </div>
+                </Form.Item>
+              </Form>
+
+              <Divider>Hoặc</Divider>
+
+              <div className="login-register-link">
+                Chưa có tài khoản?
+                <Link to={"/register"}> Đăng ký</Link>
+              </div>
+
+            </div>
+          </Col>
+        </Row>
+      </main>
+
+      <footer className="login-footer">
+        <span className="footer-copy">© Hoài Ninh 2025</span>
+        <nav className="footer-links">
+          <a href="#">Chính sách bảo mật</a>
+          <a href="#">Điều khoản</a>
+          <a href="#">Liên hệ</a>
+        </nav>
+      </footer>
+    </div>
   );
 };
 
