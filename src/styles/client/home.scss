@@ -1,928 +1,914 @@
-// ===================================
-// HOMEPAGE STYLES
-// ===================================
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
 
-// Variables
-$primary-color: #2563eb;
-$secondary-color: #3b82f6;
-$accent-color: #f59e0b;
-$success-color: #10b981;
-$danger-color: #ef4444;
-$text-dark: #1f2937;
-$text-muted: #6b7280;
-$border-color: #e5e7eb;
-$bg-light: #f9fafb;
+// ─── Tokens ────────────────────────────────────────────────────────────────
+$font: "Plus Jakarta Sans", sans-serif;
+$max-w: 1280px;
+$blue: #2563eb;
+$blue-light: #eff6ff;
+$blue-mid: #dbeafe;
+$indigo: #4f46e5;
+$red: #ef4444;
+$red-light: #fff1f2;
+$amber: #f59e0b;
+$amber-light: #fffbeb;
+$green: #10b981;
+$green-light: #ecfdf5;
+$text: #111827;
+$text-2: #374151;
+$text-3: #6b7280;
+$text-4: #9ca3af;
+$bg: #f8fafc;
+$bg-2: #f1f5f9;
+$white: #ffffff;
+$border: #e5e7eb;
+$border-2: #f3f4f6;
+$radius: 16px;
+$radius-sm: 10px;
+$radius-lg: 24px;
 
-// Breakpoints
-$breakpoint-xl: 1280px;
-$breakpoint-lg: 1024px;
-$breakpoint-md: 768px;
-$breakpoint-sm: 576px;
-
-// Mixins
-@mixin flex-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+@mixin container {
+  max-width: $max-w;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: clamp(1rem, 4vw, 2rem);
+  padding-right: clamp(1rem, 4vw, 2rem);
 }
 
-@mixin transition($property: all) {
-  transition: $property 0.3s ease;
+@mixin ease($t: 0.28s) {
+  transition: all $t cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-// ===================================
-// LOADING
-// ===================================
-.homepage-loading {
-  @include flex-center;
-  min-height: 60vh;
-}
-
-// ===================================
-// HOMEPAGE CONTAINER
-// ===================================
-.homepage {
-  background-color: $bg-light;
-  padding-bottom: 3rem;
-
-  @media (max-width: $breakpoint-md) {
-    padding-bottom: 2rem;
+// ─── Keyframes ─────────────────────────────────────────────────────────────
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
   }
-}
-
-// ===================================
-// SECTION HEADER
-// ===================================
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-
-  @media (max-width: $breakpoint-sm) {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-.section-title {
-  font-size: 2rem;
-  font-weight: 700;
-  color: $text-dark;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin: 0;
-
-  .anticon {
-    color: $accent-color;
-    font-size: 2rem;
+@keyframes fadeIn {
+  from {
+    opacity: 0;
   }
-
-  @media (max-width: $breakpoint-md) {
-    font-size: 1.75rem;
-
-    .anticon {
-      font-size: 1.75rem;
-    }
-  }
-
-  @media (max-width: $breakpoint-sm) {
-    font-size: 1.5rem;
-
-    .anticon {
-      font-size: 1.5rem;
-    }
-  }
-}
-
-.section-link {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: $primary-color;
-  font-weight: 500;
-  font-size: 1rem;
-  background: none;
-  border: none;
-  cursor: pointer;
-  @include transition;
-
-  &:hover {
-    color: $secondary-color;
-    transform: translateX(4px);
-  }
-
-  @media (max-width: $breakpoint-sm) {
-    font-size: 0.875rem;
-  }
-}
-
-// ===================================
-// HERO BANNER
-// ===================================
-.hero {
-  margin-bottom: 3rem;
-  overflow: hidden;
-
-  @media (max-width: $breakpoint-md) {
-    margin-bottom: 2rem;
-  }
-
-  .ant-carousel {
-    .slick-dots {
-      bottom: 2rem;
-
-      li button {
-        background: rgba(255, 255, 255, 0.5);
-        height: 4px;
-        border-radius: 2px;
-      }
-
-      li.slick-active button {
-        background: white;
-        width: 32px;
-      }
-    }
-  }
-
-  &__slide {
-    position: relative;
-    height: 600px;
-    display: flex !important;
-    align-items: center;
-    padding: 0 5rem;
-    overflow: hidden;
-
-    @media (max-width: $breakpoint-lg) {
-      height: 500px;
-      padding: 0 3rem;
-    }
-
-    @media (max-width: $breakpoint-md) {
-      height: 400px;
-      padding: 0 2rem;
-      flex-direction: column;
-      justify-content: center;
-      text-align: center;
-    }
-
-    @media (max-width: $breakpoint-sm) {
-      height: 350px;
-      padding: 0 1.5rem;
-    }
-
-    &--1 {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    }
-
-    &--2 {
-      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    }
-
-    &--3 {
-      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-    }
-  }
-
-  &__content {
-    flex: 1;
-    z-index: 2;
-    max-width: 600px;
-
-    @media (max-width: $breakpoint-md) {
-      max-width: 100%;
-    }
-  }
-
-  &__subtitle {
-    display: inline-block;
-    background: rgba(255, 255, 255, 0.2);
-    color: white;
-    padding: 0.5rem 1.25rem;
-    border-radius: 2rem;
-    font-size: 0.875rem;
-    font-weight: 600;
-    margin-bottom: 1.5rem;
-    backdrop-filter: blur(10px);
-
-    @media (max-width: $breakpoint-sm) {
-      font-size: 0.75rem;
-      padding: 0.375rem 1rem;
-      margin-bottom: 1rem;
-    }
-  }
-
-  &__title {
-    font-size: 4rem;
-    font-weight: 800;
-    color: white;
-    line-height: 1.1;
-    margin: 0 0 1.5rem 0;
-
-    .highlight {
-      color: $accent-color;
-      display: block;
-    }
-
-    @media (max-width: $breakpoint-lg) {
-      font-size: 3rem;
-    }
-
-    @media (max-width: $breakpoint-md) {
-      font-size: 2.5rem;
-      margin-bottom: 1rem;
-    }
-
-    @media (max-width: $breakpoint-sm) {
-      font-size: 2rem;
-    }
-  }
-
-  &__description {
-    font-size: 1.125rem;
-    color: rgba(255, 255, 255, 0.9);
-    line-height: 1.6;
-    margin-bottom: 2rem;
-
-    @media (max-width: $breakpoint-md) {
-      font-size: 1rem;
-      margin-bottom: 1.5rem;
-    }
-
-    @media (max-width: $breakpoint-sm) {
-      font-size: 0.875rem;
-    }
-  }
-
-  &__btn {
-    background: white;
-    color: $text-dark;
-    border: none;
-    padding: 1rem 2.5rem;
-    font-size: 1.125rem;
-    font-weight: 600;
-    border-radius: 3rem;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.75rem;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    @include transition;
-
-    &:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
-    }
-
-    &:active {
-      transform: translateY(0);
-    }
-
-    @media (max-width: $breakpoint-sm) {
-      padding: 0.875rem 2rem;
-      font-size: 1rem;
-    }
-  }
-
-  &__image {
-    flex: 1;
-    display: flex;
-    justify-content: flex-end;
-    z-index: 1;
-
-    img {
-      max-width: 100%;
-      max-height: 500px;
-      object-fit: contain;
-      filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.3));
-      animation: float 6s ease-in-out infinite;
-    }
-
-    @media (max-width: $breakpoint-md) {
-      display: none;
-    }
+  to {
+    opacity: 1;
   }
 }
 
 @keyframes float {
   0%,
   100% {
-    transform: translateY(0);
+    transform: translateY(0px);
   }
   50% {
-    transform: translateY(-20px);
+    transform: translateY(-12px);
   }
 }
 
-// ===================================
-// FEATURES
-// ===================================
-.features {
-  background: white;
-  padding: 3rem 0;
-  margin-bottom: 3rem;
-
-  @media (max-width: $breakpoint-md) {
-    padding: 2rem 0;
-    margin-bottom: 2rem;
+@keyframes shimmer {
+  0% {
+    background-position: -200% center;
   }
-
-  &__container {
-    max-width: 1280px;
-    margin: 0 auto;
-    padding: 0 2rem;
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 2rem;
-
-    @media (max-width: $breakpoint-lg) {
-      grid-template-columns: repeat(2, 1fr);
-    }
-
-    @media (max-width: $breakpoint-sm) {
-      grid-template-columns: 1fr;
-      gap: 1.5rem;
-      padding: 0 1rem;
-    }
-  }
-
-  &__item {
-    display: flex;
-    align-items: center;
-    gap: 1.25rem;
-    padding: 1.5rem;
-    border-radius: 1rem;
-    @include transition;
-
-    &:hover {
-      background: $bg-light;
-      transform: translateY(-4px);
-    }
-
-    @media (max-width: $breakpoint-sm) {
-      padding: 1rem;
-    }
-  }
-
-  &__icon {
-    width: 60px;
-    height: 60px;
-    @include flex-center;
-    border-radius: 50%;
-    font-size: 1.75rem;
-    flex-shrink: 0;
-
-    &--delivery {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-    }
-
-    &--secure {
-      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-      color: white;
-    }
-
-    &--return {
-      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-      color: white;
-    }
-
-    &--support {
-      background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-      color: white;
-    }
-
-    @media (max-width: $breakpoint-sm) {
-      width: 50px;
-      height: 50px;
-      font-size: 1.5rem;
-    }
-  }
-
-  &__content {
-    h3 {
-      font-size: 1.125rem;
-      font-weight: 600;
-      color: $text-dark;
-      margin: 0 0 0.25rem 0;
-
-      @media (max-width: $breakpoint-sm) {
-        font-size: 1rem;
-      }
-    }
-
-    p {
-      font-size: 0.875rem;
-      color: $text-muted;
-      margin: 0;
-
-      @media (max-width: $breakpoint-sm) {
-        font-size: 0.8125rem;
-      }
-    }
+  100% {
+    background-position: 200% center;
   }
 }
 
-// ===================================
-// CATEGORIES
-// ===================================
-.categories {
-  max-width: 1280px;
-  margin: 0 auto 3rem;
-  padding: 0 2rem;
-
-  @media (max-width: $breakpoint-md) {
-    margin-bottom: 2rem;
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.25);
   }
-
-  @media (max-width: $breakpoint-sm) {
-    padding: 0 1rem;
+  70% {
+    box-shadow: 0 0 0 10px rgba(37, 99, 235, 0);
   }
-
-  &__grid {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: 1.5rem;
-
-    @media (max-width: $breakpoint-lg) {
-      grid-template-columns: repeat(4, 1fr);
-    }
-
-    @media (max-width: $breakpoint-md) {
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1rem;
-    }
-
-    @media (max-width: $breakpoint-sm) {
-      grid-template-columns: repeat(2, 1fr);
-    }
+  100% {
+    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0);
   }
 }
 
-.category-card {
-  background: white;
-  padding: 2rem 1rem;
-  border-radius: 1rem;
-  text-align: center;
+// ─── Base ──────────────────────────────────────────────────────────────────
+.homepage,
+.homepage * {
+  box-sizing: border-box;
+  font-family: $font;
+}
+
+.homepage {
+  background: $bg;
+  color: $text;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.homepage-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 70vh;
+  background: $white;
+}
+
+// ─── Section Shared ────────────────────────────────────────────────────────
+.section-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 1.75rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+  animation: fadeUp 0.5s ease both;
+}
+
+.section-title {
+  font-size: clamp(1.375rem, 2.5vw, 1.75rem);
+  font-weight: 800;
+  color: $text;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  letter-spacing: -0.025em;
+
+  .anticon {
+    color: $amber;
+    font-size: 1.25rem;
+  }
+}
+
+.section-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: $blue;
+  background: $blue-light;
+  border: none;
+  border-radius: 2rem;
+  padding: 0.45rem 1.1rem;
   cursor: pointer;
-  border: 2px solid transparent;
-  @include transition;
+  @include ease;
+  white-space: nowrap;
 
   &:hover {
-    border-color: $primary-color;
-    transform: translateY(-4px);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-
-    .category-card__icon {
-      background: $primary-color;
-      color: white;
-    }
-  }
-
-  &__icon {
-    width: 80px;
-    height: 80px;
-    @include flex-center;
-    background: $bg-light;
-    border-radius: 50%;
-    margin: 0 auto 1rem;
-    font-size: 2rem;
-    color: $primary-color;
-    @include transition;
-
-    @media (max-width: $breakpoint-sm) {
-      width: 60px;
-      height: 60px;
-      font-size: 1.5rem;
-    }
-  }
-
-  &__name {
-    font-size: 1rem;
-    font-weight: 600;
-    color: $text-dark;
-    margin: 0 0 0.5rem 0;
-
-    @media (max-width: $breakpoint-sm) {
-      font-size: 0.875rem;
-    }
+    background: $blue-mid;
+    color: darken($blue, 10%);
+    transform: translateX(2px);
   }
 }
 
-// ===================================
-// FLASH SALE
-// ===================================
-.flash-sale {
-  max-width: 1280px;
-  margin: 0 auto 3rem;
-  padding: 2rem;
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-  border-radius: 1rem;
-
-  @media (max-width: $breakpoint-md) {
-    margin-bottom: 2rem;
-  }
-
-  @media (max-width: $breakpoint-sm) {
-    padding: 1.5rem 1rem;
-  }
-
-  .section-title {
-    color: white;
-
-    .anticon {
-      color: $accent-color;
-    }
-  }
-}
-
-// ===================================
-// FEATURED PRODUCTS & NEW ARRIVALS
-// ===================================
-.featured-products,
-.new-arrivals {
-  max-width: 1280px;
-  margin: 0 auto 3rem;
-  padding: 0 2rem;
-
-  @media (max-width: $breakpoint-md) {
-    margin-bottom: 2rem;
-  }
-
-  @media (max-width: $breakpoint-sm) {
-    padding: 0 1rem;
-  }
-}
-
-// ===================================
-// PRODUCTS GRID
-// ===================================
-.products-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1.5rem;
-
-  @media (max-width: $breakpoint-lg) {
-    grid-template-columns: repeat(3, 1fr);
-  }
-
-  @media (max-width: $breakpoint-md) {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
-  }
-
-  @media (max-width: $breakpoint-sm) {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.75rem;
-  }
-}
-
-// ===================================
-// PRODUCT CARD
-// ===================================
-.product-card {
-  background: white;
-  border-radius: 1rem;
+// ─── Hero ──────────────────────────────────────────────────────────────────
+.hero {
+  margin-bottom: 0;
   overflow: hidden;
-  cursor: pointer;
-  border: 1px solid $border-color;
-  @include transition;
 
-  &:hover {
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-    transform: translateY(-8px);
+  :global {
+    .ant-carousel .slick-dots {
+      bottom: 1.25rem;
 
-    .product-card__image img {
-      transform: scale(1.1);
-    }
+      li button {
+        height: 4px;
+        border-radius: 2px;
+        background: rgba(255, 255, 255, 0.45);
+        width: 20px;
+        transition: all 0.3s;
+      }
 
-    .product-card__btn {
-      background: $primary-color;
-      color: white;
+      li.slick-active button {
+        background: $white;
+        width: 36px;
+      }
     }
   }
 
-  &__image {
+  &__slide {
+    height: 580px;
+    display: flex !important;
+    align-items: center;
+    padding: 0 max(1.5rem, calc((100vw - #{$max-w}) / 2 + 2rem));
     position: relative;
-    width: 100%;
-    padding-top: 133.33%; // 3:4 ratio
-    background: $bg-light;
     overflow: hidden;
 
-    img {
+    &--1 {
+      background: linear-gradient(
+        135deg,
+        #1e3a8a 0%,
+        #1d4ed8 55%,
+        #3b82f6 100%
+      );
+    }
+    &--2 {
+      background: linear-gradient(
+        135deg,
+        #312e81 0%,
+        #4338ca 55%,
+        #6366f1 100%
+      );
+    }
+    &--3 {
+      background: linear-gradient(
+        135deg,
+        #164e63 0%,
+        #0369a1 55%,
+        #0ea5e9 100%
+      );
+    }
+
+    // decorative circle
+    &::before {
+      content: "";
       position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      @include transition(transform);
+      right: -80px;
+      top: -80px;
+      width: 500px;
+      height: 500px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.05);
+      pointer-events: none;
+    }
+
+    &::after {
+      content: "";
+      position: absolute;
+      right: 120px;
+      bottom: -120px;
+      width: 320px;
+      height: 320px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.04);
+      pointer-events: none;
+    }
+
+    @media (max-width: 768px) {
+      height: 460px;
+      padding: 2rem 1.25rem 3rem;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: flex-end;
+    }
+
+    @media (max-width: 480px) {
+      height: 400px;
     }
   }
 
-  &__badge {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    background: $danger-color;
-    color: white;
-    padding: 0.375rem 0.875rem;
-    border-radius: 2rem;
-    font-size: 0.75rem;
-    font-weight: 600;
+  &__content {
+    position: relative;
     z-index: 2;
+    max-width: 540px;
+    animation: fadeUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
 
-    @media (max-width: $breakpoint-sm) {
-      top: 0.5rem;
-      right: 0.5rem;
-      padding: 0.25rem 0.625rem;
-      font-size: 0.625rem;
+    @media (max-width: 768px) {
+      max-width: 100%;
     }
   }
 
-  &__content {
-    padding: 1.25rem;
-
-    @media (max-width: $breakpoint-sm) {
-      padding: 1rem;
-    }
+  &__subtitle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: rgba(255, 255, 255, 0.18);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    color: $white;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    padding: 0.35rem 1rem;
+    border-radius: 2rem;
+    margin-bottom: 1.25rem;
   }
 
   &__title {
-    font-size: 1rem;
-    font-weight: 600;
-    color: $text-dark;
-    margin: 0 0 0.75rem 0;
-    line-height: 1.4;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    height: 2.8em;
-
-    @media (max-width: $breakpoint-sm) {
-      font-size: 0.875rem;
-      margin-bottom: 0.5rem;
-    }
-  }
-
-  &__rating {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 0.75rem;
-
-    .stars {
-      font-size: 0.875rem;
-
-      .ant-rate-star {
-        margin-right: 2px;
-      }
-    }
-
-    .count {
-      font-size: 0.875rem;
-      color: $text-muted;
-
-      @media (max-width: $breakpoint-sm) {
-        font-size: 0.75rem;
-      }
-    }
-
-    @media (max-width: $breakpoint-sm) {
-      margin-bottom: 0.5rem;
-    }
-  }
-
-  &__price {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    margin-bottom: 1rem;
-
-    .current {
-      font-size: 1.375rem;
-      font-weight: 700;
-      color: $danger-color;
-
-      @media (max-width: $breakpoint-sm) {
-        font-size: 1.125rem;
-      }
-    }
-
-    .original {
-      font-size: 1rem;
-      color: $text-muted;
-      text-decoration: line-through;
-
-      @media (max-width: $breakpoint-sm) {
-        font-size: 0.875rem;
-      }
-    }
-
-    @media (max-width: $breakpoint-sm) {
-      margin-bottom: 0.75rem;
-      gap: 0.5rem;
-    }
-  }
-
-  &__btn {
-    width: 100%;
-    padding: 0.875rem;
-    background: $bg-light;
-    border: none;
-    border-radius: 0.5rem;
-    font-size: 0.9375rem;
-    font-weight: 600;
-    color: $text-dark;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    @include transition;
-
-    &:hover {
-      background: $primary-color;
-      color: white;
-    }
-
-    @media (max-width: $breakpoint-sm) {
-      padding: 0.75rem;
-      font-size: 0.875rem;
-    }
-  }
-}
-
-// ===================================
-// NEWSLETTER
-// ===================================
-.newsletter {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 5rem 2rem;
-  margin-top: 3rem;
-  text-align: center;
-
-  @media (max-width: $breakpoint-md) {
-    padding: 4rem 2rem;
-    margin-top: 2rem;
-  }
-
-  @media (max-width: $breakpoint-sm) {
-    padding: 3rem 1rem;
-  }
-
-  &__content {
-    max-width: 700px;
-    margin: 0 auto;
-  }
-
-  &__title {
-    font-size: 2.5rem;
+    font-size: clamp(2rem, 5vw, 3.5rem);
     font-weight: 800;
-    color: white;
-    margin: 0 0 1rem 0;
+    color: $white;
+    line-height: 1.1;
+    margin: 0 0 1.125rem;
+    letter-spacing: -0.03em;
 
-    @media (max-width: $breakpoint-md) {
-      font-size: 2rem;
-    }
-
-    @media (max-width: $breakpoint-sm) {
-      font-size: 1.75rem;
+    .highlight {
+      display: block;
+      color: $amber;
+      filter: drop-shadow(0 0 12px rgba(245, 158, 11, 0.45));
     }
   }
 
   &__description {
-    font-size: 1.125rem;
-    color: rgba(255, 255, 255, 0.9);
-    margin: 0 0 2rem 0;
-
-    @media (max-width: $breakpoint-md) {
-      font-size: 1rem;
-      margin-bottom: 1.5rem;
-    }
-
-    @media (max-width: $breakpoint-sm) {
-      font-size: 0.875rem;
-    }
-  }
-
-  &__form {
-    display: flex;
-    gap: 1rem;
-    max-width: 500px;
-    margin: 0 auto;
-
-    @media (max-width: $breakpoint-sm) {
-      flex-direction: column;
-      gap: 0.75rem;
-    }
-  }
-
-  &__input {
-    flex: 1;
-    padding: 1rem 1.5rem;
-    border: none;
-    border-radius: 3rem;
     font-size: 1rem;
-    outline: none;
-    @include transition;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.65;
+    margin-bottom: 2rem;
 
-    &:focus {
-      box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
-    }
-
-    @media (max-width: $breakpoint-sm) {
-      padding: 0.875rem 1.25rem;
-      font-size: 0.875rem;
+    @media (max-width: 768px) {
+      font-size: 0.9375rem;
+      margin-bottom: 1.5rem;
     }
   }
 
   &__btn {
-    padding: 1rem 2.5rem;
-    background: $accent-color;
-    color: white;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: $white;
+    color: $blue;
     border: none;
-    border-radius: 3rem;
+    padding: 0.875rem 2.25rem;
     font-size: 1rem;
-    font-weight: 600;
+    font-weight: 700;
+    font-family: $font;
+    border-radius: 3rem;
     cursor: pointer;
-    white-space: nowrap;
-    @include transition;
+    @include ease;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    animation: pulse-ring 2.5s ease infinite 1.5s;
 
     &:hover {
-      background: darken($accent-color, 10%);
       transform: translateY(-2px);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 14px 32px rgba(0, 0, 0, 0.28);
+      color: $indigo;
     }
 
     &:active {
       transform: translateY(0);
     }
 
-    @media (max-width: $breakpoint-sm) {
-      padding: 0.875rem 2rem;
+    @media (max-width: 480px) {
+      padding: 0.8rem 1.75rem;
+      font-size: 0.9375rem;
+    }
+  }
+
+  &__image {
+    position: absolute;
+    right: max(2rem, calc((100vw - #{$max-w}) / 2 + 1rem));
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1;
+    animation:
+      float 6s ease-in-out infinite,
+      fadeIn 0.8s ease both 0.3s;
+
+    img {
+      width: 380px;
+      height: 380px;
+      object-fit: cover;
+      border-radius: $radius-lg;
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.35);
+      border: 3px solid rgba(255, 255, 255, 0.15);
+    }
+
+    @media (max-width: 1100px) {
+      img {
+        width: 280px;
+        height: 280px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      display: none;
+    }
+  }
+}
+
+// ─── Features ──────────────────────────────────────────────────────────────
+.features {
+  background: $white;
+  border-bottom: 1px solid $border;
+  margin-bottom: 3.5rem;
+
+  &__container {
+    @include container;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    divide-x: 1px solid $border;
+
+    @media (max-width: 900px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    @media (max-width: 480px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem clamp(1rem, 2vw, 1.75rem);
+    border-right: 1px solid $border-2;
+    @include ease;
+
+    &:last-child {
+      border-right: none;
+    }
+    &:hover {
+      background: $bg;
+    }
+
+    @media (max-width: 900px) {
+      &:nth-child(2) {
+        border-right: none;
+      }
+      border-bottom: 1px solid $border-2;
+      &:nth-child(3),
+      &:nth-child(4) {
+        border-bottom: none;
+      }
+    }
+
+    @media (max-width: 480px) {
+      border-right: none !important;
+      border-bottom: 1px solid $border-2;
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+  }
+
+  &__icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.375rem;
+    flex-shrink: 0;
+
+    &--delivery {
+      background: $blue-light;
+      color: $blue;
+    }
+    &--secure {
+      background: $green-light;
+      color: $green;
+    }
+    &--return {
+      background: $amber-light;
+      color: $amber;
+    }
+    &--support {
+      background: $red-light;
+      color: $red;
+    }
+  }
+
+  &__content {
+    h3 {
+      font-size: 0.9375rem;
+      font-weight: 700;
+      color: $text;
+      margin: 0 0 0.2rem;
+    }
+
+    p {
+      font-size: 0.8125rem;
+      color: $text-3;
+      margin: 0;
+    }
+  }
+}
+
+// ─── Categories ────────────────────────────────────────────────────────────
+.categories {
+  @include container;
+  margin-bottom: 3.5rem;
+  animation: fadeUp 0.5s ease both 0.1s;
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 1rem;
+
+    @media (max-width: 1100px) {
+      grid-template-columns: repeat(4, 1fr);
+    }
+    @media (max-width: 700px) {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    @media (max-width: 420px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+}
+
+.category-card {
+  background: $white;
+  border: 1.5px solid $border;
+  border-radius: $radius;
+  padding: 1.5rem 1rem;
+  text-align: center;
+  cursor: pointer;
+  @include ease(0.3s);
+
+  &:hover {
+    border-color: $blue;
+    box-shadow: 0 8px 28px rgba(37, 99, 235, 0.1);
+    transform: translateY(-4px);
+
+    .category-card__icon {
+      background: $blue;
+      color: $white;
+      transform: scale(1.1);
+    }
+
+    .category-card__name {
+      color: $blue;
+    }
+  }
+
+  &__icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: $blue-light;
+    color: $blue;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.625rem;
+    margin: 0 auto 0.875rem;
+    @include ease;
+
+    @media (max-width: 480px) {
+      width: 48px;
+      height: 48px;
+      font-size: 1.25rem;
+    }
+  }
+
+  &__name {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: $text-2;
+    margin: 0;
+    @include ease(0.2s);
+    line-height: 1.3;
+  }
+}
+
+// ─── Flash Sale ────────────────────────────────────────────────────────────
+.flash-sale {
+  @include container;
+  margin-bottom: 3.5rem;
+
+  > div:first-child {
+    background: linear-gradient(135deg, #fef3c7 0%, #fff7ed 100%);
+    border: 1.5px solid #fde68a;
+    border-radius: $radius-lg;
+    padding: clamp(1.25rem, 3vw, 2rem) clamp(1.25rem, 3vw, 2rem);
+    animation: fadeUp 0.5s ease both 0.15s;
+  }
+
+  .section-title .anticon {
+    color: $amber;
+  }
+}
+
+// ─── Product Sections ──────────────────────────────────────────────────────
+.featured-products,
+.new-arrivals {
+  @include container;
+  margin-bottom: 3.5rem;
+  animation: fadeUp 0.5s ease both 0.2s;
+}
+
+// ─── Products Grid ─────────────────────────────────────────────────────────
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+
+  @media (max-width: 1100px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+  @media (max-width: 360px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ─── Product Card ──────────────────────────────────────────────────────────
+.product-card {
+  background: $white;
+  border: 1.5px solid $border;
+  border-radius: $radius;
+  overflow: hidden;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  @include ease(0.32s);
+
+  &:hover {
+    border-color: rgba(37, 99, 235, 0.3);
+    box-shadow: 0 16px 44px rgba(0, 0, 0, 0.1);
+    transform: translateY(-6px);
+
+    .product-card__image img {
+      transform: scale(1.07);
+    }
+    .product-card__overlay {
+      opacity: 1;
+    }
+    .product-card__btn {
+      background: $blue;
+      color: $white;
+      border-color: $blue;
+    }
+  }
+
+  &__image {
+    position: relative;
+    width: 100%;
+    padding-top: 128%;
+    background: $bg-2;
+    overflow: hidden;
+    flex-shrink: 0;
+
+    img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      @include ease(0.5s);
+    }
+  }
+
+  &__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      180deg,
+      transparent 50%,
+      rgba(0, 0, 0, 0.12) 100%
+    );
+    opacity: 0;
+    @include ease;
+  }
+
+  &__badge {
+    position: absolute;
+    top: 0.75rem;
+    left: 0.75rem;
+    background: $red;
+    color: $white;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 0.25rem 0.6rem;
+    border-radius: 2rem;
+    z-index: 2;
+
+    @media (max-width: 480px) {
+      font-size: 0.625rem;
+      padding: 0.2rem 0.5rem;
+    }
+  }
+
+  &__content {
+    padding: 1.125rem;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: 0;
+
+    @media (max-width: 480px) {
+      padding: 0.875rem;
+    }
+  }
+
+  &__title {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: $text;
+    margin: 0 0 0.625rem;
+    line-height: 1.45;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: 2.75em;
+
+    @media (max-width: 480px) {
       font-size: 0.875rem;
     }
   }
-}
 
-// ===================================
-// ANTD OVERRIDES
-// ===================================
-.ant-rate {
-  &-star {
-    &-full,
-    &-half .ant-rate-star-first {
-      color: $accent-color;
+  &__rating {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    margin-bottom: 0.625rem;
+
+    :global(.ant-rate) {
+      font-size: 0.8125rem;
+      line-height: 1;
+      color: $amber;
+    }
+
+    .count {
+      font-size: 0.8125rem;
+      color: $text-4;
+    }
+  }
+
+  &__price {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    margin-bottom: 0.875rem;
+    flex-wrap: wrap;
+
+    .current {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: $red;
+      letter-spacing: -0.01em;
+
+      @media (max-width: 480px) {
+        font-size: 1.0625rem;
+      }
+    }
+
+    .original {
+      font-size: 0.8125rem;
+      color: $text-4;
+      text-decoration: line-through;
+    }
+  }
+
+  &__btn {
+    width: 100%;
+    margin-top: auto;
+    padding: 0.75rem;
+    background: $bg-2;
+    border: 1.5px solid $border;
+    border-radius: $radius-sm;
+    font-size: 0.875rem;
+    font-weight: 600;
+    font-family: $font;
+    color: $text-2;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    @include ease;
+
+    &:hover {
+      background: $blue;
+      color: $white;
+      border-color: $blue;
     }
   }
 }
 
-.ant-carousel {
-  .slick-slider {
+// ─── Newsletter ────────────────────────────────────────────────────────────
+.newsletter {
+  background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 60%, #3b82f6 100%);
+  padding: clamp(3rem, 6vw, 5rem) clamp(1rem, 4vw, 2rem);
+  margin-top: 3rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  &::before {
+    width: 400px;
+    height: 400px;
+    background: rgba(255, 255, 255, 0.05);
+    top: -150px;
+    left: -100px;
+  }
+
+  &::after {
+    width: 300px;
+    height: 300px;
+    background: rgba(255, 255, 255, 0.04);
+    bottom: -100px;
+    right: -80px;
+  }
+
+  &__content {
+    max-width: 560px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  &__title {
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    font-weight: 800;
+    color: $white;
+    margin: 0 0 0.875rem;
+    letter-spacing: -0.03em;
+  }
+
+  &__description {
+    font-size: clamp(0.9375rem, 2vw, 1.0625rem);
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0 0 2rem;
+    line-height: 1.6;
+  }
+
+  &__form {
+    display: flex;
+    gap: 0.75rem;
+    max-width: 460px;
+    margin: 0 auto;
+
+    @media (max-width: 480px) {
+      flex-direction: column;
+    }
+  }
+
+  &__input {
+    flex: 1;
+    padding: 0.875rem 1.25rem;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1.5px solid rgba(255, 255, 255, 0.25);
+    border-radius: 3rem;
+    font-size: 0.9375rem;
+    font-family: $font;
+    color: $white;
+    outline: none;
+    @include ease;
+    backdrop-filter: blur(6px);
+
+    &::placeholder {
+      color: rgba(255, 255, 255, 0.55);
+    }
+
+    &:focus {
+      background: rgba(255, 255, 255, 0.22);
+      border-color: rgba(255, 255, 255, 0.5);
+      box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.12);
+    }
+  }
+
+  &__btn {
+    padding: 0.875rem 2rem;
+    background: $amber;
+    color: #1c1917;
+    border: none;
+    border-radius: 3rem;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    font-family: $font;
+    cursor: pointer;
+    white-space: nowrap;
+    @include ease;
+    box-shadow: 0 4px 16px rgba(245, 158, 11, 0.4);
+
+    &:hover {
+      background: darken($amber, 8%);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(245, 158, 11, 0.5);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+}
+
+// ─── Antd Overrides ────────────────────────────────────────────────────────
+:global {
+  .ant-rate-star-full .ant-rate-star-second,
+  .ant-rate-star-half .ant-rate-star-first {
+    color: #f59e0b;
+  }
+
+  .ant-rate-star-zero .ant-rate-star-second {
+    color: #e5e7eb;
+  }
+
+  .ant-carousel {
     .slick-list {
       overflow: hidden;
     }
-
-    .slick-track {
-      display: flex;
-      align-items: center;
-    }
   }
-}
 
-// ===================================
-// UTILITIES
-// ===================================
-.text-center {
-  text-align: center;
-}
-
-.mt-1 {
-  margin-top: 1rem;
-}
-
-.mt-2 {
-  margin-top: 2rem;
-}
-
-.mt-3 {
-  margin-top: 3rem;
-}
-
-.mb-1 {
-  margin-bottom: 1rem;
-}
-
-.mb-2 {
-  margin-bottom: 2rem;
-}
-
-.mb-3 {
-  margin-bottom: 3rem;
+  .ant-spin-dot-item {
+    background: #2563eb;
+  }
 }

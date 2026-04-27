@@ -206,7 +206,6 @@ const ProfilePage = () => {
             setDeletedImage(file.name);
             console.log('Đã đánh dấu xóa ảnh:', file.name);
         }
-
         setFileList(prevList => prevList.filter(item => item.uid !== file.uid));
         return true;
     };
@@ -258,13 +257,12 @@ const ProfilePage = () => {
                                 >
                                     {imageLoading ? (
                                         <LoadingOutlined />
-                                    )
-                                        : (
-                                            <button style={{ border: 0, background: 'none' }} type="button">
-                                                <PlusOutlined />
-                                                <div style={{ marginTop: 8 }}>Upload</div>
-                                            </button>
-                                        )}
+                                    ) : (
+                                        <button style={{ border: 0, background: 'none' }} type="button">
+                                            <PlusOutlined />
+                                            <div style={{ marginTop: 8 }}>Upload</div>
+                                        </button>
+                                    )}
                                 </Upload>
                             </Form.Item>
                             {previewImage && (
@@ -279,10 +277,14 @@ const ProfilePage = () => {
                                 />
                             )}
                         </div>
+
                         <Form.Item<InfoValues>
                             label="Email:"
                             name="email"
-                            rules={[{ required: true, message: "Vui lòng nhập email!" }, { type: "email", message: "Email không hợp lệ!" }]}
+                            rules={[
+                                { required: true, message: "Vui lòng nhập email!" },
+                                { type: "email", message: "Email không hợp lệ!" }
+                            ]}
                         >
                             <Input prefix={<MailOutlined />} size="large" disabled />
                         </Form.Item>
@@ -298,7 +300,10 @@ const ProfilePage = () => {
                         <Form.Item<InfoValues>
                             label="Số điện thoại:"
                             name="phone"
-                            rules={[{ required: true, message: "Vui lòng nhập số điện thoại!" }, { pattern: /^[0-9]{10}$/, message: "Số điện thoại không hợp lệ!" }]}
+                            rules={[
+                                { required: true, message: "Vui lòng nhập số điện thoại!" },
+                                { pattern: /^[0-9]{10}$/, message: "Số điện thoại không hợp lệ!" }
+                            ]}
                         >
                             <Input prefix={<PhoneOutlined />} size="large" />
                         </Form.Item>
@@ -361,12 +366,6 @@ const ProfilePage = () => {
                             name="confirmPassword"
                             rules={[
                                 { required: true, message: "Vui lòng xác nhận mật khẩu!" },
-                                // ({ getFieldValue }) => ({
-                                //     validator(_, value) {
-                                //         if (!value || getFieldValue("newPassword") === value) return Promise.resolve();
-                                //         return Promise.reject(new Error("Mật khẩu xác nhận không khớp!"));
-                                //     }
-                                // })
                             ]}
                         >
                             <Input.Password
@@ -397,6 +396,7 @@ const ProfilePage = () => {
         <div className="profile-page">
             <div className="profile-container">
                 <h1 className="profile-title">Tài khoản của tôi</h1>
+                <p className="profile-subtitle">Quản lý thông tin cá nhân và bảo mật tài khoản</p>
                 <Button type="primary" size="large" onClick={() => setIsModalOpen(true)}>
                     Quản lý tài khoản
                 </Button>
