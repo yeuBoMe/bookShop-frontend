@@ -254,9 +254,11 @@
     display: flex;
     gap: 15px;
     margin-bottom: 20px;
+    flex-wrap: wrap;
 
     @media (max-width: 576px) {
       flex-direction: column;
+      gap: 10px;
     }
 
     .ant-btn {
@@ -267,7 +269,10 @@
       border-radius: 6px;
 
       @media (max-width: 576px) {
+        flex: unset;
         width: 100%;
+        height: 50px;
+        font-size: 15px;
       }
 
       &.btn-add-cart {
@@ -373,8 +378,9 @@
      ============================================================== */
   .reviews-content {
     padding: 32px 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-      "Helvetica Neue", Arial, sans-serif;
+    font-family:
+      -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
+      Arial, sans-serif;
 
     @media (max-width: 576px) {
       padding: 20px 0;
