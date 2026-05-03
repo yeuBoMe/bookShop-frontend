@@ -49,25 +49,63 @@
     }
   }
 
+  // ── Action Buttons ──────────────────────────────────────────
   .payment-actions {
-    display: flex;
-    gap: 15px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
     margin-top: 30px;
+    width: 100%;
 
-    .ant-btn {
-      flex: 1;
-      height: 45px;
+    :global(.ant-btn) {
+      width: 100%;
+      height: 52px;
       font-size: 16px;
       font-weight: 600;
+      border-radius: 8px;
+      transition: all 0.25s ease;
     }
 
-    .submit-order-btn {
+    :global(.submit-order-btn) {
       background: #52c41a;
       border-color: #52c41a;
 
       &:hover {
         background: #73d13d;
         border-color: #73d13d;
+      }
+    }
+
+    @media (max-width: 768px) {
+      gap: 10px;
+      margin-top: 24px;
+
+      :global(.ant-btn) {
+        height: 50px;
+        font-size: 15px;
+      }
+    }
+
+    @media (max-width: 576px) {
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-top: 20px;
+
+      :global(.ant-btn) {
+        height: 52px;
+        font-size: 16px;
+        border-radius: 10px;
+      }
+
+      :global(.submit-order-btn) {
+        order: -1;
+      }
+    }
+
+    @media (max-width: 360px) {
+      :global(.ant-btn) {
+        height: 48px;
+        font-size: 15px;
       }
     }
   }
@@ -94,15 +132,6 @@
             font-size: 12px;
           }
         }
-      }
-    }
-
-    .payment-actions {
-      flex-direction: column;
-
-      .ant-btn {
-        height: 42px;
-        font-size: 15px;
       }
     }
   }
@@ -134,15 +163,6 @@
             font-size: 11px;
           }
         }
-      }
-    }
-
-    .payment-actions {
-      margin-top: 20px;
-
-      .ant-btn {
-        height: 40px;
-        font-size: 14px;
       }
     }
   }
@@ -249,7 +269,6 @@
 
 // QR Payment Modal - Responsive
 .qr-payment-modal {
-  // Desktop
   .ant-modal-content {
     max-width: 600px;
   }
@@ -328,7 +347,6 @@
     }
   }
 
-  // Tablet
   @media (max-width: 768px) {
     max-width: 90vw !important;
     width: 90vw !important;
@@ -379,7 +397,6 @@
     }
   }
 
-  // Mobile
   @media (max-width: 480px) {
     max-width: 95vw !important;
     width: 95vw !important;
@@ -439,7 +456,6 @@
     }
   }
 
-  // Extra small mobile
   @media (max-width: 360px) {
     .qr-modal-content {
       .qr-image-wrapper {
