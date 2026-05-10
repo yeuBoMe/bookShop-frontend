@@ -101,11 +101,13 @@ const HomePage = () => {
         if (cartStorage) {
             const carts = JSON.parse(cartStorage) as ICart[];
             let isExistIndex = carts.findIndex((cart) => cart.id === book.id);
+
             if (isExistIndex > -1) {
                 carts[isExistIndex].quantity = carts[isExistIndex].quantity + 1;
             } else {
                 carts.push({ id: book.id, quantity: 1, detail: book });
             }
+
             localStorage.setItem("carts", JSON.stringify(carts));
             setCarts(carts);
         } else {
@@ -138,7 +140,7 @@ const HomePage = () => {
             <div className="product-card__content">
                 <h3 className="product-card__title">{book.name}</h3>
                 <div className="product-card__rating">
-                    <Rate disabled defaultValue={5} className="stars" />
+                    <Rate defaultValue={book.averageStars} allowHalf className="stars" />
                     <span className="count">(99)</span>
                 </div>
                 <div className="product-card__price">
