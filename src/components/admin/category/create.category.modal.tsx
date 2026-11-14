@@ -1,6 +1,7 @@
 import { createCategoryAPI } from "@/services/api.service";
 import { App, Col, Form, Input, Modal, Row, type FormProps } from "antd";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 interface CategoryCreateValues {
     name: string;
@@ -16,6 +17,8 @@ const CreateCategoryModal = (props: CreateCategoryProps) => {
     const { isModalCreateOpen, setIsModalCreateOpen, refreshTable } = props;
     const [form] = Form.useForm<CategoryCreateValues>();
     const { notification, message } = App.useApp();
+
+    const { t } = useTranslation();
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const handleCreateCategory: FormProps<CategoryCreateValues>['onFinish'] = async (values) => {
@@ -25,12 +28,12 @@ const CreateCategoryModal = (props: CreateCategoryProps) => {
             const createCategoryResponse = await createCategoryAPI(name);
             if (createCategoryResponse.data) {
                 handleClearDataAndCloseModal();
-                message.success("Create category successfully!");
+                message.success(t("admin.msg.createSuccess", { entity: t("admin.entity.category") }));
                 refreshTable();
             }
         } catch (error: any) {
             notification.error({
-                message: "Error",
+                message: t("common.error"),
                 description: error?.message,
                 duration: 5,
                 placement: "topRight"
@@ -48,14 +51,14 @@ const CreateCategoryModal = (props: CreateCategoryProps) => {
     return (
         <>
             <Modal
-                title="Create category"
+                title={t("admin.form.createTitle", { entity: t("admin.entity.category") })}
                 closable={false}
                 maskClosable={false}
                 open={isModalCreateOpen}
                 onOk={() => form.submit()}
                 onCancel={handleClearDataAndCloseModal}
                 loading={isLoading}
-                okText="Create"
+                okText={t("common.create")}
                 width={"50vw"}
             >
                 <Row justify={"center"}>
@@ -71,14 +74,14 @@ const CreateCategoryModal = (props: CreateCategoryProps) => {
                             <Row gutter={16}>
                                 <Col span={17}>
                                     <Form.Item<CategoryCreateValues>
-                                        label="Name:"
+                                        label={t("field.name")}
                                         name="name"
                                         rules={[
-                                            { required: true, message: "Category's name is required" },
-                                            { max: 100, message: "Name must be less than 100 characters" },
+                                            { required: true, message: t("validate.required", { field: t("field.name") }) },
+                                            { max: 100, message: t("validate.maxLength", { field: t("field.name"), max: 100 }) },
                                             {
                                                 pattern: /^[A-Za-zÀ-ỹà-ỹ0-9'\-.:\s]{1,100}$/,
-                                                message: "Invalid name format",
+                                                message: t("validate.invalid", { field: t("field.name") }),
                                             },
                                         ]}
                                     >

@@ -1,22 +1,25 @@
+@use "../../abstracts/tokens" as t;
+@use "../../abstracts/mixins" as m;
+
 /* ==================== VARIABLES ==================== */
-$primary: #1890ff;
-$error: #ff4d4f;
-$border: #e8e8e8;
-$text-sec: #8c8c8c;
+$primary: t.$primary;
+$error: t.$danger;
+$border: t.$border;
+$text-sec: t.$text-muted;
 $mobile: 576px;
 $tablet: 768px;
 
 /* ==================== MOBILE CARD (≤768px) – Ưu tiên cao nhất ==================== */
 .order-history-mobile {
   padding: 12px;
-  background: #f9f9f9;
+  background: t.$surface-subtle;
 
   .mobile-order-card {
     margin-bottom: 16px;
     border-radius: 16px;
     overflow: hidden;
     background: white;
-    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 6px 24px rgba(15, 23, 42, 0.07);
     transition: transform 0.25s ease;
 
     &:hover {
@@ -45,17 +48,17 @@ $tablet: 768px;
     /* Ngày */
     > div:nth-child(2) {
       font-size: 13.5px;
-      color: #666;
+      color: t.$text-muted;
       margin: 10px 0;
       .anticon {
         margin-right: 6px;
-        color: #999;
+        color: t.$text-subtle;
       }
     }
 
     /* Danh sách sách */
     > div:nth-child(3) {
-      background: #f8fbff;
+      background: t.$brand-50;
       padding: 14px;
       border-radius: 12px;
       margin-bottom: 16px;
@@ -101,17 +104,17 @@ $tablet: 768px;
           padding: 0 18px;
 
           &.ant-btn-primary {
-            background: linear-gradient(135deg, $primary, #096dd9);
+            background: linear-gradient(135deg, $primary, t.$primary-hover);
           }
           &.ant-btn-dangerous {
-            background: linear-gradient(135deg, $error, #cf1322);
+            background: linear-gradient(135deg, $error, t.$danger-strong);
           }
         }
       }
     }
 
     /* Siêu nhỏ: chỉ hiện icon */
-    @media (max-width: 450px) {
+    @include m.below(xs) {
       .ant-btn span:not(.anticon) {
         display: none;
       }
@@ -121,34 +124,25 @@ $tablet: 768px;
     }
   }
 
-  /* Empty + Footer info */
-  > div[style*="textAlign: center"] {
-    padding: 80px 20px;
-    font-size: 17px;
-    color: #999;
-  }
-  > div:last-child[style*="backgroundColor"] {
-    margin: 20px 12px 0;
-    padding: 16px;
-    background: white;
-    border-radius: 12px;
-    font-size: 14.5px;
-    font-weight: 500;
-    text-align: center;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  // Hai quy tắc cũ ở đây khớp theo [style*="textAlign: center"] và
+  // [style*="backgroundColor"] — React render ra CSS dạng "text-align" chứ
+  // không phải tên thuộc tính JS, nên chúng chưa bao giờ có tác dụng.
+  // Đã bỏ; phần rỗng dùng component Empty của antd.
+  .ant-empty {
+    padding: t.$space-16 t.$space-5;
   }
 }
 
 /* ==================== DESKTOP TABLE (>768px) – Không ép min-width ==================== */
 .order-history-table {
   padding: 12px;
-  background: #f9f9f9;
+  background: t.$surface-subtle;
 
   .ant-table-wrapper {
     border-radius: 16px;
     overflow: hidden;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-    background: white;
+    box-shadow: t.$shadow-md;
+    background: t.$surface;
   }
 
   /* Chỉ bật scroll ngang khi thật sự cần (trên màn hình nhỏ hơn nội dung) */
@@ -156,36 +150,38 @@ $tablet: 768px;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: thin;
-    scrollbar-color: #c1c1c1 #f1f1f1;
+    scrollbar-color: t.$border-strong t.$surface-muted;
 
     &::-webkit-scrollbar {
       height: 8px;
     }
     &::-webkit-scrollbar-track {
-      background: #f1f1f1;
+      background: t.$surface-muted;
       border-radius: 4px;
     }
     &::-webkit-scrollbar-thumb {
-      background: #c1c1c1;
+      background: t.$border-strong;
       border-radius: 4px;
     }
   }
 
   .ant-table {
-    background: white;
+    background: t.$surface;
 
     .ant-table-thead > tr > th {
-      background: linear-gradient(135deg, #f8f9fa, #f0f2f5);
-      font-weight: 700;
-      color: #1f1f1f;
+      background: t.$surface-subtle;
+      font-weight: t.$fw-semibold;
+      color: t.$text-strong;
       text-align: center;
-      padding: 16px 12px !important;
-      font-size: 15px;
-      border-bottom: 3px solid $primary;
+      padding: t.$space-4 t.$space-3 !important;
+      font-size: t.$fs-sm;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      border-bottom: 2px solid t.$primary;
     }
 
     .ant-table-tbody > tr:hover > td {
-      background: #e6f7ff !important;
+      background: t.$brand-50 !important;
     }
 
     .ant-table-tbody > tr > td {
@@ -195,7 +191,7 @@ $tablet: 768px;
 
     /* Cố định cột trái nếu cần */
     .ant-table-cell-fix-left {
-      background: white !important;
+      background: t.$surface !important;
     }
 
     .ant-tag {
@@ -211,9 +207,16 @@ $tablet: 768px;
       font-weight: 600;
     }
 
-    strong[style*="color: #ff4d4f"] {
-      font-size: 16px;
-      font-weight: 700;
+    // Dùng class thay vì khớp theo inline style (selector cũ rất dễ vỡ:
+    // chỉ cần đổi mã màu trong JSX là style mất tác dụng)
+    .order-total {
+      font-size: t.$fs-md;
+      font-weight: t.$fw-bold;
+      color: t.$danger-text;
+    }
+
+    .order-item__qty {
+      color: t.$text-subtle;
     }
   }
 
@@ -222,17 +225,45 @@ $tablet: 768px;
     justify-content: center;
     .ant-pagination-total-text {
       font-size: 15px;
-      color: #555;
-      font-weight: 500;
+      color: t.$text-muted;
+      font-weight: t.$fw-medium;
     }
   }
 }
 
 /* Tablet: card căn giữa đẹp hơn */
-@media (min-width: 577px) and (max-width: $tablet) {
+@include m.between(sm, lg) {
   .order-history-mobile {
     max-width: 680px;
     margin: 0 auto;
-    padding: 16px;
+    padding: t.$space-4;
+  }
+}
+
+@include m.below(md) {
+  // Bảng đơn hàng có nhiều cột — trên máy tính bảng trở xuống cho cuộn ngang
+  // thay vì bóp chữ đến mức không đọc được
+  .order-history-table {
+    padding: t.$space-2;
+
+    .ant-table-wrapper {
+      border-radius: t.$radius-lg;
+    }
+
+    .ant-table {
+      font-size: t.$fs-sm;
+
+      .ant-table-thead > tr > th,
+      .ant-table-tbody > tr > td {
+        padding: t.$space-3 t.$space-2 !important;
+        white-space: nowrap;
+      }
+    }
+
+    .ant-pagination {
+      margin: t.$space-5 0;
+      flex-wrap: wrap;
+      row-gap: t.$space-2;
+    }
   }
 }

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button, Empty, Steps, App } from "antd";
+import { useTranslation } from "react-i18next";
 import {
     ShoppingCartOutlined,
     SolutionOutlined,
@@ -12,16 +13,19 @@ import "styles/client/checkout/checkout.scss";
 import CheckoutSuccess from "@/components/client/checkout/checkout-success";
 import Cart from "@/components/client/checkout/cart";
 import Payment from "@/components/client/checkout/payment";
+import { calculateSubtotal, calculateGrandTotal, clearCart } from "@/services/cart.service";
 
 const CheckoutPage = () => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const { notification } = App.useApp();
+
+    const { t } = useTranslation();
     const { carts, setCarts } = useCurrentApp();
     const [totalPrice, setTotalPrice] = useState<number>(0);
     const [currentStep, setCurrentStep] = useState<number>(0);
     const [isPaymentLoading, setIsPaymentLoading] = useState<boolean>(false);
-    const finalTotalPrice = totalPrice + (totalPrice >= 150000 ? 0 : 30000);
+    const finalTotalPrice = calculateGrandTotal(totalPrice);
 
     const hasProcessedCallback = useRef(false);
 
@@ -29,6 +33,21 @@ const CheckoutPage = () => {
         handlePaymentCallback();
     }, [searchParams]);
 
+    /**
+     * CẢNH BÁO BẢO MẬT — cần sửa ở BACKEND, không thể vá triệt để ở đây.
+     *
+     * Đơn hàng hiện được TẠO Ở FRONTEND sau khi cổng thanh toán redirect về,
+     * dựa trên `localStorage.pendingVnpayOrder` và query param `status=success`.
+     * Hệ quả:
+     *   1. Người dùng tự gõ /checkout?payment=vnpay&status=success là tạo được
+     *      đơn "đã thanh toán" mà không trả một đồng nào.
+     *   2. `totalPrice` và `status` nằm trong localStorage nên sửa được tùy ý.
+     *   3. Trả tiền xong mà đóng tab trước khi redirect => mất tiền, không có đơn.
+     *
+     * Cách sửa đúng: backend tạo đơn TRƯỚC khi redirect sang cổng (status UNPAID),
+     * dùng chính mã đơn làm vnp_TxnRef, rồi IPN/return của cổng mới cập nhật
+     * sang PAID sau khi verify chữ ký. Frontend chỉ đọc trạng thái đơn.
+     */
     const handlePaymentCallback = async () => {
         // Lấy params từ URL
         const payment = searchParams.get('payment');
@@ -63,7 +82,7 @@ const CheckoutPage = () => {
                 const pending = localStorage.getItem('pendingVnpayOrder');
 
                 if (!pending) {
-                    throw new Error('Không tìm thấy thông tin đơn hàng');
+                    throw new Error(t('checkout.orderNotFound'));
                 }
 
                 const orderData = JSON.parse(pending);
@@ -72,44 +91,31 @@ const CheckoutPage = () => {
                 const response = await createAnOrderAPI(orderData);
 
                 if (response.data) {
-                    localStorage.removeItem('carts');
-                    setCarts([]);
+                    setCarts(clearCart());
                     setCurrentStep(2);
                     notification.success({
-                        message: 'Thanh toán VNPay thành công!',
-                        description: 'Đơn hàng của bạn đã được tạo thành công.'
+                        message: t('checkout.vnpaySuccess'),
+                        description: t('checkout.orderCreated')
                     });
                 }
             } catch (err: any) {
                 hasProcessedCallback.current = false;
                 notification.error({
-                    message: 'Lỗi tạo đơn hàng',
-                    description: err.message || 'Có lỗi xảy ra khi tạo đơn hàng'
+                    message: t('checkout.createOrderError'),
+                    description: err.message || t('checkout.createOrderErrorDesc')
                 });
             } finally {
                 setIsPaymentLoading(false);
             }
         } else if (status === 'fail') {
-            const errorMessages: Record<string, string> = {
-                '07': 'Giao dịch bị nghi ngờ gian lận',
-                '09': 'Giao dịch chưa đăng ký InternetBanking',
-                '10': 'Xác thực thông tin không chính xác quá 3 lần',
-                '11': 'Hết thời gian thanh toán',
-                '12': 'Tài khoản bị khóa',
-                '13': 'Sai mật khẩu OTP',
-                '24': 'Khách hàng hủy giao dịch',
-                '51': 'Tài khoản không đủ số dư',
-                '65': 'Vượt quá số lần nhập mã OTP',
-                '75': 'Ngân hàng đang bảo trì',
-                '79': 'Giao dịch vượt quá số tiền cho phép',
-                '97': 'Chữ ký không hợp lệ'
-            };
 
             localStorage.removeItem('pendingVnpayOrder');
 
             notification.error({
-                message: 'Thanh toán VNPay thất bại',
-                description: code ? (errorMessages[code] || `Mã lỗi: ${code}`) : 'Giao dịch không thành công'
+                message: t('checkout.vnpayFailed'),
+                description: code
+                    ? t(`checkout.vnpayError.${code}`, { defaultValue: t("checkout.errorCode", { code }) })
+                    : t("checkout.transactionFailed")
             });
         }
     };
@@ -124,57 +130,36 @@ const CheckoutPage = () => {
 
                 try {
                     await createAnOrderAPI(orderData);
-                    localStorage.removeItem("carts");
-                    setCarts([]);
+                    setCarts(clearCart());
                     setCurrentStep(2);
                     notification.success({
-                        message: "Thanh toán MoMo thành công!",
-                        description: 'Đơn hàng của bạn đã được tạo thành công.'
+                        message: t("checkout.momoSuccess"),
+                        description: t('checkout.orderCreated')
                     });
                 } catch (err) {
                     hasProcessedCallback.current = false;
                     notification.error({
-                        message: "Lỗi tạo đơn hàng",
-                        description: "Có lỗi xảy ra khi tạo đơn hàng"
+                        message: t("checkout.createOrderError"),
+                        description: t("checkout.createOrderErrorDesc")
                     });
                 }
             }
         } else if (status === 'fail') {
-            const errorMessages: Record<string, string> = {
-                '1': 'Giao dịch thất bại',
-                '2': 'Giao dịch bị từ chối',
-                '9': 'Giao dịch bị hủy',
-                '10': 'Khách hàng hủy giao dịch',
-                '1001': 'Giao dịch đã được xử lý',
-                '1002': 'Giao dịch không hợp lệ',
-                '1003': 'Số tiền không hợp lệ',
-                '1004': 'Số tiền vượt quá hạn mức',
-                '1005': 'URL không hợp lệ',
-                '1006': 'Không tìm thấy giao dịch',
-                '1007': 'Chữ ký không hợp lệ',
-                '99': 'Lỗi không xác định'
-            };
 
             localStorage.removeItem("pendingMomoOrder");
 
             notification.error({
-                message: "Thanh toán MoMo thất bại",
-                description: code ? (errorMessages[code] || `Mã lỗi: ${code}`) : 'Giao dịch không thành công'
+                message: t("checkout.momoFailed"),
+                description: code
+                    ? t(`checkout.momoError.${code}`, { defaultValue: t("checkout.errorCode", { code }) })
+                    : t("checkout.transactionFailed")
             });
         }
     };
 
     useEffect(() => {
         window.scrollTo({ top: 0, behavior: "smooth" });
-        if (carts && carts.length > 0) {
-            let sum = 0;
-            carts.forEach((item) => {
-                sum += item.detail.price * item.quantity;
-            });
-            setTotalPrice(sum);
-        } else {
-            setTotalPrice(0);
-        }
+        setTotalPrice(calculateSubtotal(carts));
     }, [carts]);
 
     const handleContinueToPayment = () => {
@@ -188,9 +173,9 @@ const CheckoutPage = () => {
     };
 
     const steps = [
-        { title: "Giỏ hàng" },
-        { title: "Đặt hàng" },
-        { title: "Thanh toán" },
+        { title: t("checkout.stepCart") },
+        { title: t("checkout.stepOrder") },
+        { title: t("checkout.stepPay") },
     ];
 
     if ((!carts || carts.length === 0) && currentStep !== 2) {
@@ -205,8 +190,8 @@ const CheckoutPage = () => {
                         }
                         description={
                             <div className="empty-text">
-                                <h3>Giỏ hàng của bạn đang trống</h3>
-                                <p>Hãy thêm sản phẩm vào giỏ hàng để tiếp tục mua sắm</p>
+                                <h3>{t("checkout.emptyTitle")}</h3>
+                                <p>{t("checkout.emptyDesc")}</p>
                             </div>
                         }
                     >
@@ -215,7 +200,7 @@ const CheckoutPage = () => {
                             size="large"
                             onClick={() => navigate("/books")}
                         >
-                            Khám phá sản phẩm
+                            {t("checkout.explore")}
                         </Button>
                     </Empty>
                 </div>
@@ -238,22 +223,22 @@ const CheckoutPage = () => {
                 <h1>
                     {currentStep === 0 && (
                         <>
-                            <ShoppingCartOutlined /> Giỏ hàng của bạn
+                            <ShoppingCartOutlined /> {t("checkout.yourCart")}
                         </>
                     )}
                     {currentStep === 1 && (
                         <>
-                            <SolutionOutlined /> Thông tin đặt hàng
+                            <SolutionOutlined /> {t("checkout.orderInfo")}
                         </>
                     )}
                     {currentStep === 2 && (
                         <>
-                            <CreditCardOutlined /> Thanh toán thành công
+                            <CreditCardOutlined /> {t("checkout.paySuccess")}
                         </>
                     )}
                 </h1>
                 {currentStep === 0 && (
-                    <p className="cart-count">({carts ? carts.length : 0} sản phẩm)</p>
+                    <p className="cart-count">{t("checkout.itemCount", { count: carts ? carts.length : 0 })}</p>
                 )}
             </div>
 

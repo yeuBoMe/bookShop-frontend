@@ -4,7 +4,12 @@ import { FiSearch, FiShoppingCart, FiUser, FiMenu } from "react-icons/fi";
 import "styles/client/layout/client.header.scss";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { App, Avatar, Button, Drawer } from "antd";
+import { Trans, useTranslation } from "react-i18next";
 import { logoutAPI } from "@/services/api.service";
+import { clearCart } from "@/services/cart.service";
+import { formatPrice, getImageUrl } from "@/services/helper";
+import LanguageSwitcher from "@/components/common/language.switcher";
+import ThemeToggle from "@/components/common/theme.toggle";
 
 interface HeaderProps {
     searchTerm: string;
@@ -16,8 +21,8 @@ const Header = (props: HeaderProps) => {
     const { user, setUser, setIsAuthenticated, carts, setCarts } = useCurrentApp();
     const navigate = useNavigate();
     const { notification, message } = App.useApp();
-    const baseImageUrl = import.meta.env.VITE_IMAGE_URL || "https://res.cloudinary.com/dvglvfask/image/upload";
-    const urlAvatar = user?.avatar ? `${baseImageUrl}/${user.avatar}` : "";
+    const { t } = useTranslation();
+    const urlAvatar = user?.avatar ? getImageUrl(user.avatar) : "";
     const [drawerVisible, setDrawerVisible] = useState(false);
 
     const handleLogoutRequest = async () => {
@@ -30,16 +35,15 @@ const Header = (props: HeaderProps) => {
             const logoutResponse = await logoutAPI();
             if (logoutResponse) {
                 setUser(null);
-                setCarts([]);
+                setCarts(clearCart());
                 setIsAuthenticated(false);
                 localStorage.removeItem("access_token");
-                localStorage.removeItem("carts");
-                message.success("Đăng xuất thành công!");
+                message.success(t("header.logoutSuccess"));
                 navigate("/login");
             }
         } catch (error: any) {
             notification.error({
-                message: "Error",
+                message: t("common.error"),
                 description: error?.message,
                 duration: 5,
                 placement: "topRight"
@@ -55,20 +59,13 @@ const Header = (props: HeaderProps) => {
         }
     };
 
-    // Format price to VND
-    const formatPrice = (price: number) => {
-        return new Intl.NumberFormat('vi-VN', {
-            style: 'currency',
-            currency: 'VND'
-        }).format(price);
-    };
-
     return (
         <>
             <header className="header">
                 {/* Top announcement bar */}
                 <div className="announcementBar">
-                    Miễn phí vận chuyển cho đơn hàng từ 5$ trở lên | Nhập mã <strong>WELCOME10</strong> để giảm 10%
+                    {/* Trans giữ thẻ <strong> quanh mã giảm giá ở cả hai ngôn ngữ */}
+                    <Trans i18nKey="header.announcement" components={{ 1: <strong /> }} />
                 </div>
 
                 {/* Main header */}
@@ -76,7 +73,7 @@ const Header = (props: HeaderProps) => {
                     <div className="headerContent">
                         {/* Logo */}
                         <div className="logo">
-                            <Link to="/">BookShop</Link>
+                            <Link to="/">{t("common.appName")}</Link>
                         </div>
 
                         {/* Mobile Menu Toggle */}
@@ -86,11 +83,11 @@ const Header = (props: HeaderProps) => {
 
                         {/* Desktop Navigation */}
                         <nav className="desktopNav">
-                            <NavLink to="/">Trang chủ</NavLink>
-                            <NavLink to="/books" end>Sản phẩm</NavLink>
-                            <NavLink to="/order-history">Đơn hàng</NavLink>
-                            <NavLink to="/profile">Hồ sơ</NavLink>
-                            <NavLink to="/about">Liên hệ</NavLink>
+                            <NavLink to="/">{t("nav.home")}</NavLink>
+                            <NavLink to="/books" end>{t("nav.products")}</NavLink>
+                            <NavLink to="/order-history">{t("nav.orders")}</NavLink>
+                            <NavLink to="/profile">{t("nav.profile")}</NavLink>
+                            <NavLink to="/about">{t("nav.contact")}</NavLink>
                         </nav>
 
                         {/* Right side icons */}
@@ -101,10 +98,18 @@ const Header = (props: HeaderProps) => {
                                 <input
                                     className="input-search"
                                     type="text"
-                                    placeholder="Bạn tìm gì hôm nay"
+                                    aria-label={t("common.search")}
+                                    placeholder={t("header.searchPlaceholder")}
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                 />
+                            </div>
+
+                            {/* Đổi ngôn ngữ + đổi giao diện sáng/tối — dùng chung
+                                với khu quản trị, xem src/components/common */}
+                            <div className="headerControls">
+                                <LanguageSwitcher compact />
+                                <ThemeToggle compact />
                             </div>
 
                             {/* Cart with Dropdown */}
@@ -113,6 +118,7 @@ const Header = (props: HeaderProps) => {
                                     <button
                                         className="iconButton cartButton"
                                         onClick={handleCartClick}
+                                        aria-label={t("header.yourCart")}
                                     >
                                         <FiShoppingCart size={20} />
                                         <span className="cartBadge">{carts?.length ?? 0}</span>
@@ -123,9 +129,9 @@ const Header = (props: HeaderProps) => {
                                         {carts && carts.length > 0 ? (
                                             <>
                                                 <div className="cartDropdownHeader">
-                                                    <h3>Giỏ hàng của bạn</h3>
+                                                    <h3>{t("header.yourCart")}</h3>
                                                     <Link to={"/checkout"}>
-                                                        <span className="cartItemWatch">Xem giỏ hàng</span>
+                                                        <span className="cartItemWatch">{t("header.viewCart")}</span>
                                                     </Link>
                                                 </div>
 
@@ -151,16 +157,16 @@ const Header = (props: HeaderProps) => {
 
                                                 {carts.length > 3 && (
                                                     <div className="cartMoreItems">
-                                                        +{carts.length - 3} sản phẩm khác
+                                                        {t("header.moreItems", { count: carts.length - 3 })}
                                                     </div>
                                                 )}
                                             </>
                                         ) : (
                                             <div className="emptyCart">
                                                 <FiShoppingCart size={48} />
-                                                <p>Giỏ hàng trống</p>
+                                                <p>{t("header.emptyCart")}</p>
                                                 <Link to="/books" className="shopNowButton">
-                                                    Mua sắm ngay
+                                                    {t("header.shopNow")}
                                                 </Link>
                                             </div>
                                         )}
@@ -181,20 +187,20 @@ const Header = (props: HeaderProps) => {
                                                 alt={user.fullName || "User Avatar"}
                                             />
                                         ) : (
-                                            <button className="iconNoneAvatarButton">
+                                            <button className="iconNoneAvatarButton" aria-label={t("nav.profile")}>
                                                 <FiUser size={20} />
                                             </button>
                                         )}
 
                                         <div className="dropdownMenu">
                                             <div className="userInfo">
-                                                <p>Hello, {user.fullName}</p>
+                                                <p>{t("header.greeting", { name: user.fullName })}</p>
                                             </div>
 
                                             {user.role?.name === "ADMIN" && (
                                                 <>
-                                                    <Link to="/admin">Trang quản trị</Link>
-                                                    <Link to="/admin/user">Quản lý tài khoản</Link>
+                                                    <Link to="/admin">{t("header.adminArea")}</Link>
+                                                    <Link to="/admin/user">{t("header.manageAccounts")}</Link>
                                                 </>
                                             )}
 
@@ -202,7 +208,7 @@ const Header = (props: HeaderProps) => {
                                                 className="dropdownLogout"
                                                 onClick={handleLogoutRequest}
                                             >
-                                                Đăng xuất
+                                                {t("header.logout")}
                                             </button>
                                         </div>
                                     </>
@@ -211,7 +217,7 @@ const Header = (props: HeaderProps) => {
                                         type="primary"
                                         style={{ borderRadius: "20px", paddingBottom: "3px" }}
                                     >
-                                        <Link to="/login">Đăng nhập</Link>
+                                        <Link to="/login">{t("header.login")}</Link>
                                     </Button>
                                 )}
                             </div>
@@ -222,19 +228,26 @@ const Header = (props: HeaderProps) => {
 
             {/* Drawer for mobile menu */}
             <Drawer
-                title="Menu"
+                title={t("nav.menu")}
                 placement="right"
                 onClose={() => setDrawerVisible(false)}
                 open={drawerVisible}
                 width={250}
             >
                 <nav className="mobileNav">
-                    <NavLink to="/" onClick={() => setDrawerVisible(false)}>Trang chủ</NavLink>
-                    <NavLink to="/books" onClick={() => setDrawerVisible(false)}>Sản phẩm</NavLink>
-                    <NavLink to="/order-history" onClick={() => setDrawerVisible(false)}>Đơn hàng</NavLink>
-                    <NavLink to="/profile" onClick={() => setDrawerVisible(false)}>Hồ sơ</NavLink>
-                    <NavLink to="/about" onClick={() => setDrawerVisible(false)}>Liên hệ</NavLink>
+                    <NavLink to="/" onClick={() => setDrawerVisible(false)}>{t("nav.home")}</NavLink>
+                    <NavLink to="/books" onClick={() => setDrawerVisible(false)}>{t("nav.products")}</NavLink>
+                    <NavLink to="/order-history" onClick={() => setDrawerVisible(false)}>{t("nav.orders")}</NavLink>
+                    <NavLink to="/profile" onClick={() => setDrawerVisible(false)}>{t("nav.profile")}</NavLink>
+                    <NavLink to="/about" onClick={() => setDrawerVisible(false)}>{t("nav.contact")}</NavLink>
                 </nav>
+
+                {/* Trên điện thoại thanh trên không đủ chỗ, nên hai nút điều khiển
+                    được đặt trong ngăn kéo — vẫn là cùng component */}
+                <div className="mobileNavControls">
+                    <LanguageSwitcher />
+                    <ThemeToggle />
+                </div>
             </Drawer>
         </>
     );

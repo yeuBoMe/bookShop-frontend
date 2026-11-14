@@ -1,4 +1,4 @@
-
+import { useTranslation } from "react-i18next";
 import { Badge, Descriptions, Drawer, type DescriptionsProps } from "antd";
 import dayjs from "dayjs";
 
@@ -10,6 +10,7 @@ interface DrawerRatingProps {
 }
 
 const DetailRatingDrawer = (props: DrawerRatingProps) => {
+    const { t } = useTranslation();
     const {
         isDrawerDetailOpen,
         setIsDrawerDetailOpen,
@@ -25,22 +26,22 @@ const DetailRatingDrawer = (props: DrawerRatingProps) => {
         ...(dataDetail ? [
             {
                 key: '1',
-                label: 'Id',
+                label: t("admin.table.id"),
                 children: <p>{dataDetail.id}</p>,
             },
             {
                 key: '2',
-                label: 'User',
+                label: t("admin.table.user"),
                 children: <p>{dataDetail.user.name}</p>,
             },
             {
                 key: '3',
-                label: 'Book',
+                label: t("admin.table.book"),
                 children: <p>{dataDetail.book}</p>,
             },
             {
                 key: '4',
-                label: 'Stars',
+                label: t("admin.table.stars"),
                 children: (
                     <Badge
                         status="processing"
@@ -50,17 +51,17 @@ const DetailRatingDrawer = (props: DrawerRatingProps) => {
             },
             {
                 key: '5',
-                label: 'Comment',
+                label: t("admin.table.comment"),
                 children: <p>{dataDetail.comment}</p>,
             },
             {
                 key: '6',
-                label: 'Created At',
+                label: t("admin.table.createdAt"),
                 children: <p>{formatDateTime(dataDetail?.createdAt)}</p>,
             },
             {
                 key: '7',
-                label: 'Updated At',
+                label: t("admin.table.updatedAt"),
                 children: <p>{formatDateTime(dataDetail?.updatedAt)}</p>,
             },
         ] : [])
@@ -74,14 +75,14 @@ const DetailRatingDrawer = (props: DrawerRatingProps) => {
     return (
         <>
             <Drawer
-                title="Rating Detail"
+                title={t("admin.detail.title", { entity: t("admin.entity.rating") })}
                 placement={"right"}
                 width={"50vw"}
                 open={isDrawerDetailOpen}
                 onClose={handleClearDataAndCloseDrawer}
             >
                 <Descriptions
-                    title="Rating Info"
+                    title={t("admin.detail.info", { entity: t("admin.entity.rating") })}
                     items={items}
                     bordered
                     size="small"

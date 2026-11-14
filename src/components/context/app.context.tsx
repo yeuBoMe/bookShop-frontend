@@ -1,6 +1,7 @@
 import { getAccountInfoAPI } from "@/services/api.service";
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 import BarLoader from "react-spinners/BarLoader";
+import { readCart } from "@/services/cart.service";
 import "styles/spinner.scss";
 
 // blueprint
@@ -33,22 +34,11 @@ export const AuthProvider = (props: IProps) => {
         fetchUserInfoWithAccessTokenRequest()
     }, []);
 
-    const delayTime = (milSeconds: number) => {
-        return new Promise<void>((resolve) => {
-            setTimeout(() => {
-                resolve();
-            }, milSeconds);
-        });
-    }
-
     const fetchUserInfoWithAccessTokenRequest = async () => {
         try {
             const getAccountInfoResponse = await getAccountInfoAPI();
-            await delayTime(200);
 
             if (getAccountInfoResponse?.data) {
-                await new Promise((resolve) => setTimeout(resolve, 100));
-
                 const mappedIAccountToIUser: IUser = {
                     id: getAccountInfoResponse.data.user.id,
                     fullName: getAccountInfoResponse.data.user.name,
@@ -61,14 +51,10 @@ export const AuthProvider = (props: IProps) => {
                 setUser(mappedIAccountToIUser);
                 setIsAuthenticated(true);
 
-                const carts = localStorage.getItem("carts");
-                if (carts) {
-                    const cartsData = JSON.parse(carts) as ICart[];
-                    setCarts(cartsData);
-                }
+                setCarts(readCart());
             }
-        } catch (error: any) {
-            console.log("Check error fetching user info >>> ", error)
+        } catch {
+            // Chưa đăng nhập hoặc token hết hạn — đây là trạng thái bình thường
             setIsAuthenticated(false);
         } finally {
             setIsAppLoading(false);

@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Button } from "antd";
 import { CloseCircleOutlined } from "@ant-design/icons";
 import "styles/client/checkout/order-fail.scss";
@@ -6,17 +7,19 @@ import "styles/client/checkout/order-fail.scss";
 const CheckoutFail = () => {
     const navigate = useNavigate();
 
+    const { t } = useTranslation();
+
     return (
         <div className="order-fail-container">
             <div className="fail-content">
                 <div className="fail-icon">
                     <CloseCircleOutlined />
                 </div>
-                <h2>Thanh toán thất bại</h2>
-                <p>Rất tiếc, giao dịch của bạn chưa được thực hiện thành công.</p>
+                <h2>{t("checkout.failTitle")}</h2>
+                <p>{t("checkout.failLead")}</p>
                 <p className="order-info">
-                    Vui lòng thử lại sau hoặc chọn phương thức thanh toán khác.
-                    Nếu đã bị trừ tiền, vui lòng liên hệ bộ phận hỗ trợ của BookShop để được xử lý.
+                    {t("checkout.failNote1")}
+                    {t("checkout.failNote2")}
                 </p>
                 <div className="fail-actions">
                     <Button
@@ -24,10 +27,10 @@ const CheckoutFail = () => {
                         size="large"
                         onClick={() => navigate("/books")}
                     >
-                        Thử lại
+                        {t("checkout.retry")}
                     </Button>
                     <Button size="large" onClick={() => navigate("/")}>
-                        Về trang chủ
+                        {t("checkout.backHome")}
                     </Button>
                 </div>
             </div>

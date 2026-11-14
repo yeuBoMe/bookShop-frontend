@@ -5,6 +5,7 @@ import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
 import { App, Button, Popconfirm, Space } from 'antd';
 import { useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import DetailUserDrawer from 'components/admin/user/detail.user.drawer';
 import CreateUserModal from 'components/admin/user/create.user.modal';
@@ -22,6 +23,8 @@ type TSearch = {
 const TableUser = () => {
     const actionRef = useRef<ActionType | null>(null);
     const { notification, message } = App.useApp();
+
+    const { t } = useTranslation();
     const [meta, setMeta] = useState({
         current: 1,
         pageSize: 5,
@@ -53,12 +56,12 @@ const TableUser = () => {
             console.log("Check data delete >>> ", deleteUserResponse);
             await new Promise((resolve) => setTimeout(resolve, 1000));
             if (deleteUserResponse) {
-                message.success("Delete user successfully!");
+                message.success(t("admin.msg.deleteSuccess", { entity: t("admin.entity.user") }));
                 refreshTable();
             }
         } catch (error: any) {
             notification.error({
-                message: "Error",
+                message: t("common.error"),
                 description: error?.message,
                 duration: 5,
                 placement: "topRight",
@@ -75,7 +78,7 @@ const TableUser = () => {
             width: 48,
         },
         {
-            title: 'Id',
+            title: t("admin.table.id"),
             dataIndex: 'id',
             hideInSearch: true,
             sorter: true,
@@ -94,36 +97,36 @@ const TableUser = () => {
             },
         },
         {
-            title: 'Full Name',
+            title: t("admin.table.fullName"),
             dataIndex: 'fullName',
             sorter: true,
         },
         {
-            title: 'Email',
+            title: t("admin.table.email"),
             dataIndex: 'email',
             copyable: true,
             sorter: true,
         },
         {
-            title: 'Phone',
+            title: t("admin.table.phone"),
             dataIndex: 'phone',
             sorter: true,
         },
         {
-            title: 'Created At',
+            title: t("admin.table.createdAt"),
             dataIndex: 'createdAt',
             valueType: 'date',
             hideInSearch: true,
             sorter: true,
         },
         {
-            title: 'Created At',
+            title: t("admin.table.createdAt"),
             dataIndex: 'createdAtRange',
             valueType: 'dateRange',
             hideInTable: true,
         },
         {
-            title: 'Action',
+            title: t("admin.table.action"),
             hideInSearch: true,
             render(_, entity) {
                 return (
@@ -145,10 +148,10 @@ const TableUser = () => {
                             />
                             <Popconfirm
                                 placement="topLeft"
-                                title={"Delete user"}
-                                description={"Are you sure to delete this user?"}
-                                okText="Yes"
-                                cancelText="No"
+                                title={t("admin.confirm.deleteTitle", { entity: t("admin.entity.user") })}
+                                description={t("admin.confirm.deleteDescription", { entity: t("admin.entity.user") })}
+                                okText={t("common.yes")}
+                                cancelText={t("common.no")}
                                 onConfirm={() => handleDeleteUser(entity.id)}
                                 okButtonProps={{ loading: isDeleteUser }}
                             >
@@ -267,13 +270,13 @@ const TableUser = () => {
                     showTotal: (total, range) => {
                         return (
                             <div>
-                                {range[0]} - {range[1]} on {total} rows
+                                {t("admin.table.paginationTotal", { from: range[0], to: range[1], total })}
                             </div>
                         )
                     },
                 }}
                 dateFormatter="string"
-                headerTitle="Table User"
+                headerTitle={t("admin.table.header", { entity: t("admin.entityPlural.user") })}
                 toolBarRender={() => [
                     <CSVLink
                         data={currentDataTable}
@@ -284,7 +287,7 @@ const TableUser = () => {
                             icon={<ExportOutlined />}
                             type="primary"
                         >
-                            Export
+                            {t("admin.table.export")}
                         </Button>
                     </CSVLink>,
                     <Button
@@ -293,7 +296,7 @@ const TableUser = () => {
                         onClick={() => setIsModalImportOpen(true)}
                         type="primary"
                     >
-                        Import
+                        {t("admin.table.import")}
                     </Button>,
                     <Button
                         key="add"
@@ -301,7 +304,7 @@ const TableUser = () => {
                         onClick={() => setIsModalCreateOpen(true)}
                         type="primary"
                     >
-                        Add new
+                        {t("admin.table.addNew")}
                     </Button>
                 ]}
             />

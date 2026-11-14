@@ -1,22 +1,25 @@
+@use "../../abstracts/tokens" as t;
+@use "../../abstracts/mixins" as m;
+
 // ===================================
 // FOOTER STYLES - REDESIGNED
 // ===================================
 
 // Variables
-$footer-bg-start: #1e3a5f;
-$footer-bg-end: #2d4a6e;
-$footer-text: #ffffff;
+$footer-bg-start: t.$brand-950;
+$footer-bg-end: t.$brand-900;
+$footer-text: t.$white;
 $footer-text-muted: rgba(255, 255, 255, 0.9);
-$footer-brand-color: #5eb3f6;
-$footer-username-color: #ffa500;
+$footer-brand-color: t.$brand-300;
+$footer-username-color: t.$star;
 $footer-border: rgba(255, 255, 255, 0.2);
-$scroll-btn-bg-start: #1890ff;
-$scroll-btn-bg-end: #0969da;
+$scroll-btn-bg-start: t.$primary;
+$scroll-btn-bg-end: t.$brand-800;
 
 // Breakpoints
-$breakpoint-lg: 1024px;
-$breakpoint-md: 768px;
-$breakpoint-sm: 576px;
+$breakpoint-lg: t.$bp-lg;
+$breakpoint-md: t.$bp-md;
+$breakpoint-sm: t.$bp-sm;
 
 // ===================================
 // FOOTER MAIN
@@ -294,7 +297,7 @@ $breakpoint-sm: 576px;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3);
+  box-shadow: 0 4px 12px rgba(t.$primary, 0.3);
   transition: all 0.25s ease;
   z-index: 1000;
   animation: fadeIn 0.3s ease-out;
@@ -302,7 +305,7 @@ $breakpoint-sm: 576px;
   &:hover {
     background: linear-gradient(135deg, $scroll-btn-bg-end 0%, #0550ae 100%);
     transform: translateY(-4px);
-    box-shadow: 0 6px 16px rgba(24, 144, 255, 0.4);
+    box-shadow: 0 6px 16px rgba(t.$primary, 0.28);
   }
 
   &:active {
@@ -312,7 +315,7 @@ $breakpoint-sm: 576px;
   svg {
     width: 1.5rem;
     height: 1.5rem;
-    fill: #ffffff;
+    fill: t.$white;
   }
 
   @media (max-width: $breakpoint-md) {

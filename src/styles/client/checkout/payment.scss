@@ -1,12 +1,15 @@
+@use "../../abstracts/tokens" as t;
+@use "../../abstracts/mixins" as m;
+
 .payment-info-section {
   padding: 30px;
 
   h3 {
     font-size: 20px;
     font-weight: 600;
-    color: #333;
+    color: t.$text-body;
     margin-bottom: 25px;
-    border-bottom: 2px solid #1890ff;
+    border-bottom: 2px solid t.$primary;
     padding-bottom: 10px;
   }
 
@@ -17,17 +20,17 @@
       width: 100%;
       margin-bottom: 15px;
       padding: 15px;
-      border: 2px solid #f0f0f0;
+      border: 2px solid t.$border;
       border-radius: 8px;
       transition: all 0.3s;
 
       &:hover {
-        border-color: #1890ff;
+        border-color: t.$primary-text;
       }
 
       &.ant-radio-wrapper-checked {
-        border-color: #1890ff;
-        background: #f0f9ff;
+        border-color: t.$primary-text;
+        background: t.$brand-50;
       }
 
       .payment-option {
@@ -37,13 +40,13 @@
 
         strong {
           font-size: 15px;
-          color: #333;
+          color: t.$text-body;
         }
 
         p {
           margin: 0;
           font-size: 13px;
-          color: #666;
+          color: t.$text-muted;
         }
       }
     }
@@ -67,12 +70,12 @@
     }
 
     :global(.submit-order-btn) {
-      background: #52c41a;
-      border-color: #52c41a;
+      background: t.$success;
+      border-color: t.$success-text;
 
       &:hover {
-        background: #73d13d;
-        border-color: #73d13d;
+        background: t.$success;
+        border-color: t.$success-text;
       }
     }
 
@@ -179,15 +182,15 @@
   }
 
   &::-webkit-scrollbar-track {
-    background: #f5f5f5;
+    background: t.$surface-muted;
   }
 
   &::-webkit-scrollbar-thumb {
-    background: #d9d9d9;
+    background: t.$border-strong;
     border-radius: 3px;
 
     &:hover {
-      background: #bfbfbf;
+      background: t.$text-subtle;
     }
   }
 
@@ -196,7 +199,7 @@
     align-items: center;
     gap: 12px;
     padding: 12px 0;
-    border-bottom: 1px solid #f5f5f5;
+    border-bottom: 1px solid t.$surface-muted;
 
     &:last-child {
       border-bottom: none;
@@ -217,7 +220,7 @@
       .order-item-name {
         font-size: 14px;
         font-weight: 500;
-        color: #333;
+        color: t.$text-body;
         margin: 0 0 4px 0;
         line-height: 1.4;
         display: -webkit-box;
@@ -228,7 +231,7 @@
 
       .order-item-quantity {
         font-size: 13px;
-        color: #666;
+        color: t.$text-muted;
         margin: 0;
       }
     }
@@ -236,7 +239,7 @@
     .order-item-price {
       font-size: 15px;
       font-weight: 600;
-      color: #ff4d4f;
+      color: t.$danger-text;
       flex-shrink: 0;
     }
   }
@@ -291,7 +294,7 @@
         max-width: 300px;
         height: auto;
         border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 2px 8px rgba(15, 23, 42, 0.07);
       }
     }
 
@@ -304,7 +307,7 @@
         justify-content: space-between;
         align-items: flex-start;
         padding: 12px 0;
-        border-bottom: 1px solid #f0f0f0;
+        border-bottom: 1px solid t.$border;
         gap: 15px;
 
         &:last-child {
@@ -313,19 +316,19 @@
 
         strong {
           font-size: 15px;
-          color: #333;
+          color: t.$text-body;
           min-width: 100px;
           flex-shrink: 0;
         }
 
         span {
           font-size: 15px;
-          color: #666;
+          color: t.$text-muted;
           text-align: right;
           word-break: break-word;
 
           &.amount {
-            color: #ff4d4f;
+            color: t.$danger-text;
             font-weight: 600;
             font-size: 16px;
           }

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { App, Carousel, Rate, Spin } from "antd";
+import { useTranslation } from "react-i18next";
 import {
     ShoppingCartOutlined,
     TruckOutlined,
@@ -13,20 +14,21 @@ import {
 } from "@ant-design/icons";
 import "styles/client/home.scss";
 import { fetchAllBooksAPI, fetchAllCategoriesSelectAPI } from "@/services/api.service";
-import { useCurrentApp } from "@/components/context/app.context";
+import { useAddToCart } from "@/hooks/use-add-to-cart";
+import { formatPrice, getBookImageUrl } from "@/services/helper";
 
 const HomePage = () => {
-    const { user, setCarts } = useCurrentApp();
-    const { message, notification } = App.useApp();
+    const { notification } = App.useApp();
+
+    const { t } = useTranslation();
     const navigate = useNavigate();
+    const addBookToCart = useAddToCart();
 
     const [loading, setLoading] = useState(true);
     const [featuredBooks, setFeaturedBooks] = useState<IBook[]>([]);
     const [newArrivals, setNewArrivals] = useState<IBook[]>([]);
     const [bestSellers, setBestSellers] = useState<IBook[]>([]);
     const [categories, setCategories] = useState<ICategory[]>([]);
-
-    const baseImageUrl = import.meta.env.VITE_IMAGE_URL || "https://res.cloudinary.com/dvglvfask/image/upload";
 
     useEffect(() => {
         window.scrollTo({ top: 0, behavior: "smooth" });
@@ -57,18 +59,15 @@ const HomePage = () => {
                 setBestSellers(bestRes.data.result);
             }
 
-        } catch (error) {
-            console.error("Failed to fetch homepage data:", error);
+        } catch (error: any) {
+            notification.error({
+                message: t("home.loadFail"),
+                description: error?.message ?? t("book.tryAgainLater"),
+                placement: "topRight",
+            });
         } finally {
             setLoading(false);
         }
-    };
-
-    const formatPrice = (price: number) => {
-        return new Intl.NumberFormat("vi-VN", {
-            style: "currency",
-            currency: "VND",
-        }).format(price);
     };
 
     const handleNavigate = (path: string) => {
@@ -83,40 +82,7 @@ const HomePage = () => {
 
     const handleAddEachProductToCart = (e: React.MouseEvent, book: IBook) => {
         e.stopPropagation();
-
-        if (!user || !user.id) {
-            notification.warning({
-                message: "Chưa đăng nhập",
-                description: "Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng",
-                duration: 3,
-                placement: "topRight"
-            });
-            setTimeout(() => {
-                navigate("/login");
-            }, 1000);
-            return;
-        }
-
-        const cartStorage = localStorage.getItem("carts");
-        if (cartStorage) {
-            const carts = JSON.parse(cartStorage) as ICart[];
-            let isExistIndex = carts.findIndex((cart) => cart.id === book.id);
-
-            if (isExistIndex > -1) {
-                carts[isExistIndex].quantity = carts[isExistIndex].quantity + 1;
-            } else {
-                carts.push({ id: book.id, quantity: 1, detail: book });
-            }
-
-            localStorage.setItem("carts", JSON.stringify(carts));
-            setCarts(carts);
-        } else {
-            const data = [{ id: book.id, quantity: 1, detail: book }];
-            localStorage.setItem("carts", JSON.stringify(data));
-            setCarts(data);
-        }
-
-        message.success(`Đã thêm 1 sản phẩm "${book.name}" vào giỏ hàng!`);
+        addBookToCart(book, 1);
     };
 
     const renderBookCard = (book: IBook) => (
@@ -127,20 +93,16 @@ const HomePage = () => {
         >
             <div className="product-card__image">
                 <img
-                    src={
-                        book.images && book.images.length > 0
-                            ? `${baseImageUrl}/${book.images[0]}`
-                            : "https://via.placeholder.com/200x280?text=No+Image"
-                    }
+                    src={getBookImageUrl(book.images)}
                     alt={book.name}
                 />
                 <div className="product-card__overlay" />
-                <div className="product-card__badge">Hot</div>
+                <div className="product-card__badge">{t("common.hot")}</div>
             </div>
             <div className="product-card__content">
                 <h3 className="product-card__title">{book.name}</h3>
                 <div className="product-card__rating">
-                    <Rate defaultValue={book.averageStars} allowHalf className="stars" />
+                    <Rate value={book.averageStars ?? 0} allowHalf disabled className="stars" />
                     <span className="count">(99)</span>
                 </div>
                 <div className="product-card__price">
@@ -151,7 +113,7 @@ const HomePage = () => {
                     className="product-card__btn"
                     onClick={(e) => handleAddEachProductToCart(e, book)}
                 >
-                    <ShoppingCartOutlined /> Thêm vào giỏ hàng
+                    <ShoppingCartOutlined /> {t("home.addToCart")}
                 </button>
             </div>
         </div>
@@ -160,7 +122,7 @@ const HomePage = () => {
     if (loading) {
         return (
             <div className="homepage-loading">
-                <Spin size="large" tip="Đang tải..." />
+                <Spin size="large" tip={t("home.loading")} />
             </div>
         );
     }
@@ -173,58 +135,58 @@ const HomePage = () => {
                 <Carousel autoplay autoplaySpeed={5000} effect="fade">
                     <div className="hero__slide hero__slide--1">
                         <div className="hero__content">
-                            <span className="hero__subtitle">✦ Ưu đãi đặc biệt</span>
+                            <span className="hero__subtitle">{t("home.heroBadge1")}</span>
                             <h1 className="hero__title">
-                                Mua Sắm Thông Minh <br />
-                                <span className="highlight">Tiết Kiệm Hơn 50%</span>
+                                {t("home.heroTitle1a")} <br />
+                                <span className="highlight">{t("home.heroTitle1b")}</span>
                             </h1>
                             <p className="hero__description">
-                                Khám phá hàng ngàn sản phẩm chất lượng cao với giá cực ưu đãi
+                                {t("home.heroDesc1")}
                             </p>
                             <button className="hero__btn" onClick={() => handleNavigate("/books")}>
-                                Mua Ngay <RightOutlined />
+                                {t("home.heroCta1")} <RightOutlined />
                             </button>
                         </div>
                         <div className="hero__image">
-                            <img src="https://images.unsplash.com/photo-1512820790803-83ca734da794?w=800" alt="Banner 1" />
+                            <img src="https://images.unsplash.com/photo-1512820790803-83ca734da794?w=800" alt={t("home.heroTitle1a")} />
                         </div>
                     </div>
 
                     <div className="hero__slide hero__slide--2">
                         <div className="hero__content">
-                            <span className="hero__subtitle">✦ Bộ sưu tập mới</span>
+                            <span className="hero__subtitle">{t("home.heroBadge2")}</span>
                             <h1 className="hero__title">
-                                Sản Phẩm Mới <br />
-                                <span className="highlight">Xu Hướng 2025</span>
+                                {t("home.heroTitle2a")} <br />
+                                <span className="highlight">{t("home.heroTitle2b")}</span>
                             </h1>
                             <p className="hero__description">
-                                Cập nhật những sản phẩm hot nhất, đáp ứng mọi nhu cầu
+                                {t("home.heroDesc2")}
                             </p>
                             <button className="hero__btn" onClick={() => handleNavigate("/books")}>
-                                Khám Phá <RightOutlined />
+                                {t("home.heroCta2")} <RightOutlined />
                             </button>
                         </div>
                         <div className="hero__image">
-                            <img src="https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=800" alt="Banner 2" />
+                            <img src="https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=800" alt={t("home.heroTitle2a")} />
                         </div>
                     </div>
 
                     <div className="hero__slide hero__slide--3">
                         <div className="hero__content">
-                            <span className="hero__subtitle">✦ Giao hàng miễn phí</span>
+                            <span className="hero__subtitle">{t("home.heroBadge3")}</span>
                             <h1 className="hero__title">
-                                Freeship Toàn Quốc <br />
-                                <span className="highlight">Đơn Từ 150K</span>
+                                {t("home.heroTitle3a")} <br />
+                                <span className="highlight">{t("home.heroTitle3b")}</span>
                             </h1>
                             <p className="hero__description">
-                                Nhận hàng nhanh chóng, tiện lợi ngay tại nhà bạn
+                                {t("home.heroDesc3")}
                             </p>
                             <button className="hero__btn" onClick={() => handleNavigate("/books")}>
-                                Đặt Hàng <RightOutlined />
+                                {t("home.heroCta3")} <RightOutlined />
                             </button>
                         </div>
                         <div className="hero__image">
-                            <img src="https://images.unsplash.com/photo-1519682337058-a94d519337bc?w=800" alt="Banner 3" />
+                            <img src="https://images.unsplash.com/photo-1519682337058-a94d519337bc?w=800" alt={t("home.heroTitle3a")} />
                         </div>
                     </div>
                 </Carousel>
@@ -238,8 +200,8 @@ const HomePage = () => {
                             <TruckOutlined />
                         </div>
                         <div className="features__content">
-                            <h3>Giao Hàng Nhanh</h3>
-                            <p>Freeship đơn từ 150K</p>
+                            <h3>{t("home.perk1")}</h3>
+                            <p>{t("home.perk1Note")}</p>
                         </div>
                     </div>
                     <div className="features__item">
@@ -247,8 +209,8 @@ const HomePage = () => {
                             <SafetyOutlined />
                         </div>
                         <div className="features__content">
-                            <h3>Thanh Toán An Toàn</h3>
-                            <p>Bảo mật 100%</p>
+                            <h3>{t("home.perk2")}</h3>
+                            <p>{t("home.perk2Note")}</p>
                         </div>
                     </div>
                     <div className="features__item">
@@ -256,8 +218,8 @@ const HomePage = () => {
                             <ShoppingCartOutlined />
                         </div>
                         <div className="features__content">
-                            <h3>Đổi Trả Dễ Dàng</h3>
-                            <p>Trong vòng 7 ngày</p>
+                            <h3>{t("home.perk3")}</h3>
+                            <p>{t("home.perk3Note")}</p>
                         </div>
                     </div>
                     <div className="features__item">
@@ -265,8 +227,8 @@ const HomePage = () => {
                             <CustomerServiceOutlined />
                         </div>
                         <div className="features__content">
-                            <h3>Hỗ Trợ 24/7</h3>
-                            <p>Tư vấn nhiệt tình</p>
+                            <h3>{t("home.perk4")}</h3>
+                            <p>{t("home.perk4Note")}</p>
                         </div>
                     </div>
                 </div>
@@ -276,10 +238,10 @@ const HomePage = () => {
             <section className="categories">
                 <div className="section-header">
                     <h2 className="section-title">
-                        <StarOutlined /> Danh Mục Nổi Bật
+                        <StarOutlined /> {t("home.featuredCategories")}
                     </h2>
                     <button className="section-link" onClick={() => handleNavigate("/books")}>
-                        Xem tất cả <RightOutlined />
+                        {t("home.seeAll")} <RightOutlined />
                     </button>
                 </div>
                 <div className="categories__grid">
@@ -299,7 +261,7 @@ const HomePage = () => {
                 <div>
                     <div className="section-header">
                         <h2 className="section-title">
-                            <ThunderboltOutlined /> Sản phẩm bán chạy
+                            <ThunderboltOutlined /> {t("home.bestSellers")}
                         </h2>
                     </div>
                     <div className="products-grid">
@@ -312,10 +274,10 @@ const HomePage = () => {
             <section className="featured-products">
                 <div className="section-header">
                     <h2 className="section-title">
-                        <FireOutlined /> Sản Phẩm Nổi Bật
+                        <FireOutlined /> {t("home.featuredProducts")}
                     </h2>
                     <button className="section-link" onClick={() => handleNavigate("/books")}>
-                        Xem tất cả <RightOutlined />
+                        {t("home.seeAll")} <RightOutlined />
                     </button>
                 </div>
                 <div className="products-grid">
@@ -327,10 +289,10 @@ const HomePage = () => {
             <section className="new-arrivals">
                 <div className="section-header">
                     <h2 className="section-title">
-                        <StarOutlined /> Hàng Mới Về
+                        <StarOutlined /> {t("home.newArrivals")}
                     </h2>
                     <button className="section-link" onClick={() => handleNavigate("/books")}>
-                        Xem tất cả <RightOutlined />
+                        {t("home.seeAll")} <RightOutlined />
                     </button>
                 </div>
                 <div className="products-grid">
@@ -341,17 +303,17 @@ const HomePage = () => {
             {/* Newsletter */}
             <section className="newsletter">
                 <div className="newsletter__content">
-                    <h2 className="newsletter__title">Đăng Ký Nhận Ưu Đãi</h2>
+                    <h2 className="newsletter__title">{t("home.newsletterTitle")}</h2>
                     <p className="newsletter__description">
-                        Nhận ngay voucher 100K cho đơn hàng đầu tiên
+                        {t("home.newsletterDesc")}
                     </p>
                     <div className="newsletter__form">
                         <input
                             type="email"
-                            placeholder="Nhập email của bạn..."
+                            placeholder={t("home.newsletterPlaceholder")}
                             className="newsletter__input"
                         />
-                        <button className="newsletter__btn">Đăng Ký</button>
+                        <button className="newsletter__btn">{t("home.newsletterCta")}</button>
                     </div>
                 </div>
             </section>

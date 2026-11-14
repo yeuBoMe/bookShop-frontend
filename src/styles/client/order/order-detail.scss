@@ -1,14 +1,17 @@
-$primary-color: #1890ff;
-$success-color: #52c41a;
-$warning-color: #faad14;
-$error-color: #ff4d4f;
-$text-color: #262626;
-$text-secondary: #8c8c8c;
-$border-color: #e8e8e8;
-$bg-gray: #fafafa;
-$shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
-$mobile: 576px;
-$tablet: 768px;
+@use "../../abstracts/tokens" as t;
+@use "../../abstracts/mixins" as m;
+
+$primary-color: t.$primary-text;
+$success-color: t.$success-text;
+$warning-color: t.$warning-text;
+$error-color: t.$danger-text;
+$text-color: t.$text-strong;
+$text-secondary: t.$text-muted;
+$border-color: t.$border;
+$bg-gray: t.$surface-subtle;
+$shadow-sm: t.$shadow-sm;
+$mobile: t.$bp-sm;
+$tablet: t.$bp-md;
 
 .order-detail-modal {
   .ant-modal {
@@ -112,7 +115,7 @@ $tablet: 768px;
         transition: all 0.2s ease;
 
         &:hover {
-          background: #f0f0f0;
+          background: t.$surface-muted;
           border: 1px solid $primary-color;
         }
 
@@ -164,7 +167,7 @@ $tablet: 768px;
       display: flex;
       justify-content: space-between;
       padding: 16px;
-      background: linear-gradient(135deg, #e6f4ff 0%, #f0f9ff 100%);
+      background: linear-gradient(135deg, t.$brand-50 0%, t.$brand-50 100%);
       border-radius: 8px;
       border: 1px solid #bae0ff;
 

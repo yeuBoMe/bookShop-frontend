@@ -119,7 +119,9 @@ declare global {
     introduceText: string;
     description: string;
     reader: string;
-    averageStars: double;
+    sold?: string;
+    averageStars: number;
+    ratingCount?: number;
     createdAt?: Date;
     updatedAt?: Date;
     createdBy?: string;
@@ -186,6 +188,110 @@ declare global {
     countBooks: number;
     countCategories: number;
     countRatings: number;
+  }
+
+  interface IRevenueSummary {
+    totalRevenue: number;
+    paidOrderCount: number;
+    averageOrderValue: number;
+  }
+
+  interface IRevenuePoint {
+    day: string;
+    revenue: number;
+    orderCount: number;
+  }
+
+  interface IOrderStatusCount {
+    status: string;
+    orderCount: number;
+  }
+
+  interface ITopBook {
+    bookId: number;
+    name: string;
+    author: string;
+    soldQuantity: number;
+    revenue: number;
+  }
+
+  interface ITopCustomer {
+    email: string;
+    name: string;
+    orderCount: number;
+    totalSpent: number;
+  }
+
+  interface ILowStockBook {
+    bookId: number;
+    name: string;
+    author: string;
+    quantity: number;
+  }
+
+  /** Một lát cắt của biểu đồ tròn tỷ trọng doanh thu theo thể loại. */
+  interface ICategoryRevenueShare {
+    categoryId: number | null;
+    name: string;
+    revenue: number;
+    soldQuantity: number;
+    percentage: number;
+  }
+
+  interface IDashboardStatistics {
+    fromTime: string;
+    toTime: string;
+    revenue: IRevenueSummary;
+    revenueByDay: IRevenuePoint[];
+    ordersByStatus: IOrderStatusCount[];
+    topSellingBooks: ITopBook[];
+    topCustomers: ITopCustomer[];
+    revenueByCategory: ICategoryRevenueShare[];
+    lowStockBooks: ILowStockBook[];
+  }
+
+  /**
+   * Trang dữ liệu theo con trỏ. KHÔNG có tổng số bản ghi — đó là chủ đích:
+   * bỏ count(*) và OFFSET nên trang sau không chậm dần theo độ sâu.
+   */
+  interface ICursorPage<T> {
+    items: T[];
+    nextCursor: string | null;
+    hasNext: boolean;
+    size: number;
+  }
+
+  type TBookSort = "NEWEST" | "PRICE_ASC" | "PRICE_DESC" | "RATING_DESC";
+
+  interface IBookSearchParams {
+    keyword?: string;
+    categoryIds?: number[];
+    categoryName?: string;
+    minPrice?: number;
+    maxPrice?: number;
+    minRating?: number;
+    sort?: TBookSort;
+    cursor?: string | null;
+    size?: number;
+  }
+
+  /** Thao tác của một dòng khi import theo dòng. Bỏ trống = CREATE. */
+  type TImportAction = "CREATE" | "UPDATE" | "DELETE";
+
+  /**
+   * Một dòng trong file import sách. Mọi trường đều tuỳ chọn vì dòng DELETE
+   * chỉ cần khoá định danh (name + author), không phải khai đủ cột.
+   */
+  interface IBookImportRow {
+    action?: TImportAction;
+    name?: string;
+    author?: string;
+    price?: number;
+    quantity?: number;
+    introduceText?: string;
+    description?: string;
+    reader?: string;
+    category?: string;
   }
 
   interface IPay {

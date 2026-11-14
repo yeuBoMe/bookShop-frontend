@@ -10,10 +10,25 @@ import {
     type FormProps,
 } from "antd";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 interface OrderUpdateValues {
     status: string
 }
+
+/**
+ * Luat chuyen trang thai, PHAI khop StatusEnum.ALLOWED_TRANSITIONS ben backend.
+ * Lech nhau thi nguoi dung chon duoc trang thai ma backend se tu choi.
+ * SUCCESS va CANCEL la trang thai ket thuc nen khong con luoi chon nao.
+ */
+const ALLOWED_TRANSITIONS: Record<string, string[]> = {
+    PENDING: ["SHIPPING", "PAID", "CANCEL"],
+    UNPAID: ["PAID", "CANCEL"],
+    PAID: ["SHIPPING", "CANCEL"],
+    SHIPPING: ["SUCCESS", "CANCEL"],
+    SUCCESS: [],
+    CANCEL: [],
+};
 
 interface UpdateOrderProps {
     isModalUpdateOpen: boolean;
@@ -34,6 +49,8 @@ const UpdateOrderModal = (props: UpdateOrderProps) => {
 
     const [form] = Form.useForm<OrderUpdateValues>();
     const { notification, message } = App.useApp();
+
+    const { t } = useTranslation();
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
     useEffect(() => {
@@ -53,12 +70,12 @@ const UpdateOrderModal = (props: UpdateOrderProps) => {
             const updateOrderResponse = await updateOrderAPI(dataUpdate.id, status);
             if (updateOrderResponse.data) {
                 handleClearDataAndCloseModal();
-                message.success("Update order successfully!");
+                message.success(t("admin.msg.updateSuccess", { entity: t("admin.entity.order") }));
                 refreshTable();
             }
         } catch (error: any) {
             notification.error({
-                message: "Error",
+                message: t("common.error"),
                 description: error?.message || "An error happens when updating order",
                 duration: 5,
                 placement: "topRight",
@@ -75,13 +92,17 @@ const UpdateOrderModal = (props: UpdateOrderProps) => {
         setDataUpdate(null);
     }
 
-    const orderStatusOptions = [
+    const currentStatus = dataUpdate?.status ?? "";
+    const selectableStatuses = ALLOWED_TRANSITIONS[currentStatus] ?? [];
+    const isFinalStatus = selectableStatuses.length === 0;
+
+    const allOrderStatusOptions = [
         {
             value: "PENDING",
             label: (
                 <span>
                     <ClockCircleOutlined style={{ color: "orange", marginRight: 8 }} />
-                    PENDING
+                    {t("admin.order.status.PENDING")}
                 </span>
             ),
         },
@@ -90,7 +111,7 @@ const UpdateOrderModal = (props: UpdateOrderProps) => {
             label: (
                 <span>
                     <TruckOutlined style={{ color: "cyan", marginRight: 8 }} />
-                    SHIPPING
+                    {t("admin.order.status.SHIPPING")}
                 </span>
             ),
         },
@@ -99,7 +120,7 @@ const UpdateOrderModal = (props: UpdateOrderProps) => {
             label: (
                 <span>
                     <CheckCircleOutlined style={{ color: "green", marginRight: 8 }} />
-                    SUCCESS
+                    {t("admin.order.status.SUCCESS")}
                 </span>
             ),
         },
@@ -108,7 +129,7 @@ const UpdateOrderModal = (props: UpdateOrderProps) => {
             label: (
                 <span>
                     <CloseCircleOutlined style={{ color: "red", marginRight: 8 }} />
-                    CANCEL
+                    {t("admin.order.status.CANCEL")}
                 </span>
             ),
         },
@@ -117,23 +138,29 @@ const UpdateOrderModal = (props: UpdateOrderProps) => {
             label: (
                 <span>
                     <DollarCircleOutlined style={{ color: "blue", marginRight: 8 }} />
-                    PAID
+                    {t("admin.order.status.PAID")}
                 </span>
             ),
         },
     ];
 
+    // Giu lai chinh trang thai hien tai de o chon khong bi trong,
+    // con lai chi hien nhung trang thai backend cho phep chuyen toi.
+    const orderStatusOptions = allOrderStatusOptions.filter(
+        (option) => option.value === currentStatus || selectableStatuses.includes(option.value)
+    );
+
     return (
         <>
             <Modal
-                title="Update order"
+                title={t("admin.form.updateTitle", { entity: t("admin.entity.order") })}
                 closable={false}
                 maskClosable={false}
                 open={isModalUpdateOpen}
                 onOk={() => form.submit()}
                 onCancel={handleClearDataAndCloseModal}
                 loading={isLoading}
-                okText="Update"
+                okText={t("common.update")}
                 width={"50vw"}
             >
                 <Row justify={"center"}>
@@ -149,12 +176,14 @@ const UpdateOrderModal = (props: UpdateOrderProps) => {
                             <Row gutter={16}>
                                 <Col span={17}>
                                     <Form.Item<OrderUpdateValues>
-                                        label="Status:"
+                                        label={t("field.status")}
                                         name={["status"]}
-                                        rules={[{ required: true, message: "Status is required" }]}
+                                        rules={[{ required: true, message: t("validate.required", { field: t("field.status") }) }]}
                                     >
                                         <Select
                                             options={orderStatusOptions}
+                                            disabled={isFinalStatus}
+                                            placeholder={isFinalStatus ? t("admin.order.finalStatusHint") : undefined}
                                         />
                                     </Form.Item>
                                 </Col>

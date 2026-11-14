@@ -462,3 +462,152 @@ export const getAccountInfoAPI = () => {
 export const logoutAPI = () => {
   return axios.post<IBackendRes<IAccount>>("/api/v1/auth/logout");
 };
+
+// Module dashboard - số liệu thống kê
+/** Bỏ qua tham số rỗng để backend tự áp mặc định trong cấu hình. */
+const buildStatisticsQuery = (from?: string, to?: string, topLimit?: number) => {
+  const params = new URLSearchParams();
+  if (from) params.set("from", from);
+  if (to) params.set("to", to);
+  if (topLimit) params.set("topLimit", String(topLimit));
+  const query = params.toString();
+  return query ? `?${query}` : "";
+};
+
+export const getDashboardStatisticsAPI = (
+  from?: string,
+  to?: string,
+  topLimit?: number
+) => {
+  return axios.get<IBackendRes<IDashboardStatistics>>(
+    `/api/v1/dashboard/statistics${buildStatisticsQuery(from, to, topLimit)}`
+  );
+};
+
+export const getRevenueSummaryAPI = (from?: string, to?: string) => {
+  return axios.get<IBackendRes<IRevenueSummary>>(
+    `/api/v1/dashboard/revenue${buildStatisticsQuery(from, to)}`
+  );
+};
+
+export const getRevenueByDayAPI = (from?: string, to?: string) => {
+  return axios.get<IBackendRes<IRevenuePoint[]>>(
+    `/api/v1/dashboard/revenue-by-day${buildStatisticsQuery(from, to)}`
+  );
+};
+
+export const getOrdersByStatusAPI = (from?: string, to?: string) => {
+  return axios.get<IBackendRes<IOrderStatusCount[]>>(
+    `/api/v1/dashboard/order-status${buildStatisticsQuery(from, to)}`
+  );
+};
+
+export const getTopSellingBooksAPI = (
+  from?: string,
+  to?: string,
+  topLimit?: number
+) => {
+  return axios.get<IBackendRes<ITopBook[]>>(
+    `/api/v1/dashboard/top-books${buildStatisticsQuery(from, to, topLimit)}`
+  );
+};
+
+export const getTopCustomersAPI = (
+  from?: string,
+  to?: string,
+  topLimit?: number
+) => {
+  return axios.get<IBackendRes<ITopCustomer[]>>(
+    `/api/v1/dashboard/top-customers${buildStatisticsQuery(from, to, topLimit)}`
+  );
+};
+
+export const getRevenueByCategoryAPI = (
+  from?: string,
+  to?: string,
+  topLimit?: number
+) => {
+  return axios.get<IBackendRes<ICategoryRevenueShare[]>>(
+    `/api/v1/dashboard/revenue-by-category${buildStatisticsQuery(from, to, topLimit)}`
+  );
+};
+
+export const getLowStockBooksAPI = (topLimit?: number) => {
+  return axios.get<IBackendRes<ILowStockBook[]>>(
+    `/api/v1/dashboard/low-stock${buildStatisticsQuery(undefined, undefined, topLimit)}`
+  );
+};
+
+// Module import theo dòng - mỗi dòng mang thao tác riêng, tính đúng/sai độc lập
+export const importBooksBatchAPI = (data: IBookImportRow[]) => {
+  return axios.post<IBackendRes<IResponseImportData<IDetailFaultInfo<IBook>>>>(
+    "/api/v1/books/import/batch",
+    data
+  );
+};
+
+export const importCategoriesBatchAPI = (
+  data: { name: string; action?: TImportAction }[]
+) => {
+  return axios.post<
+    IBackendRes<IResponseImportData<IDetailFaultInfo<ICategory>>>
+  >("/api/v1/categories/import/batch", data);
+};
+
+export const importUsersBatchAPI = (
+  data: {
+    fullName?: string;
+    email: string;
+    phone?: string;
+    action?: TImportAction;
+  }[]
+) => {
+  return axios.post<IBackendRes<IResponseImportData<IDetailFaultInfo<IUserView>>>>(
+    "/api/v1/users/import/batch",
+    data
+  );
+};
+
+// Module tìm kiếm sách theo con trỏ (keyset) — dùng cho cuộn "xem thêm" phía khách
+export const searchBooksAPI = (params: IBookSearchParams) => {
+  const query = new URLSearchParams();
+
+  if (params.keyword) query.set("keyword", params.keyword);
+  if (params.categoryName) query.set("categoryName", params.categoryName);
+  // Nhiều thể loại: lặp lại cùng một tên tham số, Spring gom thành List
+  params.categoryIds?.forEach((id) => query.append("categoryIds", String(id)));
+  if (params.minPrice != null) query.set("minPrice", String(params.minPrice));
+  if (params.maxPrice != null) query.set("maxPrice", String(params.maxPrice));
+  if (params.minRating) query.set("minRating", String(params.minRating));
+  if (params.sort) query.set("sort", params.sort);
+  if (params.cursor) query.set("cursor", params.cursor);
+  if (params.size) query.set("size", String(params.size));
+
+  return axios.get<IBackendRes<ICursorPage<IBook>>>(
+    `/api/v1/books/search?${query.toString()}`
+  );
+};
+
+// Module export theo luồng — tải toàn bộ dữ liệu theo bộ lọc, không giới hạn ở trang đang xem
+/** responseType blob: backend trả CSV thô, không phải JSON bọc trong GlobalResponse. */
+export const exportBooksCsvAPI = (params: IBookSearchParams) => {
+  const query = new URLSearchParams();
+
+  if (params.keyword) query.set("keyword", params.keyword);
+  if (params.categoryName) query.set("categoryName", params.categoryName);
+  params.categoryIds?.forEach((id) => query.append("categoryIds", String(id)));
+  if (params.minPrice != null) query.set("minPrice", String(params.minPrice));
+  if (params.maxPrice != null) query.set("maxPrice", String(params.maxPrice));
+  if (params.minRating) query.set("minRating", String(params.minRating));
+
+  return axios.get<Blob>(`/api/v1/exports/books.csv?${query.toString()}`, {
+    responseType: "blob",
+  });
+};
+
+export const exportOrdersCsvAPI = (status?: string) => {
+  const query = status ? `?status=${encodeURIComponent(status)}` : "";
+  return axios.get<Blob>(`/api/v1/exports/orders.csv${query}`, {
+    responseType: "blob",
+  });
+};

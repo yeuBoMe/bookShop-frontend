@@ -1,5 +1,6 @@
 import { ShoppingOutlined, ClockCircleOutlined, CheckCircleOutlined, CloseCircleOutlined, TruckOutlined, DollarCircleOutlined, ExclamationCircleOutlined } from '@ant-design/icons'
 import { Button, Descriptions, Modal, Tag } from 'antd'
+import { useTranslation } from "react-i18next";
 import type { JSX } from 'react';
 import "styles/client/order/order-detail.scss";
 
@@ -11,6 +12,7 @@ interface OrderDetailModalProps {
 }
 
 const OrderDetailModal = (props: OrderDetailModalProps) => {
+    const { t } = useTranslation();
     const { modalVisible, setModalVisible, selectedOrder, setSelectedOrder } = props;
 
     // Format giá tiền
@@ -38,32 +40,32 @@ const OrderDetailModal = (props: OrderDetailModalProps) => {
     const getStatusConfig = (status: string) => {
         const configs: Record<string, { text: string; color: string; icon: JSX.Element }> = {
             PENDING: {
-                text: "Chờ xác nhận",
+                text: t("order.statusText.PENDING"),
                 color: "orange",
                 icon: <ClockCircleOutlined />
             },
             SHIPPING: {
-                text: "Đang giao",
+                text: t("order.statusText.SHIPPING"),
                 color: "cyan",
                 icon: <TruckOutlined />
             },
             SUCCESS: {
-                text: "Thành công",
+                text: t("order.statusText.SUCCESS"),
                 color: "green",
                 icon: <CheckCircleOutlined />
             },
             CANCEL: {
-                text: "Đã huỷ",
+                text: t("order.statusText.CANCEL"),
                 color: "red",
                 icon: <CloseCircleOutlined />
             },
             PAID: {
-                text: "Đã thanh toán",
+                text: t("order.statusText.PAID"),
                 color: "blue",
                 icon: <DollarCircleOutlined />
             },
             UNPAID: {
-                text: "UNPAID",
+                text: t("order.statusText.UNPAID"),
                 color: "magenta",
                 icon: <ExclamationCircleOutlined />,
             },
@@ -88,14 +90,14 @@ const OrderDetailModal = (props: OrderDetailModalProps) => {
             title={
                 <div className="modal-title">
                     <ShoppingOutlined />
-                    <span>Chi tiết đơn hàng #{selectedOrder.id}</span>
+                    <span>{t("order.detailTitle", { id: selectedOrder.id })}</span>
                 </div>
             }
             open={modalVisible}
             closable={false}
             footer={[
                 <Button key="close" onClick={handleCloseModal}>
-                    Đóng
+                    {t("common.close")}
                 </Button>
             ]}
             width={700}
@@ -105,32 +107,32 @@ const OrderDetailModal = (props: OrderDetailModalProps) => {
             <div className="order-detail-content">
                 {/* Thông tin chung của đơn hàng */}
                 <Descriptions column={1} bordered>
-                    <Descriptions.Item label="Mã đơn hàng">
+                    <Descriptions.Item label={t("order.code")}>
                         <strong>{selectedOrder.id}</strong>
                     </Descriptions.Item>
-                    <Descriptions.Item label="Trạng thái">
+                    <Descriptions.Item label={t("order.status")}>
                         <Tag color={statusConfig.color} icon={statusConfig.icon}>
                             {statusConfig.text}
                         </Tag>
                     </Descriptions.Item>
-                    <Descriptions.Item label="Thời gian đặt">
+                    <Descriptions.Item label={t("order.placedAt")}>
                         {formatDate(selectedOrder.createdAt)}
                     </Descriptions.Item>
-                    <Descriptions.Item label="Địa chỉ giao hàng">
+                    <Descriptions.Item label={t("order.address")}>
                         {selectedOrder.address}
                     </Descriptions.Item>
-                    <Descriptions.Item label="Phương thức thanh toán">
+                    <Descriptions.Item label={t("order.paymentMethod")}>
                         {selectedOrder.paymentMethod === "cod"
-                            ? "Thanh toán khi nhận hàng (COD)"
+                            ? t("order.payment.COD")
                             : selectedOrder.paymentMethod === "vnpay"
-                                ? "Thanh toán bằng ví VNPay"
-                                : "Thanh toán MoMo QR"}
+                                ? t("order.payment.VNPAY")
+                                : t("order.payment.MOMO")}
                     </Descriptions.Item>
                 </Descriptions>
 
                 {/* Danh sách sản phẩm trong đơn hàng */}
                 <div className="modal-products">
-                    <h3>Sản phẩm đã đặt</h3>
+                    <h3>{t("order.orderedProducts")}</h3>
                     {selectedOrder.detail.map((item, index) => {
                         console.log("Check data detail >>>", item);
                         return (
@@ -149,7 +151,7 @@ const OrderDetailModal = (props: OrderDetailModalProps) => {
 
                 {/* Tổng tiền */}
                 <div className="modal-total">
-                    <span>Tổng tiền:</span>
+                    <span>{t("order.totalLabel")}</span>
                     <span className="total-price">
                         {formatPrice(selectedOrder.totalPrice)}
                     </span>

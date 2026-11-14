@@ -17,6 +17,7 @@ import {
     type UploadProps
 } from "antd";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 const { TextArea } = Input;
 
 interface BookCreateValues {
@@ -58,6 +59,8 @@ const CreateBookModal = (props: CreateBookProps) => {
     const { isModalCreateOpen, setIsModalCreateOpen, refreshTable } = props;
     const [form] = Form.useForm<BookCreateValues>();
     const { notification, message } = App.useApp();
+
+    const { t } = useTranslation();
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const [previewOpen, setPreviewOpen] = useState<boolean>(false);
@@ -81,7 +84,7 @@ const CreateBookModal = (props: CreateBookProps) => {
                     setCategories(categoriesSelect);
                 }
             } catch {
-                message.error("Cannot fetch categories list");
+                message.error(t("admin.msg.loadCategoriesFail"));
             }
         };
         fetchAllCategories();
@@ -99,11 +102,11 @@ const CreateBookModal = (props: CreateBookProps) => {
     const beforeUpload = (file: FileType) => {
         const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
         if (!isJpgOrPng) {
-            message.error('You can only upload JPG/PNG file!');
+            message.error(t("admin.msg.imageTypeInvalid"));
         }
         const isLt2M = file.size / 1024 / 1024 < 2;
         if (!isLt2M) {
-            message.error('Image must smaller than 2MB!');
+            message.error(t("admin.msg.imageTooLarge"));
         }
         return isJpgOrPng && isLt2M || Upload.LIST_IGNORE;
     };
@@ -165,12 +168,12 @@ const CreateBookModal = (props: CreateBookProps) => {
                 }
 
                 handleClearDataAndCloseModal();
-                message.success("Create book successfully!");
+                message.success(t("admin.msg.createSuccess", { entity: t("admin.entity.book") }));
                 refreshTable();
             }
         } catch (error: any) {
             notification.error({
-                message: "Error",
+                message: t("common.error"),
                 description: error?.message,
                 duration: 5,
                 placement: "topRight"
@@ -192,14 +195,14 @@ const CreateBookModal = (props: CreateBookProps) => {
     return (
         <>
             <Modal
-                title="Create book"
+                title={t("admin.form.createTitle", { entity: t("admin.entity.book") })}
                 closable={false}
                 maskClosable={false}
                 open={isModalCreateOpen}
                 onOk={() => form.submit()}
                 onCancel={handleClearDataAndCloseModal}
                 loading={isLoading}
-                okText="Create"
+                okText={t("common.create")}
                 width={"50vw"}
             >
                 <Row justify={"center"}>
@@ -215,14 +218,14 @@ const CreateBookModal = (props: CreateBookProps) => {
                             <Row gutter={16}>
                                 <Col span={12}>
                                     <Form.Item<BookCreateValues>
-                                        label="Name:"
+                                        label={t("field.name")}
                                         name="name"
                                         rules={[
-                                            { required: true, message: "Book's name is required" },
-                                            { max: 100, message: "Name must be less than 100 characters" },
+                                            { required: true, message: t("validate.required", { field: t("field.name") }) },
+                                            { max: 100, message: t("validate.maxLength", { field: t("field.name"), max: 100 }) },
                                             {
                                                 pattern: /^[A-Za-zÀ-ỹà-ỹ0-9'\-.:\s]{1,100}$/,
-                                                message: "Invalid name format",
+                                                message: t("validate.invalid", { field: t("field.name") }),
                                             },
                                         ]}
                                     >
@@ -232,14 +235,14 @@ const CreateBookModal = (props: CreateBookProps) => {
 
                                 <Col span={12}>
                                     <Form.Item<BookCreateValues>
-                                        label="Author:"
+                                        label={t("field.author")}
                                         name="author"
                                         rules={[
-                                            { required: true, message: "Author is required" },
-                                            { max: 100, message: "Author must be less than 100 characters" },
+                                            { required: true, message: t("validate.required", { field: t("field.author") }) },
+                                            { max: 100, message: t("validate.maxLength", { field: t("field.author"), max: 100 }) },
                                             {
                                                 pattern: /^[A-Za-zÀ-ỹà-ỹ'\-.\s]{1,100}$/,
-                                                message: "Invalid author format",
+                                                message: t("validate.invalid", { field: t("field.author") }),
                                             },
                                         ]}
                                     >
@@ -251,15 +254,15 @@ const CreateBookModal = (props: CreateBookProps) => {
                             <Row gutter={16}>
                                 <Col span={8}>
                                     <Form.Item<BookCreateValues>
-                                        label="Price:"
+                                        label={t("field.price")}
                                         name="price"
                                         rules={[
-                                            { required: true, message: "Price is required" },
-                                            { type: "number", min: 0, message: "Price must be a positive number" },
+                                            { required: true, message: t("validate.required", { field: t("field.price") }) },
+                                            { type: "number", min: 0, message: t("validate.positive", { field: t("field.price") }) },
                                         ]}
                                     >
                                         <InputNumber
-                                            addonAfter="đ"
+                                            addonAfter={t("common.currency")}
                                             style={{ width: "100%" }}
                                             formatter={(value) =>
                                                 `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
@@ -272,11 +275,11 @@ const CreateBookModal = (props: CreateBookProps) => {
 
                                 <Col span={8}>
                                     <Form.Item<BookCreateValues>
-                                        label="Quantity:"
+                                        label={t("field.quantity")}
                                         name="quantity"
                                         rules={[
-                                            { required: true, message: "Quantity is required" },
-                                            { type: "number", min: 1, max: 1000, message: "Quantity must be between 1 and 1000" },
+                                            { required: true, message: t("validate.required", { field: t("field.quantity") }) },
+                                            { type: "number", min: 1, max: 1000, message: t("validate.range", { field: t("field.quantity"), min: 1, max: 1000 }) },
                                         ]}
                                     >
                                         <InputNumber style={{ width: "100%" }} />
@@ -285,12 +288,12 @@ const CreateBookModal = (props: CreateBookProps) => {
 
                                 <Col span={8}>
                                     <Form.Item<BookCreateValues>
-                                        label="Category:"
+                                        label={t("field.category")}
                                         name={["category", "id"]}
-                                    // rules={[{ required: true, message: "Category is required" }]}
+                                    // rules={[{ required: true, message: t("validate.required", { field: t("field.category") }) }]}
                                     >
                                         <Select
-                                            placeholder="Select a category"
+                                            placeholder={t("admin.form.selectCategory")}
                                             onChange={handleSelectChange}
                                             options={categories}
                                         />
@@ -301,14 +304,14 @@ const CreateBookModal = (props: CreateBookProps) => {
                             <Row gutter={16}>
                                 <Col span={12}>
                                     <Form.Item<BookCreateValues>
-                                        label="Introduce text:"
+                                        label={t("field.introduceText")}
                                         name="introduceText"
                                         rules={[
-                                            { required: true, message: "Introduce text is required" },
-                                            { max: 200, message: "Introduce text must be less than 200 characters" },
+                                            { required: true, message: t("validate.required", { field: t("field.introduceText") }) },
+                                            { max: 200, message: t("validate.maxLength", { field: t("field.introduceText"), max: 200 }) },
                                             {
                                                 pattern: /^[A-Za-zÀ-ỹà-ỹ0-9'.,:;\-\u2013()\s]{1,200}$/,
-                                                message: "Invalid introduce text format",
+                                                message: t("validate.invalid", { field: t("field.introduceText") }),
                                             },
                                         ]}
                                     >
@@ -318,14 +321,14 @@ const CreateBookModal = (props: CreateBookProps) => {
 
                                 <Col span={12}>
                                     <Form.Item<BookCreateValues>
-                                        label="Reader:"
+                                        label={t("field.reader")}
                                         name="reader"
                                         rules={[
-                                            { required: true, message: "Reader is required" },
-                                            { max: 200, message: "Reader must be less than 200 characters" },
+                                            { required: true, message: t("validate.required", { field: t("field.reader") }) },
+                                            { max: 200, message: t("validate.maxLength", { field: t("field.reader"), max: 200 }) },
                                             {
                                                 pattern: /^[A-Za-zÀ-ỹà-ỹ'.,\-()\s]{1,200}$/,
-                                                message: "Invalid reader format",
+                                                message: t("validate.invalid", { field: t("field.reader") }),
                                             },
                                         ]}
                                     >
@@ -337,28 +340,28 @@ const CreateBookModal = (props: CreateBookProps) => {
                             <Row>
                                 <Col span={24}>
                                     <Form.Item<BookCreateValues>
-                                        label="Description:"
+                                        label={t("field.description")}
                                         name="description"
                                         rules={[
-                                            { required: true, message: "Description is required" },
-                                            { max: 5000, message: "Description must be less than 5000 characters" },
+                                            { required: true, message: t("validate.required", { field: t("field.description") }) },
+                                            { max: 5000, message: t("validate.maxLength", { field: t("field.description"), max: 5000 }) },
                                             {
                                                 pattern: /^[A-Za-zÀ-ỹà-ỹ0-9'.,:;()\-–\s]{1,5000}$/,
-                                                message: "Invalid description text format",
+                                                message: t("validate.invalid", { field: t("field.description") }),
                                             },
                                         ]}
                                     >
                                         <TextArea
                                             rows={6}
                                             maxLength={5000}
-                                            placeholder="Fill book description..."
+                                            placeholder={t("admin.form.fillDescription")}
                                         />
                                     </Form.Item>
                                 </Col>
                             </Row>
 
                             <Form.Item<BookCreateValues>
-                                label="Image:"
+                                label={t("field.image")}
                                 name="images"
                                 valuePropName="fileList"
                                 getValueFromEvent={normFile}
@@ -378,7 +381,7 @@ const CreateBookModal = (props: CreateBookProps) => {
                                         : (
                                             <button style={{ border: 0, background: 'none' }} type="button">
                                                 <PlusOutlined />
-                                                <div style={{ marginTop: 8 }}>Upload</div>
+                                                <div style={{ marginTop: 8 }}>{t("admin.form.upload")}</div>
                                             </button>
                                         )}
                                 </Upload>

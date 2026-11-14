@@ -1,7 +1,17 @@
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { App, Button, InputNumber, Popconfirm } from "antd";
 import { DeleteOutlined, MinusOutlined, PlusOutlined } from "@ant-design/icons";
 import "styles/client/checkout/cart.scss";
+import {
+    updateCartQuantity,
+    removeFromCart,
+    clearCart,
+    calculateShippingFee,
+    calculateGrandTotal,
+    FREE_SHIPPING_THRESHOLD,
+} from "@/services/cart.service";
+import { formatPrice, getBookImageUrl } from "@/services/helper";
 
 interface CartProps {
     carts: ICart[];
@@ -14,54 +24,36 @@ const Cart = (props: CartProps) => {
     const { carts, setCarts, totalPrice, onContinueToPayment } = props;
     const navigate = useNavigate();
     const { message } = App.useApp();
-    const baseImageUrl = import.meta.env.VITE_IMAGE_URL || "https://res.cloudinary.com/dvglvfask/image/upload";
+
+    const { t } = useTranslation();
 
     const handleUpdateQuantity = (bookId: number, newQuantity: number) => {
-        if (!carts) return;
-        const updatedCarts = carts.map((item) => {
-            if (item.id === bookId) {
-                if (newQuantity > item.detail.quantity) {
-                    message.warning(`Chỉ còn ${item.detail.quantity} sản phẩm`);
-                    return { ...item, quantity: item.detail.quantity };
-                }
-                return { ...item, quantity: newQuantity };
-            }
-            return item;
-        });
+        const { carts: updatedCarts, clamped, quantity } = updateCartQuantity(bookId, newQuantity);
+        if (clamped) {
+            message.warning(t("cart.stockOnly", { count: quantity }));
+        }
         setCarts(updatedCarts);
-        localStorage.setItem("carts", JSON.stringify(updatedCarts));
     };
 
     const handleRemoveItem = (bookId: number) => {
-        if (!carts) return;
-        const updatedCarts = carts.filter((item) => item.id !== bookId);
-        setCarts(updatedCarts);
-        localStorage.setItem("carts", JSON.stringify(updatedCarts));
-        message.success("Đã xóa sản phẩm khỏi giỏ hàng");
+        setCarts(removeFromCart(bookId));
+        message.success(t("cart.removed"));
     };
 
     const handleClearCart = () => {
-        setCarts([]);
-        localStorage.removeItem("carts");
-        message.success("Đã xóa tất cả sản phẩm");
-    };
-
-    const formatPrice = (price: number) => {
-        return new Intl.NumberFormat("vi-VN", {
-            style: "currency",
-            currency: "VND",
-        }).format(price);
+        setCarts(clearCart());
+        message.success(t("cart.removedAll"));
     };
 
     return (
         <div className="cart-content">
             <div className="cart-items-section">
                 <div className="cart-items-header">
-                    <span className="header-product">Sản phẩm</span>
-                    <span className="header-price">Đơn giá</span>
-                    <span className="header-quantity">Số lượng</span>
-                    <span className="header-total">Thành tiền</span>
-                    <span className="header-action">Thao tác</span>
+                    <span className="header-product">{t("cart.colProduct")}</span>
+                    <span className="header-price">{t("cart.colPrice")}</span>
+                    <span className="header-quantity">{t("cart.colQuantity")}</span>
+                    <span className="header-total">{t("cart.colTotal")}</span>
+                    <span className="header-action">{t("cart.colAction")}</span>
                 </div>
 
                 <div className="cart-items-list">
@@ -69,12 +61,7 @@ const Cart = (props: CartProps) => {
                         <div key={item.id} className="cart-item">
                             <div className="item-product">
                                 <img
-                                    src={
-                                        item.detail.images &&
-                                            item.detail.images.length > 0
-                                            ? `${baseImageUrl}/${item.detail.images[0]}`
-                                            : "https://via.placeholder.com/100x130?text=No+Image"
-                                    }
+                                    src={getBookImageUrl(item.detail.images)}
                                     alt={item.detail.name}
                                 />
                                 <div className="item-info">
@@ -88,7 +75,7 @@ const Cart = (props: CartProps) => {
                                         {item.detail.category}
                                     </p>
                                     <p className="item-stock">
-                                        Còn lại: {item.detail.quantity} sản phẩm
+                                        {t("cart.remaining", { count: item.detail.quantity })}
                                     </p>
                                 </div>
                             </div>
@@ -137,11 +124,11 @@ const Cart = (props: CartProps) => {
 
                             <div className="item-action">
                                 <Popconfirm
-                                    title="Xóa sản phẩm"
-                                    description="Bạn có chắc muốn xóa sản phẩm này?"
+                                    title={t("cart.removeTitle")}
+                                    description={t("cart.removeConfirm")}
                                     onConfirm={() => handleRemoveItem(item.id)}
-                                    okText="Xóa"
-                                    cancelText="Hủy"
+                                    okText={t("cart.remove")}
+                                    cancelText={t("common.cancel")}
                                 >
                                     <Button
                                         type="text"
@@ -157,69 +144,67 @@ const Cart = (props: CartProps) => {
                 <div className="cart-actions">
                     {carts.length > 1 ? (
                         <Popconfirm
-                            title="Xóa tất cả sản phẩm"
-                            description="Bạn có chắc muốn xóa tất cả sản phẩm trong giỏ hàng?"
+                            title={t("cart.removeAllTitle")}
+                            description={t("cart.removeAllConfirm")}
                             onConfirm={handleClearCart}
-                            okText="Xóa tất cả"
-                            cancelText="Hủy"
+                            okText={t("cart.removeAll")}
+                            cancelText={t("common.cancel")}
                         >
                             <Button icon={<DeleteOutlined />} danger>
-                                Xóa tất cả
+                                {t("cart.removeAll")}
                             </Button>
                         </Popconfirm>
                     ) : (
                         <></>
                     )}
                     <Button onClick={() => navigate("/books")}>
-                        Tiếp tục mua sắm
+                        {t("cart.keepShopping")}
                     </Button>
                 </div>
             </div>
 
             <div className="cart-summary-section">
                 <div className="summary-card">
-                    <h2>Thông tin đơn hàng</h2>
+                    <h2>{t("cart.summary")}</h2>
 
                     <div className="summary-item">
-                        <span>Tạm tính:</span>
+                        <span>{t("payment.subtotal")}</span>
                         <span className="summary-value">
                             {formatPrice(totalPrice)}
                         </span>
                     </div>
 
                     <div className="summary-item">
-                        <span>Phí vận chuyển:</span>
+                        <span>{t("payment.shipping")}</span>
                         <span className="summary-value">
-                            {totalPrice >= 150000 ? (
-                                <span className="free-ship">Miễn phí</span>
+                            {calculateShippingFee(totalPrice) === 0 ? (
+                                <span className="free-ship">{t("payment.free")}</span>
                             ) : (
-                                formatPrice(30000)
+                                formatPrice(calculateShippingFee(totalPrice))
                             )}
                         </span>
                     </div>
 
-                    {totalPrice >= 150000 && (
+                    {totalPrice >= FREE_SHIPPING_THRESHOLD && (
                         <div className="summary-promotion">
-                            <span>🎉 Bạn được miễn phí vận chuyển!</span>
+                            <span>{t("cart.freeShipEarned")}</span>
                         </div>
                     )}
 
-                    {totalPrice < 150000 && (
+                    {totalPrice < FREE_SHIPPING_THRESHOLD && (
                         <div className="summary-note">
-                            Mua thêm{" "}
-                            <strong>{formatPrice(150000 - totalPrice)}</strong> để
-                            được freeship
+                            {t("cart.freeShipHintPrefix")}{" "}
+                            <strong>{formatPrice(FREE_SHIPPING_THRESHOLD - totalPrice)}</strong>{" "}
+                            {t("cart.freeShipHintSuffix")}
                         </div>
                     )}
 
                     <div className="summary-divider"></div>
 
                     <div className="summary-total">
-                        <span>Tổng cộng:</span>
+                        <span>{t("payment.grandTotal")}</span>
                         <span className="total-value">
-                            {formatPrice(
-                                totalPrice + (totalPrice >= 150000 ? 0 : 30000)
-                            )}
+                            {formatPrice(calculateGrandTotal(totalPrice))}
                         </span>
                     </div>
 
@@ -230,15 +215,15 @@ const Cart = (props: CartProps) => {
                         className="checkout-btn"
                         onClick={onContinueToPayment}
                     >
-                        Tiến hành đặt hàng
+                        {t("cart.checkout")}
                     </Button>
 
                     <div className="summary-guarantee">
-                        <h3>🛡️ Cam kết từ BookShop</h3>
+                        <h3>{t("cart.promiseTitle")}</h3>
                         <ul>
-                            <li>✓ Sản phẩm chính hãng 100%</li>
-                            <li>✓ Đổi trả miễn phí trong 7 ngày</li>
-                            <li>✓ Hỗ trợ 24/7</li>
+                            <li>{t("cart.promise1")}</li>
+                            <li>{t("cart.promise2")}</li>
+                            <li>{t("cart.promise3")}</li>
                         </ul>
                     </div>
                 </div>

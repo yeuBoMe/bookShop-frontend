@@ -1,0 +1,310 @@
+// ===========================================================================
+// DESIGN TOKENS — nguồn chân lý duy nhất cho màu sắc, khoảng cách, bo góc...
+//
+// Trước đây mỗi file SCSS tự khai báo bảng màu riêng, dẫn tới 4 sắc xanh khác
+// nhau cùng tồn tại ($primary-color: #1e40af ở about, #1890ff ở order,
+// #2563eb ở home, #1e3a5f ở footer) và antd thì vẫn dùng #1677ff mặc định.
+// Toàn bộ đã được quy về một thang màu thương hiệu duy nhất bên dưới.
+//
+// ---------------------------------------------------------------------------
+// HAI TẦNG
+//
+//   1. THANG MÀU GỐC — hằng số hex. Chỉ dùng để dựng biến CSS ở global.scss
+//      và admin.layout.scss. KHÔNG dùng trực tiếp trong file component.
+//   2. TOKEN NGỮ NGHĨA — trỏ vào biến CSS: var(--surface), var(--brand-600)...
+//      Đây mới là thứ các file component dùng.
+//
+// Nhờ tầng 2 mà chế độ tối hoạt động: đổi giá trị biến CSS ở một chỗ
+// (:root[data-theme="dark"]) là cả 26 file SCSS đổi theo, không phải sửa file
+// nào. Khu quản trị cũng dùng đúng cơ chế đó để chuyển sang xanh lá.
+//
+// LƯU Ý khi sửa: SCSS không tính toán được trên var() — hàm darken(), lighten()
+// hay rgba($token, 0.3) sẽ hỏng. Cần màu trong suốt thì dùng biến *-rgb:
+//   rgba(var(--brand-rgb), 0.3)
+// ===========================================================================
+
+// ===========================================================================
+// TẦNG 1 — THANG MÀU GỐC
+// ===========================================================================
+
+// ---------------------------------------------------------------------------
+// Màu thương hiệu (trang khách) — azure tươi sáng.
+// Trước đây dùng #2563eb (blue-600) ngả indigo nên nhìn khá trầm; thang dưới
+// đây dịch sang tông azure sáng hơn, nhưng $brand-600 vẫn giữ đủ tối để chữ
+// trắng trên nền nút đạt 4.75:1 (WCAG AA). Cảm giác tươi đến từ $brand-400 và
+// $brand-500 dùng cho gradient, icon và mảng nền nhạt.
+// ---------------------------------------------------------------------------
+$brand-50:  #ecf6ff;
+$brand-100: #d6ecff;
+$brand-200: #b0dbff;
+$brand-300: #7cc3fd;
+$brand-400: #40a8fa;
+$brand-500: #1690ef;
+$brand-600: #0b74d4; // ⭐ màu thương hiệu chính
+$brand-700: #0a5fae;
+$brand-800: #0d4d8a;
+$brand-900: #113f6e;
+$brand-950: #0a2745;
+
+// ---------------------------------------------------------------------------
+// Màu khu quản trị — xanh lá (emerald)
+//
+// Trang bán hàng dùng xanh dương, khu /admin dùng xanh lá để người dùng nhận ra
+// ngay mình đang ở hậu trường. Hai bảng màu tách bạch nên đổi màu admin không
+// ảnh hưởng trang khách.
+//
+// Độ tương phản với chữ trắng (WCAG 2.1):
+//   $admin-base #05835c → 4.76:1  ✓ AA — sáng nhất mà vẫn đạt chuẩn
+//   $admin-700  #047857 → 5.55:1  ✓ AA
+//   $admin-800  #065f46 → 7.72:1  ✓ AAA
+//   $admin-600  #059669 → 3.77:1  ⚠
+//   $admin-500  #10b981 → 2.55:1  ⚠
+// Hai mức ⚠ chỉ dùng cho ĐỒ HOẠ (icon, viền, gradient, chấm trạng thái) — nhóm
+// này WCAG chỉ đòi ≥3:1 và không mang chữ. Mọi chỗ có chữ đều lấy từ
+// $admin-base trở lên.
+// ---------------------------------------------------------------------------
+$admin-50:  #ecfdf5;
+$admin-100: #d1fae5;
+$admin-200: #a7f3d0;
+$admin-300: #6ee7b7;
+$admin-400: #34d399;
+$admin-500: #10b981;
+$admin-600: #059669;
+$admin-700: #047857;
+$admin-800: #065f46;
+$admin-900: #064e3b;
+$admin-950: #022c22;
+$admin-base: #05835c; // ⭐ màu chính của khu quản trị
+
+// ---------------------------------------------------------------------------
+// Trung tính
+// ---------------------------------------------------------------------------
+$white: #ffffff;
+$gray-50:  #f8fafc;
+$gray-100: #f1f5f9;
+$gray-200: #e5e7eb;
+$gray-300: #d1d5db;
+$gray-400: #9ca3af;
+$gray-500: #6b7280;
+$gray-600: #4b5563;
+$gray-700: #374151;
+$gray-800: #1f2937;
+$gray-900: #111827;
+
+// Thang tối — nền xanh đen (slate) thay vì đen tuyền: trên màn OLED, chữ trắng
+// đặt trên đen tuyền bị loang viền (halation) nên đọc lâu rất mỏi mắt.
+$slate-975: #0b1120;
+$slate-950: #0f172a;
+$slate-900: #131c2e;
+$slate-850: #1a2436;
+$slate-800: #1e293b;
+$slate-700: #334155;
+$slate-600: #475569;
+$slate-400: #94a3b8;
+$slate-300: #cbd5e1;
+$slate-200: #e2e8f0;
+
+// ===========================================================================
+// TẦNG 2 — TOKEN NGỮ NGHĨA
+// Đọc qua biến CSS nên tự đổi theo chế độ sáng/tối và theo khu vực client/admin
+// ===========================================================================
+
+// Màu NỀN (nút, mảng đặc). Đủ tối ở cả hai chế độ để chữ trắng đọc được.
+$primary:        var(--brand-600);
+$primary-hover:  var(--brand-700);
+$primary-active: var(--brand-800);
+$primary-soft:   var(--brand-50);
+$primary-muted:  var(--brand-100);
+
+// Màu CHỮ/ICON. Ở chế độ tối màu này SÁNG lên (ngược chiều với $primary) để
+// nổi trên nền tối — dùng cho liên kết, số liệu, icon nằm trên nền trang.
+$primary-text:       var(--brand-text);
+$primary-text-hover: var(--brand-text-hover);
+
+$text-strong:  var(--text-strong);
+$text-body:    var(--text-body);
+$text-muted:   var(--text-muted);
+$text-subtle:  var(--text-subtle);
+$text-inverse: #ffffff; // chữ nằm TRÊN nền màu — luôn trắng ở cả hai chế độ
+
+$surface:        var(--surface);
+$surface-subtle: var(--surface-subtle);
+$surface-muted:  var(--surface-muted);
+$surface-raised: var(--surface-raised);
+
+$border:        var(--border);
+$border-strong: var(--border-strong);
+
+// ---------------------------------------------------------------------------
+// Màu ngữ nghĩa (giữ tông trầm, không rực để phù hợp môi trường doanh nghiệp).
+// Ở chế độ sáng: success 4.76:1, warning 5.05:1, danger 4.83:1 trên nền trắng.
+// ---------------------------------------------------------------------------
+// Cùng quy ước như trên: $x là màu nền, $x-text là màu chữ.
+$success:      var(--success);
+$success-text: var(--success-text);
+$success-soft: var(--success-soft);
+$warning:      var(--warning);
+$warning-text: var(--warning-text);
+$warning-soft: var(--warning-soft);
+$danger:        var(--danger);
+$danger-strong: var(--danger-strong);
+$danger-text:   var(--danger-text);
+$danger-soft:   var(--danger-soft);
+$info:         var(--brand-600);
+$info-soft:    var(--brand-50);
+
+// Màu sao đánh giá — hổ phách ở cả hai chế độ. Đây là quy ước chung; đổi theo
+// màu thương hiệu thì người dùng không còn nhận ra đó là "sao".
+$star: #f59e0b;
+
+// ---------------------------------------------------------------------------
+// Khu quản trị
+// ---------------------------------------------------------------------------
+$admin-primary:        var(--admin-primary);
+$admin-text:           var(--admin-text);
+$admin-primary-hover:  var(--admin-primary-hover);
+$admin-primary-active: var(--admin-primary-active);
+$admin-soft:           var(--admin-soft);
+$admin-muted:          var(--admin-muted);
+$admin-accent:         var(--admin-accent);
+$admin-surface-subtle: var(--admin-surface-subtle);
+
+// Gradient MANG NỘI DUNG (icon trắng đặt lên trên): cả hai đầu đều đủ tối để
+// icon trắng đạt ≥3:1 — mức WCAG 1.4.11 đòi cho thành phần đồ hoạ.
+$admin-gradient: linear-gradient(135deg, var(--admin-600), var(--admin-primary));
+
+// Gradient THUẦN TRANG TRÍ (vạch mảnh trên thanh header): không mang chữ hay
+// icon nên được dùng sắc rực nhất.
+$admin-gradient-bright: linear-gradient(
+  135deg,
+  var(--admin-accent-bright),
+  var(--admin-accent)
+);
+$admin-shadow: 0 6px 20px rgba(var(--admin-rgb), 0.28);
+$admin-ring: 0 0 0 3px rgba(var(--admin-rgb), 0.22);
+
+// ---------------------------------------------------------------------------
+// Màu nhấn cho thẻ số liệu ở Tổng quan.
+//
+// Năm màu trải đều vòng thuần sắc (lục → lam → tím → hổ phách → hồng) nên vẫn
+// phân biệt được với người mù màu đỏ–lục; ngoài ra mỗi thẻ còn có icon và nhãn
+// chữ riêng, màu chỉ là lớp thông tin phụ chứ không phải lớp duy nhất.
+// Giá trị cụ thể nằm ở global.scss vì mỗi chế độ sáng/tối một bảng khác nhau.
+// ---------------------------------------------------------------------------
+$accent-emerald: var(--accent-emerald);
+$accent-blue:    var(--accent-blue);
+$accent-violet:  var(--accent-violet);
+$accent-amber:   var(--accent-amber);
+$accent-rose:    var(--accent-rose);
+
+// ---------------------------------------------------------------------------
+// Kiểu chữ
+// ---------------------------------------------------------------------------
+$font-sans: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI",
+  Roboto, "Helvetica Neue", Arial, sans-serif;
+
+$fs-xs:   0.75rem;   // 12px
+$fs-sm:   0.8125rem; // 13px
+$fs-base: 0.875rem;  // 14px — cỡ nền, khớp với antd
+$fs-md:   1rem;      // 16px
+$fs-lg:   1.125rem;  // 18px
+$fs-xl:   1.25rem;   // 20px
+$fs-2xl:  1.5rem;    // 24px
+$fs-3xl:  1.875rem;  // 30px
+$fs-4xl:  2.25rem;   // 36px
+$fs-5xl:  3rem;      // 48px
+
+$fw-normal:   400;
+$fw-medium:   500;
+$fw-semibold: 600;
+$fw-bold:     700;
+$fw-extra:    800;
+
+$lh-tight:  1.25;
+$lh-snug:   1.4;
+$lh-normal: 1.6;
+
+// ---------------------------------------------------------------------------
+// Khoảng cách — thang 4px
+// ---------------------------------------------------------------------------
+$space-1:  4px;
+$space-2:  8px;
+$space-3:  12px;
+$space-4:  16px;
+$space-5:  20px;
+$space-6:  24px;
+$space-8:  32px;
+$space-10: 40px;
+$space-12: 48px;
+$space-16: 64px;
+$space-20: 80px;
+
+// ---------------------------------------------------------------------------
+// Bo góc — vừa phải, không bo tròn quá đà
+// ---------------------------------------------------------------------------
+$radius-xs: 4px;
+$radius-sm: 6px;
+$radius-md: 8px;
+$radius-lg: 12px;
+$radius-xl: 16px;
+$radius-2xl: 20px;
+$radius-full: 999px;
+
+// ---------------------------------------------------------------------------
+// Đổ bóng — nhẹ và có chiều sâu, tránh bóng đen đậm.
+// Ở chế độ tối bóng phải đậm hơn hẳn mới nhìn thấy trên nền tối, nên đây cũng
+// là biến CSS chứ không phải hằng số.
+// ---------------------------------------------------------------------------
+$shadow-xs: var(--shadow-xs);
+$shadow-sm: var(--shadow-sm);
+$shadow-md: var(--shadow-md);
+$shadow-lg: var(--shadow-lg);
+$shadow-xl: var(--shadow-xl);
+$shadow-brand: 0 6px 20px rgba(var(--brand-rgb), 0.22);
+
+$ring: 0 0 0 3px rgba(var(--brand-rgb), 0.25);
+
+// ---------------------------------------------------------------------------
+// Chuyển động
+// ---------------------------------------------------------------------------
+$ease: cubic-bezier(0.4, 0, 0.2, 1);
+$transition-fast: 0.15s $ease;
+$transition-base: 0.25s $ease;
+$transition-slow: 0.4s $ease;
+
+// ---------------------------------------------------------------------------
+// Điểm ngắt responsive — thống nhất, thay cho mớ 360/450/480/576/640/700/
+// 768/900/992/1024/1100px rải rác trước đây
+// ---------------------------------------------------------------------------
+$bp-xs: 480px;   // điện thoại nhỏ
+$bp-sm: 640px;   // điện thoại
+$bp-md: 768px;   // máy tính bảng dọc
+$bp-lg: 1024px;  // máy tính bảng ngang
+$bp-xl: 1280px;  // laptop
+$bp-2xl: 1536px; // màn rộng
+
+// Giữ lại tên biến cũ để các file chưa chuyển đổi vẫn biên dịch được
+$mobile: $bp-sm;
+$tablet: $bp-md;
+$breakpoint-sm: $bp-sm;
+$breakpoint-md: $bp-md;
+$breakpoint-lg: $bp-lg;
+
+// ---------------------------------------------------------------------------
+// Bố cục
+// ---------------------------------------------------------------------------
+$container-max: 1280px;
+$container-pad-desktop: $space-6;
+$container-pad-mobile: $space-4;
+$header-height: 72px;
+
+// ---------------------------------------------------------------------------
+// Lớp chồng
+// ---------------------------------------------------------------------------
+$z-dropdown: 1000;
+$z-sticky: 1020;
+$z-header: 1030;
+$z-drawer: 1040;
+$z-modal: 1050;
+$z-chat: 1060;
+$z-toast: 1080;

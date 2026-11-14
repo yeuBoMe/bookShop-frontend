@@ -1,0 +1,322 @@
+@use "../abstracts/tokens" as t;
+@use "../abstracts/mixins" as m;
+
+// ===========================================================================
+// KHUNG QUẢN TRỊ — tông xanh lá (emerald)
+//
+// Trước đây toàn bộ khu admin không có file style nào — mọi thứ nằm trong
+// inline style của admin.layout.tsx, và thanh bên 200px không co lại nên trên
+// điện thoại nó chiếm gần hết màn hình.
+//
+// Về màu: trang bán hàng dùng xanh dương, khu quản trị dùng xanh lá để người
+// dùng nhận ra ngay mình đang ở "hậu trường". Toàn bộ sắc xanh lá lấy từ
+// $admin-* trong _tokens.scss, không hardcode ở đây.
+//
+// Hai phạm vi CSS khác nhau, cần cả hai:
+//   .layout-admin      — nội dung nằm trong cây DOM của trang admin
+//   body.admin-theme   — modal/drawer/dropdown của antd render ra portal ở
+//                        cuối <body>, nằm NGOÀI .layout-admin
+// ===========================================================================
+
+// ---------------------------------------------------------------------------
+// Biến CSS phạm vi admin — ghi đè bản xanh dương khai báo ở :root (global.scss)
+// để style inline hay component dùng var(--brand-*) tự động đổi sang xanh lá.
+// ---------------------------------------------------------------------------
+body.admin-theme {
+  // Ghi đè thang azure khai báo ở :root (global.scss) thành xanh lá. Mọi file
+  // SCSS đọc $primary/$primary-text đều tự đổi theo, không phải sửa gì thêm.
+  --brand-50: #{t.$admin-50};
+  --brand-100: #{t.$admin-100};
+  --brand-200: #{t.$admin-200};
+  --brand-300: #{t.$admin-300};
+  --brand-500: #{t.$admin-500};
+  --brand-600: #{t.$admin-base};
+  --brand-700: #{t.$admin-700};
+  --brand-800: #{t.$admin-800};
+  --brand-text: #{t.$admin-700};
+  --brand-text-hover: #{t.$admin-800};
+  --brand-rgb: 5, 131, 92;
+
+  // Token riêng của khu quản trị
+  --admin-primary: #{t.$admin-base};
+  --admin-primary-hover: #{t.$admin-700};
+  --admin-primary-active: #{t.$admin-800};
+  --admin-text: #{t.$admin-700};
+  --admin-soft: #{t.$admin-50};
+  --admin-muted: #{t.$admin-100};
+  --admin-600: #{t.$admin-600};
+  --admin-accent: #{t.$admin-500};
+  --admin-accent-bright: #{t.$admin-400};
+  --admin-surface-subtle: #f3fbf7; // mint rất nhạt thay cho xám trung tính
+  --admin-rgb: 5, 131, 92;
+
+  ::selection {
+    background: #{t.$admin-100};
+    color: #{t.$admin-900};
+  }
+
+  // global.scss cho nút primary một quầng sáng xanh dương khi hover
+  .ant-btn-primary:not(:disabled) {
+    @include m.hover {
+      box-shadow: t.$admin-shadow;
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Khu quản trị ở chế độ tối.
+//
+// Vẫn theo quy ước hai chiều của hệ token: --admin-primary (màu NỀN) giữ đủ
+// tối để chữ trắng trên nút đọc được, còn --admin-text (màu CHỮ) sáng hẳn lên
+// để nổi trên nền tối. Nền trang ngả lục nhẹ để vẫn nhận ra là khu quản trị.
+// ---------------------------------------------------------------------------
+html[data-theme="dark"] body.admin-theme {
+  --brand-50: #0d2f26;
+  --brand-100: #123d31;
+  --brand-200: #175644;
+  --brand-300: #2a9c76;
+  --brand-500: #{t.$admin-400};
+  --brand-600: #{t.$admin-base}; // chữ trắng trên nền này: 4.76:1
+  --brand-700: #{t.$admin-700};
+  --brand-800: #{t.$admin-800};
+  --brand-text: #{t.$admin-300};
+  --brand-text-hover: #{t.$admin-200};
+  --brand-rgb: 52, 211, 153;
+
+  --admin-primary: #{t.$admin-base};
+  --admin-primary-hover: #{t.$admin-700};
+  --admin-primary-active: #{t.$admin-800};
+  --admin-text: #{t.$admin-300};
+  --admin-soft: #0d2f26;
+  --admin-muted: #123d31;
+  --admin-600: #{t.$admin-600};
+  --admin-accent: #{t.$admin-500};
+  --admin-accent-bright: #{t.$admin-400};
+  --admin-surface-subtle: #0e1a16;
+  --admin-rgb: 52, 211, 153;
+}
+
+.layout-admin {
+  min-height: 100vh;
+  // Nền mint rất nhạt thay cho xám trung tính — giúp cả khu quản trị sáng và
+  // "xanh" hơn mà không phải tăng độ chói của màu chính (sẽ hỏng tương phản)
+  background: t.$admin-surface-subtle;
+
+  // ---- Thanh bên ----
+  .admin-sider {
+    border-right: 1px solid t.$border;
+    box-shadow: t.$shadow-xs;
+
+    .ant-layout-sider-children {
+      display: flex;
+      flex-direction: column;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+    }
+
+    .ant-menu {
+      flex: 1;
+      border-inline-end: none !important;
+      padding-inline: t.$space-2;
+      overflow-y: auto;
+      @include m.thin-scrollbar(transparent, t.$admin-200);
+    }
+
+    .ant-menu-item,
+    .ant-menu-submenu-title {
+      font-weight: t.$fw-medium;
+    }
+
+    // Mục đang chọn: ngoài nền xanh nhạt còn có một vạch dọc bên trái.
+    // Không chỉ dựa vào màu — người mù màu vẫn thấy được mục nào đang mở.
+    .ant-menu-item-selected {
+      font-weight: t.$fw-semibold;
+      position: relative;
+
+      &::before {
+        content: "";
+        position: absolute;
+        inset-block: 6px;
+        inset-inline-start: 0;
+        width: 3px;
+        border-radius: t.$radius-full;
+        background: t.$admin-primary;
+      }
+    }
+
+    // Trên máy tính bảng trở xuống: thanh bên trượt ra như ngăn kéo,
+    // kèm lớp phủ, thay vì bóp nội dung chính
+    @include m.below(lg) {
+      position: fixed !important;
+      inset-block: 0;
+      inset-inline-start: 0;
+      z-index: t.$z-drawer;
+      transition: transform t.$transition-base;
+
+      &.is-collapsed {
+        transform: translateX(-100%);
+      }
+    }
+  }
+
+  .admin-sider__brand {
+    display: flex;
+    align-items: center;
+    gap: t.$space-2;
+    height: t.$header-height;
+    padding-inline: t.$space-4;
+    flex-shrink: 0;
+    border-bottom: 1px solid t.$border;
+    overflow: hidden;
+    white-space: nowrap;
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      flex-shrink: 0;
+      border-radius: t.$radius-md;
+      background: t.$admin-gradient;
+      color: t.$text-inverse;
+      font-size: t.$fs-md;
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.2;
+
+      strong {
+        font-size: t.$fs-md;
+        font-weight: t.$fw-bold;
+        color: t.$text-strong;
+      }
+      span {
+        font-size: t.$fs-xs;
+        color: t.$admin-text;
+        font-weight: t.$fw-semibold;
+      }
+    }
+  }
+
+  // Lớp phủ khi mở thanh bên trên màn nhỏ
+  .admin-sider__backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: t.$z-drawer - 1;
+    background: rgba(15, 23, 42, 0.45);
+    backdrop-filter: blur(2px);
+    border: none;
+
+    @include m.from(lg) {
+      display: none;
+    }
+  }
+
+  // ---- Thanh trên ----
+  .admin-header {
+    position: sticky;
+    top: 0;
+    z-index: t.$z-header;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: t.$space-4;
+    height: t.$header-height;
+    padding-inline: t.$space-5;
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid t.$border;
+
+    // Vạch xanh mảnh trên cùng — dấu hiệu thị giác "đang ở khu quản trị"
+    &::after {
+      content: "";
+      position: absolute;
+      inset-inline: 0;
+      top: 0;
+      height: 3px;
+      // Vạch thuần trang trí, không mang chữ — dùng được sắc xanh rực nhất
+      background: t.$admin-gradient-bright;
+    }
+
+    @include m.below(md) {
+      padding-inline: t.$space-4;
+    }
+  }
+
+  .admin-header__toggle {
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    border-radius: t.$radius-md;
+    font-size: t.$fs-md;
+    color: t.$text-body;
+    transition: background t.$transition-fast, color t.$transition-fast;
+    @include m.focus-ring(t.$admin-primary);
+
+    @include m.hover {
+      background: t.$admin-soft;
+      color: t.$admin-text;
+    }
+  }
+
+  // Nhóm nút bên phải thanh trên: đổi ngôn ngữ, đổi sáng/tối, tài khoản
+  .admin-header__actions {
+    display: flex;
+    align-items: center;
+    gap: t.$space-2;
+  }
+
+  .admin-header__user {
+    display: flex;
+    align-items: center;
+    gap: t.$space-2;
+    padding: t.$space-1 t.$space-2;
+    border-radius: t.$radius-full;
+    cursor: pointer;
+    transition: background t.$transition-fast;
+    @include m.focus-ring(t.$admin-primary);
+
+    @include m.hover {
+      background: t.$admin-soft;
+    }
+
+    .user-name {
+      font-weight: t.$fw-semibold;
+      color: t.$text-strong;
+      font-size: t.$fs-base;
+      max-width: 160px;
+      @include m.truncate;
+
+      // Trên điện thoại chỉ hiện avatar cho gọn
+      @include m.below(sm) {
+        display: none;
+      }
+    }
+  }
+
+  // ---- Nội dung ----
+  .admin-content {
+    padding: t.$space-6;
+    min-height: 0;
+
+    @include m.below(md) {
+      padding: t.$space-4;
+    }
+    @include m.below(xs) {
+      padding: t.$space-3;
+    }
+  }
+
+  .admin-footer {
+    padding: t.$space-4;
+    text-align: center;
+    background: transparent;
+    color: t.$text-muted;
+    font-size: t.$fs-sm;
+    border-top: 1px solid t.$border;
+  }
+}

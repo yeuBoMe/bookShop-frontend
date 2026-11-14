@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { FormProps } from 'antd';
+import { useTranslation } from "react-i18next";
 import { App, Button, Col, Divider, Form, Input, Row } from 'antd';
 import { Link, useNavigate } from 'react-router-dom';
 import { registerAPI } from '@/services/api.service';
@@ -14,6 +15,8 @@ interface RegisterValues {
 
 const RegisterPage = () => {
   const [form] = Form.useForm<RegisterValues>();
+
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { notification, message } = App.useApp();
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -28,7 +31,7 @@ const RegisterPage = () => {
       if (registerResponse?.data) {
         console.log("Check data register >>> ", registerResponse);
 
-        message.success("Tạo tài khoản thành công!");
+        message.success(t("auth.registerSuccess"));
         setTimeout(() => {
           navigate("/login");
         }, 1000);
@@ -38,7 +41,7 @@ const RegisterPage = () => {
 
       const errorMessage = error?.message;
       notification.error({
-        message: 'Error',
+        message: t("common.error"),
         description: errorMessage,
         duration: 5,
         placement: 'topRight',
@@ -63,8 +66,8 @@ const RegisterPage = () => {
               </div>
 
               {/* Heading */}
-              <h1 className="register-title">Tạo tài khoản mới</h1>
-              <p className="register-subtitle">Đăng ký để bắt đầu mua sắm tại Laptopshop</p>
+              <h1 className="register-title">{t("auth.registerTitle")}</h1>
+              <p className="register-subtitle">{t("auth.registerSubtitle")}</p>
 
               {/* FORM */}
               <Form
@@ -75,14 +78,14 @@ const RegisterPage = () => {
                 autoComplete="off"
               >
                 <Form.Item<RegisterValues>
-                  label="Họ và tên:"
+                  label={t("field.fullName")}
                   name="fullName"
                   rules={[
-                    { required: true, message: 'Name is required' },
-                    { max: 100, message: 'Name must be less than 100 characters' },
+                    { required: true, message: t("validate.required", { field: t("field.fullName") }) },
+                    { max: 100, message: t("validate.maxLength", { field: t("field.fullName"), max: 100 }) },
                     {
                       pattern: /^[A-Za-zÀ-ỹà-ỹ'\-.\s]{1,100}$/,
-                      message: "Name must only contain letters, spaces, apostrophes, dashes or dots"
+                      message: t("validate.nameCharset")
                     }
                   ]}
                 >
@@ -90,14 +93,14 @@ const RegisterPage = () => {
                 </Form.Item>
 
                 <Form.Item<RegisterValues>
-                  label="Email:"
+                  label={t("field.email")}
                   name="email"
                   rules={[
-                    { required: true, message: 'Email is required' },
-                    { max: 150, message: 'Email must not exceed 150 characters' },
+                    { required: true, message: t("validate.required", { field: t("field.email") }) },
+                    { max: 150, message: t("validate.maxLength", { field: t("field.email"), max: 150 }) },
                     {
                       pattern: /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z]{2,6}$/,
-                      message: "Email format is invalid"
+                      message: t("validate.emailInvalid")
                     }
                   ]}
                 >
@@ -105,24 +108,24 @@ const RegisterPage = () => {
                 </Form.Item>
 
                 <Form.Item<RegisterValues>
-                  label="Mật khẩu:"
+                  label={t("field.password")}
                   name="password"
                   rules={[
-                    { required: true, message: 'Password is required' },
-                    { min: 6, message: 'Password must be at least 6 characters' }
+                    { required: true, message: t("validate.required", { field: t("field.password") }) },
+                    { min: 6, message: t("validate.minLength", { field: t("field.password"), min: 6 }) }
                   ]}
                 >
                   <Input.Password />
                 </Form.Item>
 
                 <Form.Item<RegisterValues>
-                  label="Số điện thoại:"
+                  label={t("field.phone")}
                   name="phone"
                   rules={[
-                    { required: true, message: 'Phone is required' },
+                    { required: true, message: t("validate.required", { field: t("field.phone") }) },
                     {
                       pattern: /^(0[3|5|7|8|9])[0-9]{8}$/,
-                      message: 'Phone number is invalid (Vietnamese format)'
+                      message: t("validate.phoneInvalid")
                     }
                   ]}
                 >
@@ -138,17 +141,17 @@ const RegisterPage = () => {
                       size="large"
                       className="register-submit-button"
                     >
-                      Đăng ký
+                      {t("auth.register")}
                     </Button>
                   </div>
                 </Form.Item>
               </Form>
 
-              <Divider>Hoặc</Divider>
+              <Divider>{t("auth.or")}</Divider>
 
               <div className="register-login-link">
-                Đã có tài khoản?
-                <Link to={"/login"}> Đăng nhập</Link>
+                {t("auth.haveAccount")}
+                <Link to={"/login"}> {t("auth.login")}</Link>
               </div>
 
             </div>
@@ -158,11 +161,11 @@ const RegisterPage = () => {
 
       {/* Footer */}
       <footer className="register-footer">
-        <span className="footer-copy">© Hoài Ninh 2025</span>
+        <span className="footer-copy">{t("auth.copyright")}</span>
         <nav className="footer-links">
-          <a href="#">Chính sách bảo mật</a>
-          <a href="#">Điều khoản</a>
-          <a href="#">Liên hệ</a>
+          <a href="#">{t("auth.privacy")}</a>
+          <a href="#">{t("auth.terms")}</a>
+          <a href="#">{t("auth.contact")}</a>
         </nav>
       </footer>
     </div>

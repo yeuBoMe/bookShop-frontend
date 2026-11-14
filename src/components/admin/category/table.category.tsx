@@ -5,6 +5,7 @@ import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
 import { App, Button, Popconfirm, Space } from 'antd';
 import { useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { CSVLink } from 'react-csv';
 import { Link } from 'react-router-dom';
 import CreateCategoryModal from 'components/admin/category/create.category.modal';
@@ -20,6 +21,8 @@ type TSearch = {
 const TableCategory = () => {
     const actionRef = useRef<ActionType | null>(null);
     const { notification, message } = App.useApp();
+
+    const { t } = useTranslation();
     const [meta, setMeta] = useState({
         current: 1,
         pageSize: 5,
@@ -46,12 +49,12 @@ const TableCategory = () => {
             const deleteCategoryResponse = await deleteCategoryAPI(id);
             await new Promise((resolve) => setTimeout(resolve, 400));
             if (deleteCategoryResponse) {
-                message.success("Delete category successfully!");
+                message.success(t("admin.msg.deleteSuccess", { entity: t("admin.entity.category") }));
                 refreshTable();
             }
         } catch (error: any) {
             notification.error({
-                message: "Error",
+                message: t("common.error"),
                 description: error?.message,
                 duration: 5,
                 placement: "topRight"
@@ -72,7 +75,7 @@ const TableCategory = () => {
             width: 48,
         },
         {
-            title: 'Id',
+            title: t("admin.table.id"),
             dataIndex: 'id',
             sorter: true,
             hideInSearch: true,
@@ -92,26 +95,26 @@ const TableCategory = () => {
             },
         },
         {
-            title: 'Name',
+            title: t("admin.table.name"),
             dataIndex: 'name',
             copyable: true,
             sorter: true,
         },
         {
-            title: 'Created At',
+            title: t("admin.table.createdAt"),
             dataIndex: 'createdAt',
             valueType: 'date',
             sorter: true,
             hideInSearch: true,
         },
         {
-            title: 'Created At',
+            title: t("admin.table.createdAt"),
             dataIndex: 'createdAtRange',
             valueType: 'dateRange',
             hideInTable: true,
         },
         {
-            title: 'Action',
+            title: t("admin.table.action"),
             hideInSearch: true,
             render(_, entity) {
                 return (
@@ -133,10 +136,10 @@ const TableCategory = () => {
                             />
                             <Popconfirm
                                 placement='topLeft'
-                                title="Delete category"
-                                description="Are you sure to delete this category?"
-                                okText="Yes"
-                                cancelText="No"
+                                title={t("admin.confirm.deleteTitle", { entity: t("admin.entity.category") })}
+                                description={t("admin.confirm.deleteDescription", { entity: t("admin.entity.category") })}
+                                okText={t("common.yes")}
+                                cancelText={t("common.no")}
                                 onConfirm={() => handleDeleteCategory(entity.id)}
                                 okButtonProps={{ loading: isDeleteCategory }}
                             >
@@ -248,13 +251,13 @@ const TableCategory = () => {
                     showTotal: (total, range) => {
                         return (
                             <div>
-                                {range[0]} - {range[1]} on {total} rows
+                                {t("admin.table.paginationTotal", { from: range[0], to: range[1], total })}
                             </div>
                         )
                     },
                 }}
                 dateFormatter="string"
-                headerTitle="Table Category"
+                headerTitle={t("admin.table.header", { entity: t("admin.entityPlural.category") })}
                 toolBarRender={() => [
                     <CSVLink
                         data={currentDataTable}
@@ -265,7 +268,7 @@ const TableCategory = () => {
                             icon={<ExportOutlined />}
                             type="primary"
                         >
-                            Export
+                            {t("admin.table.export")}
                         </Button>
                     </CSVLink>,
                     <Button
@@ -274,7 +277,7 @@ const TableCategory = () => {
                         onClick={() => setIsModalImportOpen(true)}
                         type="primary"
                     >
-                        Import
+                        {t("admin.table.import")}
                     </Button>,
                     <Button
                         key="add"
@@ -282,7 +285,7 @@ const TableCategory = () => {
                         onClick={() => setIsModalCreateOpen(true)}
                         type="primary"
                     >
-                        Add
+                        {t("admin.table.addNew")}
                     </Button>,
                 ]}
             />

@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import type { FormProps } from 'antd';
+import { useTranslation } from "react-i18next";
 import { App, Button, Col, Divider, Form, Input, Row } from 'antd';
 import "styles/auth/login.scss";
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { loginAPI } from '@/services/api.service';
 import { useCurrentApp } from '@/components/context/app.context';
 
@@ -14,7 +15,10 @@ interface LoginValues {
 const LoginPage = () => {
   const { setUser, setIsAuthenticated } = useCurrentApp();
   const [form] = Form.useForm<LoginValues>();
+
+  const { t } = useTranslation();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { notification, message } = App.useApp();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState<boolean>(false);
@@ -36,24 +40,28 @@ const LoginPage = () => {
           phone: loginResponse.data.user.phone || "",
           role: loginResponse.data.user.role,
         };
-        console.log(">>>>", mappedILoginToIUser)
-
         setUser(mappedILoginToIUser);
         setIsAuthenticated(true);
 
-        message.success("Đăng nhập thành công!");
+        message.success(t("auth.loginSuccess"));
 
+        // Ưu tiên quay lại trang người dùng đang muốn vào trước khi bị chặn
         const userRole = mappedILoginToIUser.role?.name;
-        const redirectPath = userRole === "ADMIN" ? "/admin" : "/";
-        setTimeout(() => {
-          navigate(redirectPath);
-        }, 500);
+        const requestedPath = searchParams.get("redirect");
+        const defaultPath = userRole === "ADMIN" ? "/admin" : "/";
+
+        // Chỉ nhận đường dẫn nội bộ, tránh open-redirect ra domain ngoài
+        const redirectPath =
+          requestedPath && requestedPath.startsWith("/") && !requestedPath.startsWith("//")
+            ? requestedPath
+            : defaultPath;
+
+        navigate(redirectPath, { replace: true });
       }
-    } catch (error: any) {
-      console.log("Check data error >>> ", error);
+    } catch {
       notification.error({
-        message: "Error",
-        description: "Tài khoản đăng nhập không chính xác",
+        message: t("auth.loginFailed"),
+        description: t("auth.loginFailedDesc"),
         duration: 5,
         placement: 'topRight'
       });
@@ -81,8 +89,8 @@ const LoginPage = () => {
                 </svg>
               </div>
 
-              <h1 className="login-title">Chào mừng đến với Bookshop</h1>
-              <p className="login-subtitle">Đăng nhập để truy cập tài khoản của bạn</p>
+              <h1 className="login-title">{t("auth.loginTitle")}</h1>
+              <p className="login-subtitle">{t("auth.loginSubtitle")}</p>
 
               <Form
                 name="basic"
@@ -92,26 +100,26 @@ const LoginPage = () => {
                 autoComplete="off"
               >
                 <Form.Item<LoginValues>
-                  label="Email:"
+                  label={t("field.email")}
                   name="username"
                   rules={[
-                    { required: true, message: 'Email is required' },
-                    { max: 150, message: 'Email must not exceed 150 characters' },
+                    { required: true, message: t("validate.required", { field: t("field.email") }) },
+                    { max: 150, message: t("validate.maxLength", { field: t("field.email"), max: 150 }) },
                     {
                       pattern: /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z]{2,6}$/,
-                      message: "Email format is invalid"
+                      message: t("validate.emailInvalid")
                     }
                   ]}
                 >
-                  <Input size="large" placeholder="example@email.com" />
+                  <Input size="large" placeholder={t("auth.emailPlaceholder")} />
                 </Form.Item>
 
                 <Form.Item<LoginValues>
-                  label="Mật khẩu:"
+                  label={t("field.password")}
                   name="password"
                   rules={[
-                    { required: true, message: 'Password is required' },
-                    { min: 6, message: 'Password must be at least 6 characters' }
+                    { required: true, message: t("validate.required", { field: t("field.password") }) },
+                    { min: 6, message: t("validate.minLength", { field: t("field.password"), min: 6 }) }
                   ]}
                 >
                   <Input.Password size="large" placeholder="••••••••" />
@@ -126,7 +134,7 @@ const LoginPage = () => {
                       size="large"
                       className="login-submit-button"
                     >
-                      Đăng nhập
+                      {t("auth.login")}
                     </Button>
                     <Button
                       loading={isGoogleLoading}
@@ -148,11 +156,11 @@ const LoginPage = () => {
                 </Form.Item>
               </Form>
 
-              <Divider>Hoặc</Divider>
+              <Divider>{t("auth.or")}</Divider>
 
               <div className="login-register-link">
-                Chưa có tài khoản?
-                <Link to={"/register"}> Đăng ký</Link>
+                {t("auth.noAccount")}
+                <Link to={"/register"}> {t("auth.register")}</Link>
               </div>
 
             </div>
@@ -161,11 +169,11 @@ const LoginPage = () => {
       </main>
 
       <footer className="login-footer">
-        <span className="footer-copy">© Hoài Ninh 2025</span>
+        <span className="footer-copy">{t("auth.copyright")}</span>
         <nav className="footer-links">
-          <a href="#">Chính sách bảo mật</a>
-          <a href="#">Điều khoản</a>
-          <a href="#">Liên hệ</a>
+          <a href="#">{t("auth.privacy")}</a>
+          <a href="#">{t("auth.terms")}</a>
+          <a href="#">{t("auth.contact")}</a>
         </nav>
       </footer>
     </div>

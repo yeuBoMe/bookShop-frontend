@@ -1,4 +1,5 @@
 import { Avatar, Badge, Descriptions, Drawer } from "antd";
+import { useTranslation } from "react-i18next";
 import type { DescriptionsProps } from "antd/lib";
 import dayjs from "dayjs";
 
@@ -10,6 +11,7 @@ interface DrawerUserProps {
 }
 
 const DetailUserDrawer = (props: DrawerUserProps) => {
+    const { t } = useTranslation();
     const { isDrawerOpen, setIsDrawerOpen, dataDetail, setDataDetail } = props;
     const baseImageUrl = import.meta.env.VITE_IMAGE_URL || "https://res.cloudinary.com/dvglvfask/image/upload";
     const urlAvatar = `${baseImageUrl}/${dataDetail?.avatar}`;
@@ -22,27 +24,27 @@ const DetailUserDrawer = (props: DrawerUserProps) => {
         ...(dataDetail ? [
             {
                 key: '1',
-                label: 'Id',
+                label: t("admin.table.id"),
                 children: <p>{dataDetail.id}</p>,
             },
             {
                 key: '2',
-                label: 'Full Name',
+                label: t("admin.table.fullName"),
                 children: <p>{dataDetail.fullName}</p>,
             },
             {
                 key: '3',
-                label: 'Email',
+                label: t("admin.table.email"),
                 children: <p>{dataDetail.email}</p>,
             },
             {
                 key: '4',
-                label: 'Phone',
+                label: t("admin.table.phone"),
                 children: <p>{dataDetail.phone}</p>,
             },
             {
                 key: '5',
-                label: 'Role',
+                label: t("admin.table.role"),
                 children: (
                     <Badge
                         status="processing"
@@ -52,7 +54,7 @@ const DetailUserDrawer = (props: DrawerUserProps) => {
             },
             {
                 key: '6',
-                label: 'Avatar',
+                label: t("admin.table.avatar"),
                 children: (
                     <Avatar
                         src={dataDetail.avatar ? urlAvatar : "user"}
@@ -61,12 +63,12 @@ const DetailUserDrawer = (props: DrawerUserProps) => {
             },
             {
                 key: '7',
-                label: 'Created At',
+                label: t("admin.table.createdAt"),
                 children: <p>{formatDateTime(dataDetail?.createdAt)}</p>,
             },
             {
                 key: '8',
-                label: 'Updated At',
+                label: t("admin.table.updatedAt"),
                 children: <p>{formatDateTime(dataDetail?.updatedAt)}</p>,
             },
         ] : [])
@@ -80,14 +82,14 @@ const DetailUserDrawer = (props: DrawerUserProps) => {
     return (
         <>
             <Drawer
-                title="User Detail"
+                title={t("admin.detail.title", { entity: t("admin.entity.user") })}
                 placement={"right"}
                 width={"50vw"}
                 open={isDrawerOpen}
                 onClose={handleClearDataAndCloseDrawer}
             >
                 <Descriptions
-                    title="User Info"
+                    title={t("admin.detail.info", { entity: t("admin.entity.user") })}
                     items={items}
                     bordered
                     size="small"

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Modal, Tabs, Form, Input, Button, Upload, Image, App } from "antd";
 import { UserOutlined, LockOutlined, MailOutlined, PhoneOutlined, LoadingOutlined, PlusOutlined } from "@ant-design/icons";
 import type { FormProps, GetProp, UploadFile, UploadProps } from "antd";
@@ -38,6 +39,8 @@ const getBase64 = (file: FileType): Promise<string> =>
 const ProfilePage = () => {
     const { user, setUser } = useCurrentApp();
     const { notification, message } = App.useApp();
+
+    const { t } = useTranslation();
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [activeTab, setActiveTab] = useState("1");
@@ -111,7 +114,7 @@ const ProfilePage = () => {
                     console.log(`Deleted ${deletedImage.length} image`);
                 } catch (error: any) {
                     console.error('Check error delete image >>> ', error);
-                    message.warning('Cannot delete image!');
+                    message.warning(t("profile.deleteImageFail"));
                 }
             }
 
@@ -127,7 +130,7 @@ const ProfilePage = () => {
                     }
                 } catch (error: any) {
                     console.error('Check error update image >>> ', error);
-                    message.error('Cannot upload new image');
+                    message.error(t("profile.uploadImageFail"));
                     throw error;
                 }
             }
@@ -142,12 +145,12 @@ const ProfilePage = () => {
                     avatar: updatedAvatar
                 });
 
-                message.success("Cập nhật tài khoản thành công!");
+                message.success(t("profile.updateSuccess"));
                 handleCloseModal();
             }
         } catch (error: any) {
             notification.error({
-                message: "Error",
+                message: t("common.error"),
                 description: error?.message || "An error happens when updating user",
                 duration: 5,
                 placement: "topRight",
@@ -177,12 +180,12 @@ const ProfilePage = () => {
             await new Promise((resolve) => setTimeout(resolve, 2000));
 
             if (updateUserPasswordResponse.data) {
-                message.success("Đổi mật khẩu thành công!");
+                message.success(t("profile.passwordChanged"));
                 handleCloseModal();
             }
         } catch (error: any) {
             notification.error({
-                message: "Error",
+                message: t("common.error"),
                 description: error?.message || "An error happens when updating password",
                 duration: 5,
                 placement: "topRight",
@@ -212,9 +215,9 @@ const ProfilePage = () => {
 
     const beforeUpload = (file: FileType) => {
         const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
-        if (!isJpgOrPng) message.error('Chỉ cho phép upload file JPG/PNG!');
+        if (!isJpgOrPng) message.error(t("admin.msg.imageTypeInvalid"));
         const isLt2M = file.size / 1024 / 1024 < 2;
-        if (!isLt2M) message.error('Kích thước ảnh phải nhỏ hơn 2MB!');
+        if (!isLt2M) message.error(t("admin.msg.imageTooLarge"));
         return isJpgOrPng && isLt2M || Upload.LIST_IGNORE;
     };
 
@@ -229,7 +232,7 @@ const ProfilePage = () => {
     const tabItems = [
         {
             key: "1",
-            label: "Cập nhật thông tin",
+            label: t("profile.tabInfo"),
             children: (
                 <div className="profile-tab-content">
                     <Form
@@ -240,7 +243,7 @@ const ProfilePage = () => {
                     >
                         <div className="profile-avatar-section">
                             <Form.Item<InfoValues>
-                                label="Avatar:"
+                                label={t("field.avatar")}
                                 name="avatar"
                                 valuePropName="fileList"
                                 getValueFromEvent={normFile}
@@ -260,7 +263,7 @@ const ProfilePage = () => {
                                     ) : (
                                         <button style={{ border: 0, background: 'none' }} type="button">
                                             <PlusOutlined />
-                                            <div style={{ marginTop: 8 }}>Upload</div>
+                                            <div style={{ marginTop: 8 }}>{t("admin.form.upload")}</div>
                                         </button>
                                     )}
                                 </Upload>
@@ -279,30 +282,30 @@ const ProfilePage = () => {
                         </div>
 
                         <Form.Item<InfoValues>
-                            label="Email:"
+                            label={t("field.email")}
                             name="email"
                             rules={[
-                                { required: true, message: "Vui lòng nhập email!" },
-                                { type: "email", message: "Email không hợp lệ!" }
+                                { required: true, message: t("validate.required", { field: t("field.email") }) },
+                                { type: "email", message: t("validate.emailInvalidShort") }
                             ]}
                         >
                             <Input prefix={<MailOutlined />} size="large" disabled />
                         </Form.Item>
 
                         <Form.Item<InfoValues>
-                            label="Tên hiển thị:"
+                            label={t("profile.displayName")}
                             name="fullName"
-                            rules={[{ required: true, message: "Vui lòng nhập tên!" }]}
+                            rules={[{ required: true, message: t("validate.required", { field: t("profile.displayName") }) }]}
                         >
                             <Input prefix={<UserOutlined />} size="large" />
                         </Form.Item>
 
                         <Form.Item<InfoValues>
-                            label="Số điện thoại:"
+                            label={t("field.phone")}
                             name="phone"
                             rules={[
-                                { required: true, message: "Vui lòng nhập số điện thoại!" },
-                                { pattern: /^[0-9]{10}$/, message: "Số điện thoại không hợp lệ!" }
+                                { required: true, message: t("validate.required", { field: t("field.phone") }) },
+                                { pattern: /^[0-9]{10}$/, message: t("validate.phoneInvalidShort") }
                             ]}
                         >
                             <Input prefix={<PhoneOutlined />} size="large" />
@@ -316,7 +319,7 @@ const ProfilePage = () => {
                                 block
                                 loading={isUpdateInfoLoading}
                             >
-                                Cập nhật
+                                {t("common.update")}
                             </Button>
                         </Form.Item>
                     </Form>
@@ -325,7 +328,7 @@ const ProfilePage = () => {
         },
         {
             key: "2",
-            label: "Đổi mật khẩu",
+            label: t("profile.tabPassword"),
             children: (
                 <div className="profile-tab-content">
                     <Form
@@ -335,42 +338,42 @@ const ProfilePage = () => {
                         className="profile-form"
                     >
                         <Form.Item<PasswordValues>
-                            label="Mật khẩu hiện tại:"
+                            label={t("profile.currentPassword")}
                             name="currentPassword"
-                            rules={[{ required: true, message: "Vui lòng nhập mật khẩu hiện tại!" }]}
+                            rules={[{ required: true, message: t("validate.required", { field: t("profile.currentPassword") }) }]}
                         >
                             <Input.Password
                                 prefix={<LockOutlined />}
-                                placeholder="Nhập mật khẩu hiện tại"
+                                placeholder={t("profile.currentPasswordPlaceholder")}
                                 size="large"
                             />
                         </Form.Item>
 
                         <Form.Item<PasswordValues>
-                            label="Mật khẩu mới:"
+                            label={t("profile.newPassword")}
                             name="newPassword"
                             rules={[
-                                { required: true, message: "Vui lòng nhập mật khẩu mới!" },
-                                { min: 6, message: "Mật khẩu phải có ít nhất 6 ký tự!" }
+                                { required: true, message: t("validate.required", { field: t("profile.newPassword") }) },
+                                { min: 6, message: t("validate.minLength", { field: t("field.password"), min: 6 }) }
                             ]}
                         >
                             <Input.Password
                                 prefix={<LockOutlined />}
-                                placeholder="Nhập mật khẩu mới"
+                                placeholder={t("profile.newPasswordPlaceholder")}
                                 size="large"
                             />
                         </Form.Item>
 
                         <Form.Item<PasswordValues>
-                            label="Xác nhận mật khẩu mới:"
+                            label={t("profile.confirmPassword")}
                             name="confirmPassword"
                             rules={[
-                                { required: true, message: "Vui lòng xác nhận mật khẩu!" },
+                                { required: true, message: t("profile.confirmRequired") },
                             ]}
                         >
                             <Input.Password
                                 prefix={<LockOutlined />}
-                                placeholder="Xác nhận mật khẩu mới"
+                                placeholder={t("profile.confirmPasswordPlaceholder")}
                                 size="large"
                             />
                         </Form.Item>
@@ -383,7 +386,7 @@ const ProfilePage = () => {
                                 block
                                 loading={isUpdatePassLoading}
                             >
-                                Đổi mật khẩu
+                                {t("profile.tabPassword")}
                             </Button>
                         </Form.Item>
                     </Form>
@@ -395,15 +398,15 @@ const ProfilePage = () => {
     return (
         <div className="profile-page">
             <div className="profile-container">
-                <h1 className="profile-title">Tài khoản của tôi</h1>
-                <p className="profile-subtitle">Quản lý thông tin cá nhân và bảo mật tài khoản</p>
+                <h1 className="profile-title">{t("profile.title")}</h1>
+                <p className="profile-subtitle">{t("profile.subtitle")}</p>
                 <Button type="primary" size="large" onClick={() => setIsModalOpen(true)}>
-                    Quản lý tài khoản
+                    {t("profile.manage")}
                 </Button>
             </div>
 
             <Modal
-                title="Quản lý tài khoản"
+                title={t("profile.manage")}
                 open={isModalOpen}
                 onCancel={handleCloseModal}
                 footer={null}

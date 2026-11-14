@@ -1,4 +1,5 @@
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { App, Button } from "antd";
 import { CreditCardOutlined } from "@ant-design/icons";
 import "styles/client/checkout/order-success.scss";
@@ -9,10 +10,12 @@ const CheckoutSuccess = () => {
     const [searchParams] = useSearchParams();
     const {message} = App.useApp();
 
+    const { t } = useTranslation();
+
     useEffect(() => {
         if (searchParams.get("vnp_ResponseCode") === "00") {
             // thành công từ VNPAY return
-            message.success("Thanh toán VNPAY thành công!");
+            message.success(t("checkout.vnpaySuccess"));
         }
     }, []);
 
@@ -22,11 +25,10 @@ const CheckoutSuccess = () => {
                 <div className="success-icon">
                     <CreditCardOutlined />
                 </div>
-                <h2>Thanh toán thành công!</h2>
-                <p>Cảm ơn bạn đã mua hàng tại BookShop</p>
+                <h2>{t("checkout.successTitle")}</h2>
+                <p>{t("checkout.successThanks")}</p>
                 <p className="order-info">
-                    Chúng tôi sẽ liên hệ với bạn để xác nhận đơn hàng trong thời
-                    gian sớm nhất.
+                    {t("checkout.successNote")}
                 </p>
                 <div className="success-actions">
                     <Button
@@ -34,10 +36,10 @@ const CheckoutSuccess = () => {
                         size="large"
                         onClick={() => navigate("/order-history")}
                     >
-                        Xem đơn hàng
+                        {t("checkout.viewOrders")}
                     </Button>
                     <Button size="large" onClick={() => navigate("/books")}>
-                        Tiếp tục mua sắm
+                        {t("checkout.keepShopping")}
                     </Button>
                 </div>
             </div>

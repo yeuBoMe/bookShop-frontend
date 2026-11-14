@@ -1,3 +1,423 @@
+@use "abstracts/tokens" as *;
+@use "abstracts/mixins" as *;
+
+// ===========================================================================
+// NỀN TẢNG TOÀN CỤC
+//
+// Trước đây file này chỉ có `* { margin: 0 }`, nên mọi thiết lập nền (font,
+// màu chữ, tiêu đề, focus, cuộn ngang trên mobile...) đều bị mỗi màn tự xử lý
+// một kiểu. Toàn bộ đã được đưa về đây.
+// ===========================================================================
+
+// Font tải một lần duy nhất — trước đây được @import lặp ở home.scss và
+// profile.scss, khiến trình duyệt tải hai lần và chặn render.
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
+
+// ===========================================================================
+// BIẾN CSS — CHẾ ĐỘ SÁNG (mặc định)
+//
+// Đây là nơi DUY NHẤT chứa giá trị màu thật. _tokens.scss chỉ trỏ vào đây,
+// nên đổi một dòng ở đây là cả 26 file SCSS đổi theo.
+//
+// Quy ước quan trọng, đọc kỹ trước khi thêm màu mới:
+//   --x        → màu NỀN, luôn đủ tối để chữ trắng đặt lên đạt ≥4.5:1
+//   --x-text   → màu CHỮ/ICON, luôn đủ tương phản với nền trang
+// Ở chế độ sáng hai màu này thường trùng nhau, nhưng ở chế độ tối thì ngược
+// chiều: nền vẫn phải tối (chữ trắng đọc được) còn chữ phải sáng (nổi trên nền
+// tối). Gộp làm một sẽ luôn hỏng một trong hai.
+// ===========================================================================
+:root {
+  color-scheme: light;
+
+  // --- Thương hiệu trang khách: azure ---
+  --brand-50: #{$brand-50};
+  --brand-100: #{$brand-100};
+  --brand-200: #{$brand-200};
+  --brand-300: #{$brand-300};
+  --brand-500: #{$brand-500};
+  --brand-600: #{$brand-600};
+  --brand-700: #{$brand-700};
+  --brand-800: #{$brand-800};
+  --brand-text: #{$brand-700}; // 6.3:1 trên nền trắng — chữ nhỏ vẫn đọc tốt
+  --brand-text-hover: #{$brand-800};
+  --brand-rgb: 11, 116, 212;
+
+  // --- Chữ ---
+  --text-strong: #{$gray-900};
+  --text-body: #{$gray-700};
+  --text-muted: #{$gray-500};
+  --text-subtle: #{$gray-400};
+
+  // --- Bề mặt ---
+  --surface: #{$white};
+  --surface-subtle: #{$gray-50};
+  --surface-muted: #{$gray-100};
+  --surface-raised: #{$white}; // menu xổ xuống, modal
+
+  // --- Viền ---
+  --border: #{$gray-200};
+  --border-strong: #{$gray-300};
+
+  // --- Màu ngữ nghĩa ---
+  --success: #05835c;
+  --success-text: #05835c;
+  --success-soft: #ecfdf5;
+  --warning: #b45309;
+  --warning-text: #b45309;
+  --warning-soft: #fffbeb;
+  --danger: #dc2626;
+  --danger-strong: #b91c1c;
+  --danger-text: #dc2626;
+  --danger-soft: #fef2f2;
+
+  // --- Màu nhấn thẻ số liệu ở Tổng quan ---
+  --accent-emerald: #05835c;
+  --accent-blue: #1d4ed8;
+  --accent-violet: #6d28d9;
+  --accent-amber: #b45309;
+  --accent-rose: #be123c;
+  --accent-emerald-soft: #ecfdf5;
+  --accent-blue-soft: #eff6ff;
+  --accent-violet-soft: #f5f3ff;
+  --accent-amber-soft: #fffbeb;
+  --accent-rose-soft: #fff1f2;
+
+  // --- Đổ bóng ---
+  --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.07), 0 2px 4px rgba(15, 23, 42, 0.04);
+  --shadow-lg: 0 12px 28px rgba(15, 23, 42, 0.09), 0 4px 8px rgba(15, 23, 42, 0.04);
+  --shadow-xl: 0 24px 48px rgba(15, 23, 42, 0.12);
+
+  // --- Hình khối, dùng được trong style inline ---
+  --radius-md: #{$radius-md};
+  --radius-lg: #{$radius-lg};
+  --header-height: #{$header-height};
+}
+
+// ===========================================================================
+// BIẾN CSS — CHẾ ĐỘ TỐI
+//
+// ThemeProvider (theme.context.tsx) đặt data-theme="dark" lên thẻ <html>.
+//
+// Nền dùng xanh đen (slate) chứ không phải đen tuyền: trên màn OLED, chữ trắng
+// đặt trên đen tuyền bị loang viền (halation) khiến đọc lâu rất mỏi mắt.
+// ===========================================================================
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  // Nền vẫn giữ xanh đủ tối để chữ trắng trên nút đọc được (--brand-600),
+  // còn --brand-text sáng hẳn lên để chữ và liên kết nổi trên nền tối.
+  --brand-50: #10243a;
+  --brand-100: #143152;
+  --brand-200: #1b4470;
+  --brand-300: #2f7fc4;
+  --brand-500: #40a8fa;
+  --brand-600: #0d6fca; // chữ trắng trên nền này: 5.07:1
+  --brand-700: #0a5fae;
+  --brand-800: #0d4d8a;
+  --brand-text: #{$brand-300}; // 8.2:1 trên nền thẻ
+  --brand-text-hover: #{$brand-200};
+  --brand-rgb: 64, 168, 250; // sáng hơn để quầng sáng còn thấy được trên nền tối
+
+  --text-strong: #f1f5f9;
+  --text-body: #{$slate-300};
+  --text-muted: #{$slate-400};
+  --text-subtle: #7c8ba1;
+
+  --surface: #{$slate-850};
+  --surface-subtle: #{$slate-950}; // nền trang, tối nhất
+  --surface-muted: #{$slate-800};
+  --surface-raised: #212d42; // menu xổ xuống nổi lên trên thẻ
+
+  --border: #2b374d;
+  --border-strong: #3d4b64;
+
+  --success: #05835c;
+  --success-text: #{$admin-300};
+  --success-soft: #0d2f26;
+  --warning: #b45309;
+  --warning-text: #fbbf24;
+  --warning-soft: #33240c;
+  --danger: #dc2626;
+  --danger-strong: #b91c1c;
+  --danger-text: #fca5a5;
+  --danger-soft: #3a1618;
+
+  // Bản sáng hơn để nổi trên nền tối, vẫn giữ đúng thứ tự sắc như chế độ sáng
+  --accent-emerald: #{$admin-300};
+  --accent-blue: #7cc3fd;
+  --accent-violet: #c4b5fd;
+  --accent-amber: #fbbf24;
+  --accent-rose: #fda4af;
+  --accent-emerald-soft: #0d2f26;
+  --accent-blue-soft: #10243a;
+  --accent-violet-soft: #241a45;
+  --accent-amber-soft: #33240c;
+  --accent-rose-soft: #3a1620;
+
+  // Bóng phải đậm hơn hẳn mới nhìn thấy trên nền tối
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.55), 0 2px 4px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 12px 28px rgba(0, 0, 0, 0.6), 0 4px 8px rgba(0, 0, 0, 0.45);
+  --shadow-xl: 0 24px 48px rgba(0, 0, 0, 0.7);
+}
+
+// ---------------------------------------------------------------------------
+// Reset
+// ---------------------------------------------------------------------------
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 * {
-  margin: 0px;
+  margin: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%; // iOS không tự phóng to chữ khi xoay ngang
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  font-family: $font-sans;
+  font-size: $fs-base;
+  font-weight: $fw-normal;
+  line-height: $lh-normal;
+  color: $text-body;
+  background: $surface-subtle;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+
+  // Đổi sáng/tối mượt thay vì nhấp nháy. Người bật "giảm chuyển động" được
+  // miễn trừ ở khối @media phía dưới.
+  transition: background-color $transition-base, color $transition-base;
+
+  // Chặn tràn ngang — nguyên nhân phổ biến nhất khiến trang "lệch" trên mobile
+  overflow-x: hidden;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+a {
+  color: $primary-text;
+  text-decoration: none;
+  transition: color $transition-fast;
+
+  @include hover {
+    color: $primary-text-hover;
+  }
+  @include focus-ring;
+}
+
+// ---------------------------------------------------------------------------
+// Tiêu đề
+// ---------------------------------------------------------------------------
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: $text-strong;
+  font-weight: $fw-bold;
+  line-height: $lh-tight;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+
+h1 {
+  font-size: clamp($fs-2xl, 4vw, $fs-4xl);
+}
+h2 {
+  font-size: clamp($fs-xl, 3vw, $fs-3xl);
+}
+h3 {
+  font-size: clamp($fs-lg, 2.2vw, $fs-2xl);
+}
+h4 {
+  font-size: $fs-lg;
+}
+h5,
+h6 {
+  font-size: $fs-md;
+  font-weight: $fw-semibold;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+// ---------------------------------------------------------------------------
+// Khả năng tiếp cận
+// ---------------------------------------------------------------------------
+:focus-visible {
+  outline: 2px solid $primary;
+  outline-offset: 2px;
+}
+
+// Tôn trọng thiết lập "giảm chuyển động" của hệ điều hành
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+::selection {
+  background: $primary-muted;
+  color: $text-strong;
+}
+
+// Thanh cuộn toàn trang
+body {
+  @include thin-scrollbar(transparent, $border-strong);
+}
+
+// ---------------------------------------------------------------------------
+// Tiện ích
+// ---------------------------------------------------------------------------
+.app-container {
+  @include container;
+}
+
+.visually-hidden {
+  @include visually-hidden;
+}
+
+// ---------------------------------------------------------------------------
+// Hoà hợp với Ant Design
+//
+// ConfigProvider (main.tsx) đã đặt colorPrimary/font/bo góc và thuật toán màu
+// tối. Phần dưới chỉ xử lý những chỗ token của antd chưa với tới, để component
+// antd và CSS tự viết trông như cùng một hệ thống thiết kế.
+// ---------------------------------------------------------------------------
+.ant-btn {
+  font-weight: $fw-semibold;
+  box-shadow: none;
+
+  &:not(:disabled) {
+    @include focus-ring;
+  }
+}
+
+.ant-btn-primary:not(:disabled) {
+  box-shadow: $shadow-xs;
+
+  @include hover {
+    box-shadow: $shadow-brand;
+  }
+}
+
+// Bảng: đầu bảng nhẹ nhàng, hàng có phản hồi khi rê chuột
+.ant-table-wrapper {
+  .ant-table-thead > tr > th {
+    background: $surface-subtle;
+    color: $text-strong;
+    font-weight: $fw-semibold;
+    font-size: $fs-sm;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    border-bottom: 1px solid $border;
+
+    &::before {
+      display: none !important; // bỏ vạch ngăn dọc mặc định
+    }
+  }
+
+  .ant-table-tbody > tr > td {
+    border-bottom: 1px solid $border;
+  }
+}
+
+// Trên mobile, cho bảng cuộn ngang thay vì bóp méo nội dung
+@include below(md) {
+  .ant-table-wrapper .ant-table-content {
+    @include scrollable-x;
+  }
+}
+
+.ant-card {
+  border-radius: $radius-lg;
+  border-color: $border;
+}
+
+.ant-modal-content,
+.ant-drawer-content {
+  border-radius: $radius-lg;
+}
+
+@include below(sm) {
+  // Modal chiếm gần trọn màn hình trên điện thoại thay vì bị co lại giữa trang
+  .ant-modal {
+    max-width: calc(100vw - #{$space-4} * 2) !important;
+    margin: $space-4 auto;
+  }
+}
+
+// Ô nhập liệu: viền và focus đồng bộ với nút
+.ant-input,
+.ant-input-affix-wrapper,
+.ant-input-number,
+.ant-select-selector,
+.ant-picker {
+  border-radius: $radius-md !important;
+}
+
+// Phân trang
+.ant-pagination {
+  .ant-pagination-item-active {
+    font-weight: $fw-semibold;
+  }
+}
+
+// Thông báo & tin nhắn nổi
+.ant-message-notice-content,
+.ant-notification-notice {
+  border-radius: $radius-lg;
+  box-shadow: $shadow-lg;
+}
+
+// Sao đánh giá dùng đúng màu token
+.ant-rate {
+  color: $star;
+  font-size: $fs-md;
 }

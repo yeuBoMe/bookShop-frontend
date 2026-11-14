@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Empty, Button, Spin } from "antd";
 import { ShoppingOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
@@ -10,6 +11,8 @@ import OrderHistoryTable from "@/components/client/order/order-his.table";
 const OrderHistoryPage = () => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
+
+    const { t } = useTranslation();
     const [orders, setOrders] = useState<IOrder[]>([]);
     const [selectedOrder, setSelectedOrder] = useState<IOrder | null>(null);
     const [modalVisible, setModalVisible] = useState<boolean>(false);
@@ -50,7 +53,7 @@ const OrderHistoryPage = () => {
     if (loading) {
         return (
             <div className="order-history-loading">
-                <Spin size="large" tip="Đang tải lịch sử đơn hàng..." />
+                <Spin size="large" tip={t("order.loadingHistory")} />
             </div>
         );
     }
@@ -58,18 +61,18 @@ const OrderHistoryPage = () => {
     return (
         <div className="order-history-container">
             <div className="order-history-header">
-                <h1><ShoppingOutlined /> Lịch sử đơn hàng</h1>
-                <p>Theo dõi và quản lý các đơn hàng của bạn</p>
+                <h1><ShoppingOutlined /> {t("order.historyTitle")}</h1>
+                <p>{t("order.historySubtitle")}</p>
             </div>
 
             <div className="order-list">
                 {orders.length === 0 ? (
                     <Empty
                         image={<ShoppingOutlined style={{ fontSize: 80, color: "#ccc" }} />}
-                        description={<span>Chưa có đơn hàng nào</span>}
+                        description={<span>{t("order.empty")}</span>}
                     >
                         <Button type="primary" onClick={() => navigate("/books")}>
-                            Mua sắm ngay
+                            {t("header.shopNow")}
                         </Button>
                     </Empty>
                 ) : (

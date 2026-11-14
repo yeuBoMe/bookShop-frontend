@@ -1,0 +1,74 @@
+@use "../abstracts/tokens" as t;
+@use "../abstracts/mixins" as m;
+
+// ===========================================================================
+// NÚT ĐIỀU KHIỂN DÙNG CHUNG — đổi ngôn ngữ, đổi giao diện sáng/tối
+//
+// Một bộ style duy nhất cho cả trang bán hàng lẫn khu quản trị. Màu nhấn lấy
+// qua biến CSS var(--brand-*) chứ không phải biến SCSS, nên nút tự động xanh
+// dương ở trang khách và xanh lá ở /admin (body.admin-theme ghi đè các biến
+// này — xem admin.layout.scss).
+// ===========================================================================
+
+.app-control {
+  display: inline-flex;
+  align-items: center;
+  gap: t.$space-2;
+  height: 36px;
+  padding-inline: t.$space-3;
+  border-radius: t.$radius-full;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-body);
+  font-size: t.$fs-sm;
+  font-weight: t.$fw-semibold;
+  line-height: 1;
+  white-space: nowrap;
+  transition: background t.$transition-fast, color t.$transition-fast,
+    border-color t.$transition-fast;
+
+  @include m.hover {
+    background: var(--brand-50);
+    border-color: var(--brand-600);
+    color: var(--brand-700);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--brand-600);
+    outline-offset: 2px;
+  }
+
+  // Vùng bấm tối thiểu 44×44 theo khuyến nghị WCAG 2.5.5 — nút cao 36px nên
+  // nới thêm bằng vùng ảo, không làm xô lệch bố cục.
+  position: relative;
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: -4px;
+  }
+
+  &__text {
+    // Trên điện thoại chỉ giữ icon cho gọn thanh điều hướng
+    @include m.below(sm) {
+      display: none;
+    }
+  }
+}
+
+// Một dòng trong menu xổ xuống
+.app-control__option {
+  display: inline-flex;
+  align-items: center;
+  gap: t.$space-2;
+  min-width: 150px;
+
+  &-label {
+    flex: 1;
+  }
+}
+
+.app-control__check {
+  flex-shrink: 0;
+  color: var(--brand-600);
+}

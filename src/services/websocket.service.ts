@@ -6,7 +6,6 @@ class WebSocketService {
 
   private connected = false;
   private currentUserEmail = "";
-  private isAdmin = false;
 
   // ✅ LƯU SUBSCRIPTION (QUAN TRỌNG)
   private userSubscription?: StompSubscription;
@@ -26,7 +25,6 @@ class WebSocketService {
     }
 
     this.currentUserEmail = userEmail;
-    this.isAdmin = isAdminRole;
 
     const baseBackendUrl =
       import.meta.env.VITE_BACKEND_URL ||
@@ -186,7 +184,6 @@ class WebSocketService {
 
     this.connected = false;
     this.currentUserEmail = "";
-    this.isAdmin = false;
   }
 
   isConnected(): boolean {

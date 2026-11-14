@@ -1,5 +1,6 @@
 import ImageGallery from "react-image-gallery";
 import { useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { Modal } from "antd";
 import "react-image-gallery/styles/css/image-gallery.css";
 
@@ -12,6 +13,7 @@ interface BookGalleryProps {
 }
 
 const BookGalleryModal = (props: BookGalleryProps) => {
+    const { t } = useTranslation();
     const {
         modalGalleryOpen,
         setModalGalleryOpen,
@@ -53,7 +55,7 @@ const BookGalleryModal = (props: BookGalleryProps) => {
                     showBullets={false}
                 />
             ) : (
-                <div>Không có ảnh để hiển thị</div>
+                <div>{t("error.noImages")}</div>
             )}
         </Modal>
     );

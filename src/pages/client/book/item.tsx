@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { useParams, useNavigate } from "react-router-dom";
 import {
     Breadcrumb,
@@ -31,15 +32,21 @@ import {
     getRatingByUserIdAndBookIdAPI
 } from "@/services/api.service";
 import { useCurrentApp } from "@/components/context/app.context";
+import { useAddToCart } from "@/hooks/use-add-to-cart";
+import { getImageUrl } from "@/services/helper";
 
 const { TextArea } = Input;
 
 const BookDetailPage = () => {
     const { id } = useParams();
-    const { user, setCarts } = useCurrentApp();
+    const { user } = useCurrentApp();
+    const addBookToCart = useAddToCart();
     const navigate = useNavigate();
 
     const { notification, message } = App.useApp();
+
+
+    const { t } = useTranslation();
 
     const [loading, setLoading] = useState<boolean>(false);
     const [ratingsLoading, setRatingsLoading] = useState<boolean>(false);
@@ -60,8 +67,7 @@ const BookDetailPage = () => {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
     const refGallery = useRef<ImageGallery>(null);
-    const baseImageUrl = import.meta.env.VITE_IMAGE_URL || "https://res.cloudinary.com/dvglvfask/image/upload";
-    const currentUserAvatarUrl = `${baseImageUrl}/${user?.avatar}`;
+    const currentUserAvatarUrl = getImageUrl(user?.avatar);
 
     const [meta, setMeta] = useState({
         current: 1,
@@ -84,15 +90,13 @@ const BookDetailPage = () => {
     const fetchBookDetailById = async (bookId: number) => {
         try {
             setLoading(true);
-            await new Promise((resolve) => setTimeout(resolve, 1000));
             const fetchBookByIdResponse = await getBookByIdAPI(bookId);
             if (fetchBookByIdResponse.data) {
                 setBook(fetchBookByIdResponse.data);
             }
         } catch (error: any) {
-            console.error("Failed to fetch book:", error);
             notification.error({
-                message: "Error",
+                message: t("common.error"),
                 description: error?.message,
                 duration: 5,
                 placement: "topRight"
@@ -113,7 +117,7 @@ const BookDetailPage = () => {
                 setTotalRatings(fetchListRatingsByBookIdResponse.data.meta.total);
             }
         } catch (error: any) {
-            console.error("Failed to fetch ratings:", error);
+            message.error(error?.message || t("book.rateFail"));
         } finally {
             setRatingsLoading(false);
         }
@@ -134,8 +138,8 @@ const BookDetailPage = () => {
     const handleSubmitRating = async () => {
         if (!user || !user.id) {
             notification.warning({
-                message: "Chưa đăng nhập",
-                description: "Vui lòng đăng nhập để đánh giá sản phẩm",
+                message: t("chat.notLoggedIn"),
+                description: t("book.notLoggedInRate"),
                 duration: 3,
                 placement: "topRight",
             });
@@ -157,26 +161,26 @@ const BookDetailPage = () => {
             };
 
             const createRatingResponse = await createRatingAPI(dataSend);
-            await new Promise((resolve) => setTimeout(resolve, 1000));
-
-            console.log("Check data rating>>>", createRatingResponse);
             if (createRatingResponse.data) {
-                message.success("Bạn đã thêm đánh giá thành công, cảm ơn bạn!");
+                message.success(t("book.rateSuccess"));
                 setNewRatingStars(0);
                 setNewRatingComment("");
-                window.location.reload();
-                // await fetchBookDetailById(parseInt(id!));
-                // await fetchListRatingsByBookId(parseInt(id!), 1);
-                // await fetchUserRating(user.id, parseInt(id!));
+                // Nạp lại dữ liệu liên quan thay vì window.location.reload():
+                // reload cả trang làm mất vị trí cuộn và tải lại toàn bộ bundle
+                const bookId = parseInt(id!);
+                await Promise.all([
+                    fetchBookDetailById(bookId),
+                    fetchListRatingsByBookId(bookId, 1),
+                    fetchUserRating(user.id, bookId),
+                ]);
             }
         } catch (error: any) {
             notification.error({
-                message: "Lỗi",
-                description: error?.message || "Không thể gửi đánh giá",
+                message: t("common.error"),
+                description: error?.message || t("book.rateFail"),
                 duration: 5,
                 placement: "topRight",
             });
-            console.log("Check error rating>>>", error);
         } finally {
             setIsSubmitRating(false);
             setLoading(false);
@@ -209,57 +213,7 @@ const BookDetailPage = () => {
     // }
 
     const handleAddToCart = () => {
-        // Kiểm tra đăng nhập
-        if (!user || !user.id) {
-            notification.warning({
-                message: "Chưa đăng nhập",
-                description: "Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng",
-                duration: 3,
-                placement: "topRight"
-            });
-            // Chuyển hướng về trang đăng nhập sau 1 giây
-            setTimeout(() => {
-                navigate("/login");
-            }, 1000);
-            return;
-        }
-
-        if (!book) return;
-
-        // update local storage
-        const cartStorage = localStorage.getItem("carts");
-        if (cartStorage) {
-            // update
-            const carts = JSON.parse(cartStorage) as ICart[];
-
-            // check exists
-            let isExistIndex = carts.findIndex(cart => cart.id === book.id);
-            if (isExistIndex > -1) {
-                carts[isExistIndex].quantity = carts[isExistIndex].quantity + quantity;
-            } else {
-                carts.push({
-                    id: book.id,
-                    quantity: quantity,
-                    detail: book
-                });
-            }
-
-            localStorage.setItem("carts", JSON.stringify(carts));
-            setCarts(carts);
-        } else {
-            // create
-            const data = [{
-                id: book.id,
-                quantity: quantity,
-                detail: book!
-            }];
-
-            localStorage.setItem("carts", JSON.stringify(data));
-
-            // sync React context
-            setCarts(data);
-        }
-        message.success(`Đã thêm ${quantity} sản phẩm "${book.name}" vào giỏ hàng`);
+        if (book) addBookToCart(book, quantity);
     };
 
     const handlePageChange = (page: number) => {
@@ -371,7 +325,7 @@ const BookDetailPage = () => {
     if (!book) {
         return (
             <div className="loading-container">
-                <p>Không tìm thấy sách</p>
+                <p>{t("book.notFound")}</p>
             </div>
         );
     }
@@ -382,8 +336,8 @@ const BookDetailPage = () => {
     }
 
     const images = (book?.images ?? []).map((img) => ({
-        original: `${baseImageUrl}/${img}`,
-        thumbnail: `${baseImageUrl}/${img}`,
+        original: getImageUrl(img),
+        thumbnail: getImageUrl(img),
     })) || [];
 
     console.log("Check book image: >>> ", images); 
@@ -391,48 +345,48 @@ const BookDetailPage = () => {
     const tabItems = [
         {
             key: "1",
-            label: "Mô tả sản phẩm",
+            label: t("book.tabDescription"),
             children: (
                 <div className="description-content">
-                    <h3>Giới thiệu sách</h3>
-                    <p>{book.introduceText || "Không có thông tin giới thiệu."}</p>
+                    <h3>{t("book.intro")}</h3>
+                    <p>{book.introduceText || t("book.introEmpty")}</p>
 
-                    <h3>Nội dung chính</h3>
-                    <p>{book.description || "Không có mô tả chi tiết."}</p>
+                    <h3>{t("book.content")}</h3>
+                    <p>{book.description || t("book.contentEmpty")}</p>
 
-                    <h3>Đối tượng đọc giả</h3>
-                    <p>{book.reader || "Phù hợp với mọi đối tượng độc giả."}</p>
+                    <h3>{t("book.audience")}</h3>
+                    <p>{book.reader || t("book.audienceEmpty")}</p>
                 </div>
             ),
         },
         {
             key: "2",
-            label: "Thông số chi tiết",
+            label: t("book.tabSpecs"),
             children: (
                 <div className="description-content">
                     <ul>
-                        <li><strong>Tên sách:</strong> {book.name}</li>
-                        <li><strong>Tác giả:</strong> {book.author}</li>
-                        <li><strong>Thể loại:</strong> {book.category}</li>
-                        <li><strong>Giá:</strong> {new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(book.price)}</li>
-                        <li><strong>Số lượng còn lại:</strong> {book.quantity}</li>
-                        <li><strong>Ngày tạo:</strong> {book.createdAt ? new Date(book.createdAt).toLocaleDateString("vi-VN") : "N/A"}</li>
-                        <li><strong>Ngày cập nhật:</strong> {book.updatedAt ? new Date(book.updatedAt).toLocaleDateString("vi-VN") : "N/A"}</li>
+                        <li><strong>{t("book.specName")}</strong> {book.name}</li>
+                        <li><strong>{t("book.specAuthor")}</strong> {book.author}</li>
+                        <li><strong>{t("book.specCategory")}</strong> {book.category}</li>
+                        <li><strong>{t("book.specPrice")}</strong> {new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(book.price)}</li>
+                        <li><strong>{t("book.specStock")}</strong> {book.quantity}</li>
+                        <li><strong>{t("book.specCreatedAt")}</strong> {book.createdAt ? new Date(book.createdAt).toLocaleDateString("vi-VN") : "N/A"}</li>
+                        <li><strong>{t("book.specUpdatedAt")}</strong> {book.updatedAt ? new Date(book.updatedAt).toLocaleDateString("vi-VN") : "N/A"}</li>
                     </ul>
                 </div>
             ),
         },
         {
             key: "3",
-            label: `Đánh giá (${totalRatings})`,
+            label: t("book.tabReviews", { count: totalRatings }),
             children: (
                 <div className="reviews-content">
                     {/* Rating Form - Only show if user hasn't rated */}
                     {!userRating && (
                         <div className="rating-form">
-                            <h3>Viết đánh giá của bạn</h3>
+                            <h3>{t("book.writeReview")}</h3>
                             <div className="rating-stars">
-                                <span>Đánh giá:</span>
+                                <span>{t("book.ratingLabel")}</span>
                                 <Rate
                                     value={newRatingStars}
                                     onChange={setNewRatingStars}
@@ -440,7 +394,7 @@ const BookDetailPage = () => {
                             </div>
                             <TextArea
                                 rows={4}
-                                placeholder="Chia sẻ cảm nhận của bạn về sản phẩm... (tối đa 200 ký tự)"
+                                placeholder={t("book.reviewPlaceholder")}
                                 value={newRatingComment}
                                 onChange={(e) => setNewRatingComment(e.target.value)}
                                 showCount
@@ -452,7 +406,7 @@ const BookDetailPage = () => {
                                 loading={isSubmitRating}
                                 style={{ marginTop: 10 }}
                             >
-                                Gửi đánh giá
+                                {t("book.submitReview")}
                             </Button>
                         </div>
                     )}
@@ -461,7 +415,7 @@ const BookDetailPage = () => {
                     {userRating && (
                         <div className="user-rating-notice">
                             <div className="notice-header">
-                                <span>✓ Bạn đã đánh giá sản phẩm này</span>
+                                <span>{t("book.alreadyReviewed")}</span>
                             </div>
                             <div className="review-item user-review">
                                 <div className="review-header">
@@ -486,10 +440,10 @@ const BookDetailPage = () => {
                                     <Rate disabled value={userRating.stars} />
                                     {/* <Popconfirm
                                         placement='topLeft'
-                                        title="Xóa đánh giá"
-                                        description="Bạn có muốn xóa đánh giá này?"
-                                        okText="Ok"
-                                        cancelText="Hủy"
+                                        title={t("book.deleteReviewTitle")}
+                                        description={t("book.deleteReviewConfirm")}
+                                        okText={t("common.yes")}
+                                        cancelText={t("common.cancel")}
                                         onConfirm={() => handleDeleteRating(userRating.id)}
                                         okButtonProps={{ loading: deleteRatingLoading }}
                                     >
@@ -498,7 +452,7 @@ const BookDetailPage = () => {
                                             icon={<DeleteOutlined />}
                                             size="small"
                                         >
-                                            Xóa
+                                            {t("book.deleteReview")}
                                         </Button>
                                     </Popconfirm> */}
                                 </div>
@@ -510,14 +464,14 @@ const BookDetailPage = () => {
                     <Divider />
 
                     {/* All ratings */}
-                    <h3>Tất cả đánh giá</h3>
+                    <h3>{t("book.allReviews")}</h3>
                     {ratingsLoading ? (
                         <Skeleton active paragraph={{ rows: 3 }} />
                     ) : ratings.length > 0 ? (
                         <>
                             {ratings.map((rating) => {
                                 const userAvatarUrl = rating.user?.avatar
-                                    ? `${baseImageUrl}/${rating.user.avatar}`
+                                    ? getImageUrl(rating.user.avatar)
                                     : null;
 
                                 return (
@@ -560,7 +514,7 @@ const BookDetailPage = () => {
                             </div>
                         </>
                     ) : (
-                        <Empty description="Chưa có đánh giá nào" />
+                        <Empty description={t("book.noReviews")} />
                     )}
                 </div>
             ),
@@ -578,7 +532,7 @@ const BookDetailPage = () => {
                                 title: <HomeOutlined onClick={() => navigate("/")} style={{ cursor: "pointer" }} />,
                             },
                             {
-                                title: <span onClick={() => navigate("/books")} style={{ cursor: "pointer" }}>Sản phẩm</span>,
+                                title: <span onClick={() => navigate("/books")} style={{ cursor: "pointer" }}>{t("book.breadcrumbProducts")}</span>,
                             },
                             {
                                 title: <span>{book.category}</span>,
@@ -613,16 +567,25 @@ const BookDetailPage = () => {
                             {/* Rating */}
                             <div className="book-rating-section">
                                 <div className="rating-group">
-                                    <Rate defaultValue={book.averageStars} allowHalf disabled />
-                                    <span className="rating-number">{book.averageStars}.0</span>
+                                    <Rate value={book.averageStars ?? 0} allowHalf disabled />
+                                    <span className="rating-number">
+                                        {(book.averageStars ?? 0).toFixed(1)}
+                                    </span>
+                                    <span className="rating-count">
+                                        {book.ratingCount
+                                            ? t("book.ratingCount", { count: book.ratingCount })
+                                            : t("book.noRatingYet")}
+                                    </span>
                                 </div>
                                 <span className="divider"></span>
-                                <span className="sold-count">Đã bán 1.2k</span>
+                                <span className="sold-count">
+                                    {t("book.soldCount", { count: book.sold ?? 0 })}
+                                </span>
                             </div>
 
                             {/* Price */}
                             <div className="book-price-section">
-                                <div className="price-label">Giá bán</div>
+                                <div className="price-label">{t("book.priceLabel")}</div>
                                 <div className="current-price">
                                     {new Intl.NumberFormat("vi-VN", {
                                         style: "currency",
@@ -643,22 +606,22 @@ const BookDetailPage = () => {
                             {/* Meta Info */}
                             <div className="book-meta">
                                 <div className="meta-item">
-                                    <span className="meta-label">Tác giả:</span>
+                                    <span className="meta-label">{t("book.metaAuthor")}</span>
                                     <span className="meta-value">{book.author}</span>
                                 </div>
                                 <div className="meta-item">
-                                    <span className="meta-label">Thể loại:</span>
+                                    <span className="meta-label">{t("book.metaCategory")}</span>
                                     <span className="meta-value">{book.category}</span>
                                 </div>
                                 <div className="meta-item">
-                                    <span className="meta-label">Tình trạng:</span>
-                                    <span className="meta-value">Còn hàng</span>
+                                    <span className="meta-label">{t("book.metaStatus")}</span>
+                                    <span className="meta-value">{t("book.inStock")}</span>
                                 </div>
                             </div>
 
                             {/* Quantity */}
                             <div className="quantity-section">
-                                <div className="quantity-label">Số lượng</div>
+                                <div className="quantity-label">{t("book.quantityLabel")}</div>
                                 <div className="quantity-controls">
                                     <InputNumber
                                         min={1}
@@ -668,7 +631,7 @@ const BookDetailPage = () => {
                                         size="large"
                                     />
                                     <span className="stock-info">
-                                        {book.quantity} sản phẩm có sẵn
+                                        {t("book.available", { count: book.quantity })}
                                     </span>
                                 </div>
                             </div>
@@ -681,20 +644,20 @@ const BookDetailPage = () => {
                                     className="btn-add-cart"
                                     onClick={handleAddToCart}
                                 >
-                                    Thêm vào giỏ hàng
+                                    {t("book.addToCartLong")}
                                 </Button>
                             </div>
 
                             {/* Guarantee */}
                             <div className="guarantee-section">
                                 <div className="guarantee-title">
-                                    <SafetyOutlined /> Cam kết từ BookShop
+                                    <SafetyOutlined /> {t("book.promiseTitle")}
                                 </div>
                                 <ul>
-                                    <li>✓ Sản phẩm chính hãng 100%</li>
-                                    <li>✓ Đổi trả miễn phí trong 7 ngày</li>
-                                    <li>✓ Freeship đơn hàng từ 150.000đ</li>
-                                    <li>✓ Hỗ trợ 24/7</li>
+                                    <li>{t("book.promise1")}</li>
+                                    <li>{t("book.promise2")}</li>
+                                    <li>{t("book.promise3")}</li>
+                                    <li>{t("book.promise4")}</li>
                                 </ul>
                             </div>
                         </div>

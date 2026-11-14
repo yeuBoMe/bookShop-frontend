@@ -1,8 +1,11 @@
+@use "../abstracts/tokens" as t;
+@use "../abstracts/mixins" as m;
+
 .register-page-wrapper {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(160deg, #0b3d91 0%, #1565c0 45%, #1e88e5 100%);
+  background: linear-gradient(160deg, t.$brand-800 0%, t.$primary-hover 45%, t.$brand-500 100%);
   position: relative;
   overflow: hidden;
 
@@ -36,12 +39,10 @@
 }
 
 .register-card {
-  background: #fff;
+  background: t.$surface;
   border-radius: 20px;
   padding: 44px 44px 36px;
-  box-shadow:
-    0 20px 60px rgba(0, 0, 0, 0.2),
-    0 4px 16px rgba(0, 0, 0, 0.08);
+  box-shadow: t.$shadow-xl;
   width: 100%;
   text-align: center;
   animation: cardIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
@@ -62,12 +63,12 @@
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #1565c0, #42a5f5);
+  background: linear-gradient(135deg, t.$primary-hover, t.$brand-400);
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto 20px;
-  box-shadow: 0 4px 16px rgba(21, 101, 192, 0.4);
+  box-shadow: 0 4px 16px rgba(t.$primary, 0.28);
 
   svg {
     width: 28px;
@@ -78,7 +79,7 @@
 .register-title {
   font-size: clamp(20px, 4vw, 24px);
   font-weight: 800;
-  color: #0d1b2a;
+  color: t.$brand-950;
   margin: 0 0 8px;
   letter-spacing: -0.3px;
   line-height: 1.25;
@@ -86,7 +87,7 @@
 
 .register-subtitle {
   font-size: 14px;
-  color: #6b7a8d;
+  color: t.$text-muted;
   margin: 0 0 28px;
   font-weight: 400;
 }
@@ -107,15 +108,15 @@
     font-size: 16px;
     font-weight: 700;
     border-radius: 10px;
-    background: linear-gradient(135deg, #1565c0 0%, #1976d2 100%) !important;
+    background: linear-gradient(135deg, t.$primary-hover 0%, t.$primary 100%) !important;
     border: none !important;
     letter-spacing: 0.2px;
     transition: all 0.25s ease;
-    box-shadow: 0 4px 14px rgba(21, 101, 192, 0.38);
+    box-shadow: 0 4px 14px rgba(t.$primary, 0.28);
 
     &:hover:not(:disabled) {
-      background: linear-gradient(135deg, #0d47a1 0%, #1565c0 100%) !important;
-      box-shadow: 0 6px 20px rgba(21, 101, 192, 0.45);
+      background: linear-gradient(135deg, t.$brand-800 0%, t.$primary-hover 100%) !important;
+      box-shadow: 0 6px 20px rgba(t.$primary, 0.28);
       transform: translateY(-1px);
     }
 
@@ -128,16 +129,16 @@
 .register-login-link {
   text-align: center;
   font-size: clamp(14px, 4vw, 15px);
-  color: #6b7a8d;
+  color: t.$text-muted;
 
   a {
-    color: #1565c0;
+    color: t.$primary-text-hover;
     font-weight: 700;
     text-decoration: none;
     transition: color 0.2s ease;
 
     &:hover {
-      color: #1976d2;
+      color: t.$primary-text;
       text-decoration: underline;
     }
   }
@@ -147,37 +148,37 @@
   .ant-form-item-label > label {
     font-weight: 600;
     font-size: 14px;
-    color: #333;
+    color: t.$text-body;
   }
 
   .ant-input,
   .ant-input-affix-wrapper {
     border-radius: 10px !important;
-    border-color: #dde3ed !important;
-    background: #f8fafc !important;
+    border-color: t.$border !important;
+    background: t.$surface-subtle !important;
     font-size: 15px;
 
     &:hover {
-      border-color: #1976d2 !important;
-      background: #fff !important;
+      border-color: t.$primary-text !important;
+      background: t.$surface !important;
     }
 
     &:focus {
-      border-color: #1976d2 !important;
-      background: #fff !important;
-      box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.12) !important;
+      border-color: t.$primary-text !important;
+      background: t.$surface !important;
+      box-shadow: 0 0 0 3px rgba(t.$primary, 0.12) !important;
     }
   }
 
   .ant-input-affix-wrapper-focused {
-    border-color: #1976d2 !important;
-    background: #fff !important;
-    box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.12) !important;
+    border-color: t.$primary-text !important;
+    background: t.$surface !important;
+    box-shadow: 0 0 0 3px rgba(t.$primary, 0.12) !important;
   }
 
   .ant-divider-horizontal.ant-divider-with-text {
     margin: 20px 0;
-    color: #b0bac5;
+    color: t.$text-subtle;
     font-size: 13px;
   }
 }
@@ -209,7 +210,7 @@
       transition: color 0.2s;
 
       &:hover {
-        color: #fff;
+        color: t.$white;
       }
     }
   }

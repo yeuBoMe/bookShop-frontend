@@ -1,3 +1,6 @@
+@use "../../abstracts/tokens" as t;
+@use "../../abstracts/mixins" as m;
+
 .book-page-container {
   max-width: 1440px;
   margin: 0 auto;
@@ -10,10 +13,10 @@
 }
 
 .filter-sidebar {
-  background-color: #fff;
+  background-color: t.$surface;
   border-radius: 2px;
   padding: 20px;
-  border: 1px solid #e8e8e8;
+  border: 1px solid t.$border;
 
   @media (max-width: 768px) {
     margin-bottom: 20px;
@@ -37,7 +40,7 @@
 
     .anticon-reload {
       cursor: pointer;
-      color: #1890ff;
+      color: t.$primary-text;
       transition: transform 0.3s;
 
       &:hover {
@@ -85,14 +88,14 @@
         }
 
         .ant-rate {
-          color: #ffce3d;
+          color: t.$star;
           font-size: 14px;
         }
 
         .rating-text {
           margin-left: 8px;
           font-size: 13px;
-          color: #666;
+          color: t.$text-muted;
         }
       }
     }
@@ -100,10 +103,10 @@
 }
 
 .products-section {
-  background-color: #fff;
+  background-color: t.$surface;
   border-radius: 2px;
   padding: 20px;
-  border: 1px solid #e8e8e8;
+  border: 1px solid t.$border;
   min-height: 600px;
 
   @media (max-width: 768px) {
@@ -135,24 +138,24 @@
 
     .ant-empty-description {
       font-size: 16px;
-      color: #666;
+      color: t.$text-muted;
     }
   }
 
   .books-grid {
     .book-card {
-      border: 1px solid #e8e8e8;
+      border: 1px solid t.$border;
       border-radius: 8px;
       overflow: hidden;
       cursor: pointer;
       transition: all 0.3s ease;
-      background-color: #fff;
+      background-color: t.$surface;
       height: 100%;
       display: flex;
       flex-direction: column;
 
       &:hover {
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 8px 16px rgba(15, 23, 42, 0.09);
         transform: translateY(-4px);
 
         .book-image-wrapper img {
@@ -160,9 +163,9 @@
         }
 
         .book-add-cart-btn {
-          background-color: #2563eb;
-          color: #fff;
-          border-color: #2563eb;
+          background-color: t.$primary-text;
+          color: t.$white;
+          border-color: t.$primary-text;
         }
       }
 
@@ -170,7 +173,7 @@
         position: relative;
         width: 100%;
         padding-top: 133.33%; // Tỷ lệ 3:4 giống HomePage
-        background-color: #f5f5f5;
+        background-color: t.$surface-muted;
         overflow: hidden;
 
         img {
@@ -187,7 +190,7 @@
           position: absolute;
           top: 10px;
           right: 10px;
-          background: #ef4444;
+          background: t.$danger;
           color: white;
           padding: 4px 12px;
           border-radius: 20px;
@@ -212,7 +215,7 @@
 
         .book-name {
           font-size: 14px;
-          color: #1f2937;
+          color: t.$text-strong;
           font-weight: 600;
           margin-bottom: 8px;
           height: 40px;
@@ -225,7 +228,7 @@
           transition: color 0.3s;
 
           &:hover {
-            color: #2563eb;
+            color: t.$primary-text;
           }
 
           @media (max-width: 768px) {
@@ -236,7 +239,7 @@
         .book-price {
           font-size: 18px;
           font-weight: 700;
-          color: #ef4444;
+          color: t.$danger-text;
           margin-bottom: 8px;
 
           @media (max-width: 768px) {
@@ -248,11 +251,11 @@
           display: flex;
           align-items: center;
           font-size: 12px;
-          color: #6b7280;
+          color: t.$text-muted;
           margin-bottom: 12px;
 
           .ant-rate {
-            color: #f59e0b;
+            color: t.$star;
             font-size: 12px;
 
             .ant-rate-star {
@@ -276,14 +279,14 @@
           font-weight: 600;
           height: 38px;
           transition: all 0.3s ease;
-          background-color: #f9fafb;
-          border-color: #e5e7eb;
-          color: #1f2937;
+          background-color: t.$surface-subtle;
+          border-color: t.$border;
+          color: t.$text-strong;
 
           &:hover {
-            background-color: #2563eb;
-            color: #fff;
-            border-color: #2563eb;
+            background-color: t.$primary-text;
+            color: t.$white;
+            border-color: t.$primary-text;
             transform: translateY(-2px);
           }
 
@@ -319,15 +322,15 @@
         border-radius: 4px;
 
         &:hover {
-          border-color: #2563eb;
+          border-color: t.$primary-text;
         }
 
         &.ant-pagination-item-active {
-          background-color: #2563eb;
-          border-color: #2563eb;
+          background-color: t.$primary-text;
+          border-color: t.$primary-text;
 
           a {
-            color: #fff;
+            color: t.$white;
           }
         }
       }
@@ -337,10 +340,10 @@
         border-radius: 4px;
 
         &:hover {
-          border-color: #2563eb;
+          border-color: t.$primary-text;
 
           .ant-pagination-item-link {
-            color: #2563eb;
+            color: t.$primary-text;
           }
         }
       }
@@ -350,4 +353,11 @@
 
 .ant-divider {
   margin: 16px 0;
+}
+
+/* Nút "xem thêm" thay cho thanh phân trang: trang khách dùng con trỏ nên không có số trang */
+.load-more-wrapper {
+    display: flex;
+    justify-content: center;
+    padding: 24px 0 8px;
 }

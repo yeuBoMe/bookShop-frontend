@@ -1,7 +1,10 @@
+@use "../../abstracts/tokens" as t;
+@use "../../abstracts/mixins" as m;
+
 .order-fail-container {
-  background: #fff;
+  background: t.$surface;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
   padding: 60px 40px;
   text-align: center;
 
@@ -33,7 +36,7 @@
     h2 {
       font-size: 32px;
       font-weight: 700;
-      color: #333;
+      color: t.$text-body;
       margin-bottom: 15px;
       animation: fadeInDown 0.8s ease-in-out;
 
@@ -51,14 +54,14 @@
 
     p {
       font-size: 16px;
-      color: #666;
+      color: t.$text-muted;
       margin-bottom: 10px;
       line-height: 1.6;
     }
 
     .order-info {
       font-size: 14px;
-      color: #999;
+      color: t.$text-subtle;
       margin-bottom: 30px;
       line-height: 1.6;
     }
@@ -90,7 +93,7 @@
 
         &:hover {
           transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          box-shadow: 0 4px 12px rgba(15, 23, 42, 0.09);
         }
 
         &:active {

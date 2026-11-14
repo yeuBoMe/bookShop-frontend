@@ -1,18 +1,20 @@
-@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
+@use "../abstracts/tokens" as t;
+@use "../abstracts/mixins" as m;
+
 
 $font: "Plus Jakarta Sans", sans-serif;
-$blue: #2563eb;
-$blue-light: #eff6ff;
-$blue-mid: #dbeafe;
-$text: #111827;
-$text-2: #374151;
-$text-3: #6b7280;
-$text-4: #9ca3af;
-$white: #ffffff;
-$bg: #f8fafc;
-$bg-2: #f1f5f9;
-$border: #e5e7eb;
-$red: #ef4444;
+$blue: t.$primary;
+$blue-light: t.$primary-soft;
+$blue-mid: t.$primary-muted;
+$text: t.$text-strong;
+$text-2: t.$text-body;
+$text-3: t.$text-muted;
+$text-4: t.$text-subtle;
+$white: t.$white;
+$bg: t.$surface-subtle;
+$bg-2: t.$surface-muted;
+$border: t.$border;
+$red: t.$danger;
 $radius: 12px;
 $radius-lg: 20px;
 
@@ -55,10 +57,10 @@ $radius-lg: 20px;
 .profile-container {
   width: 100%;
   max-width: 560px;
-  background: $white;
+  background: t.$surface;
   border-radius: $radius-lg;
   border: 1.5px solid $border;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 32px rgba(15, 23, 42, 0.06);
   padding: clamp(2.5rem, 5vw, 3.5rem) clamp(1.5rem, 4vw, 3rem);
   text-align: center;
   animation: slideUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
@@ -109,13 +111,13 @@ $radius-lg: 20px;
     border-radius: 3rem;
     background: $blue;
     border: none;
-    box-shadow: 0 4px 16px rgba(37, 99, 235, 0.3);
+    box-shadow: 0 4px 16px rgba(t.$primary, 0.3);
     @include ease;
 
     &:hover {
-      background: darken($blue, 8%) !important;
+      background: t.$primary-hover !important;
       transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(37, 99, 235, 0.4) !important;
+      box-shadow: 0 8px 24px rgba(t.$primary, 0.28) !important;
     }
 
     &:active {
@@ -131,12 +133,12 @@ $radius-lg: 20px;
       border-radius: $radius-lg;
       overflow: hidden;
       border: 1.5px solid $border;
-      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.14);
+      box-shadow: t.$shadow-xl;
       padding: 0;
     }
 
     .ant-modal-header {
-      background: $white;
+      background: t.$surface;
       border-bottom: 1.5px solid $border;
       padding: 1.25rem 1.75rem;
       margin: 0;
@@ -152,7 +154,7 @@ $radius-lg: 20px;
 
     .ant-modal-body {
       padding: 1.5rem 1.75rem 1.75rem;
-      background: $white;
+      background: t.$surface;
 
       @media (max-width: 480px) {
         padding: 1.25rem;
@@ -284,7 +286,7 @@ $radius-lg: 20px;
       border-radius: 50% !important;
       overflow: hidden;
       border: 2.5px solid $blue !important;
-      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.2);
+      box-shadow: 0 4px 14px rgba(t.$primary, 0.2);
     }
   }
 }
@@ -314,21 +316,21 @@ $radius-lg: 20px;
 
       &:hover {
         border-color: $blue !important;
-        background: $white !important;
+        background: t.$surface !important;
       }
 
       &:focus,
       &-focused {
         border-color: $blue !important;
-        background: $white !important;
-        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1) !important;
+        background: t.$surface !important;
+        box-shadow: 0 0 0 3px rgba(t.$primary, 0.1) !important;
       }
     }
 
     .ant-input-affix-wrapper-focused {
       border-color: $blue !important;
-      background: $white !important;
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1) !important;
+      background: t.$surface !important;
+      box-shadow: 0 0 0 3px rgba(t.$primary, 0.1) !important;
     }
 
     .ant-input-disabled,
@@ -381,13 +383,13 @@ $radius-lg: 20px;
     background: $blue;
     border: none;
     letter-spacing: 0.01em;
-    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.28);
+    box-shadow: 0 4px 14px rgba(t.$primary, 0.28);
     @include ease;
 
     &:hover {
-      background: darken($blue, 8%) !important;
+      background: t.$primary-hover !important;
       transform: translateY(-1px);
-      box-shadow: 0 6px 20px rgba(37, 99, 235, 0.38) !important;
+      box-shadow: 0 6px 20px rgba(t.$primary, 0.28) !important;
     }
 
     &:active {

@@ -1,6 +1,7 @@
 import { createUserAPI } from "@/services/api.service";
 import { App, Col, Form, Input, Modal, Row, type FormProps } from "antd";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 interface UserCreateValues {
     fullName: string;
@@ -19,6 +20,8 @@ const CreateUserModal = (props: CreateUserProps) => {
     const { isModalCreateOpen, setIsModalCreateOpen, refreshTable } = props; 
     const [form] = Form.useForm<UserCreateValues>();
     const { notification, message } = App.useApp();
+
+    const { t } = useTranslation();
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const handleCreateUser: FormProps<UserCreateValues>['onFinish'] = async (values) => {
@@ -30,12 +33,12 @@ const CreateUserModal = (props: CreateUserProps) => {
 
             if (createUserResponse.data) {
                 handleClearDataAndCloseModal();
-                message.success("Tạo tài khoản thành công!");
+                message.success(t("admin.msg.createSuccess", { entity: t("admin.entity.user") }));
                 refreshTable();
             }
         } catch (error: any) {
             notification.error({
-                message: "Error",
+                message: t("common.error"),
                 description: error?.message,
                 duration: 5,
                 placement: "topRight"
@@ -53,8 +56,8 @@ const CreateUserModal = (props: CreateUserProps) => {
     return (
         <>
             <Modal
-                title="Create user"
-                okText="Create"
+                title={t("admin.form.createTitle", { entity: t("admin.entity.user") })}
+                okText={t("common.create")}
                 maskClosable={false}
                 closable={false}
                 open={isModalCreateOpen}
@@ -73,14 +76,14 @@ const CreateUserModal = (props: CreateUserProps) => {
                             autoComplete="off"
                         >
                             <Form.Item<UserCreateValues>
-                                label="Full Name:"
+                                label={t("field.fullName")}
                                 name="fullName"
                                 rules={[
-                                    { required: true, message: 'Name is required' },
-                                    { max: 100, message: 'Name must be less than 100 characters' },
+                                    { required: true, message: t("validate.required", { field: t("field.fullName") }) },
+                                    { max: 100, message: t("validate.maxLength", { field: t("field.fullName"), max: 100 }) },
                                     {
                                         pattern: /^[A-Za-zÀ-ỹà-ỹ'\-.\s]{1,100}$/,
-                                        message: "Name must only contain letters, spaces, apostrophes, dashes or dots"
+                                        message: t("validate.nameCharset")
                                     }
                                 ]}
                             >
@@ -88,14 +91,14 @@ const CreateUserModal = (props: CreateUserProps) => {
                             </Form.Item>
 
                             <Form.Item<UserCreateValues>
-                                label="Email:"
+                                label={t("field.email")}
                                 name="email"
                                 rules={[
-                                    { required: true, message: 'Email is required' },
-                                    { max: 150, message: 'Email must not exceed 150 characters' },
+                                    { required: true, message: t("validate.required", { field: t("field.email") }) },
+                                    { max: 150, message: t("validate.maxLength", { field: t("field.email"), max: 150 }) },
                                     {
                                         pattern: /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z]{2,6}$/,
-                                        message: "Email format is invalid"
+                                        message: t("validate.emailInvalid")
                                     }
                                 ]}
                             >
@@ -103,24 +106,24 @@ const CreateUserModal = (props: CreateUserProps) => {
                             </Form.Item>
 
                             <Form.Item<UserCreateValues>
-                                label="Password:"
+                                label={t("field.password")}
                                 name="password"
                                 rules={[
-                                    { required: true, message: 'Password is required' },
-                                    { min: 6, message: 'Password must be at least 6 characters' }
+                                    { required: true, message: t("validate.required", { field: t("field.password") }) },
+                                    { min: 6, message: t("validate.minLength", { field: t("field.password"), min: 6 }) }
                                 ]}
                             >
                                 <Input.Password />
                             </Form.Item>
 
                             <Form.Item<UserCreateValues>
-                                label="Phone:"
+                                label={t("field.phone")}
                                 name="phone"
                                 rules={[
-                                    { required: true, message: 'Phone is required' },
+                                    { required: true, message: t("validate.required", { field: t("field.phone") }) },
                                     {
                                         pattern: /^(0[3|5|7|8|9])[0-9]{8}$/,
-                                        message: 'Phone number is invalid (Vietnamese format)'
+                                        message: t("validate.phoneInvalid")
                                     }
                                 ]}
                             >

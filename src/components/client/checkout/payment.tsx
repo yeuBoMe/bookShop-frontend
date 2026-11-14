@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { App, Button, Form, Input, Radio, type FormProps } from "antd";
 import { ShoppingOutlined, CreditCardOutlined, QrcodeOutlined } from "@ant-design/icons";
 import "styles/client/checkout/payment.scss";
 import { useCurrentApp } from "@/components/context/app.context";
 import { createAnOrderAPI, createMomopayUrlAPI, createVnpayUrlAPI } from "@/services/api.service";
+import { clearCart, calculateShippingFee } from "@/services/cart.service";
+import { formatPrice, getBookImageUrl } from "@/services/helper";
 
 interface UserCheckoutValues {
     name: string;
@@ -35,9 +38,10 @@ const Payment = (props: PaymentProps) => {
         onBackToCart,
     } = props;
     const { notification, message } = App.useApp();
+
+    const { t } = useTranslation();
     const [form] = Form.useForm<UserCheckoutValues>();
     const [_paymentMethod, setPaymentMethod] = useState<string>("cod");
-    const baseImageUrl = import.meta.env.VITE_IMAGE_URL || "https://res.cloudinary.com/dvglvfask/image/upload";
 
     useEffect(() => {
         if (user) {
@@ -48,13 +52,6 @@ const Payment = (props: PaymentProps) => {
             });
         }
     }, [user]);
-
-    const formatPrice = (price: number) => {
-        return new Intl.NumberFormat("vi-VN", {
-            style: "currency",
-            currency: "VND",
-        }).format(price);
-    };
 
     const createOrderAndSuccess = async (values: UserCheckoutValues, successMessage: string) => {
         const orderData = {
@@ -73,11 +70,9 @@ const Payment = (props: PaymentProps) => {
         };
 
         const createOrderResponse = await createAnOrderAPI(orderData);
-        await new Promise((resolve) => setTimeout(resolve, 2000));
 
         if (createOrderResponse.data) {
-            localStorage.removeItem("carts");
-            setCarts([]);
+            setCarts(clearCart());
             message.success(successMessage);
             setCurrentStep(2);
             window.scrollTo({ top: 0, behavior: "smooth" });
@@ -110,7 +105,6 @@ const Payment = (props: PaymentProps) => {
                 localStorage.setItem("pendingVnpayOrder", orderInfo);
 
                 const vnPayUrl = await createVnpayUrlAPI(finalTotalPrice, `Order_${Date.now()}`);
-                await new Promise((resolve) => setTimeout(resolve, 500));
 
                 if (vnPayUrl.data) {
                     window.location.href = vnPayUrl.data.paymentUrl;
@@ -138,7 +132,6 @@ const Payment = (props: PaymentProps) => {
                 localStorage.setItem("pendingMomoOrder", orderInfo);
 
                 const momoPayUrl = await createMomopayUrlAPI(finalTotalPrice, `Order_${Date.now()}`);
-                await new Promise((resolve) => setTimeout(resolve, 500));
 
                 if (momoPayUrl.data) {
                     window.location.href = momoPayUrl.data.paymentUrl;
@@ -147,16 +140,15 @@ const Payment = (props: PaymentProps) => {
             }
 
             if (values.paymentMethod === "cod") {
-                await createOrderAndSuccess(values, "Thanh toán COD thành công!");
+                await createOrderAndSuccess(values, t("payment.codSuccess"));
             }
         } catch (error: any) {
             notification.error({
-                message: "Error",
+                message: t("common.error"),
                 description: error?.message || "An error happens when handle payment",
                 duration: 5,
                 placement: "topRight",
             });
-            console.log("error order >>>", error);
         } finally {
             setIsPaymentLoading(false);
         }
@@ -167,7 +159,7 @@ const Payment = (props: PaymentProps) => {
             <div className="cart-content">
                 <div className="cart-items-section">
                     <div className="payment-info-section">
-                        <h3>Thông tin người nhận</h3>
+                        <h3>{t("payment.recipient")}</h3>
                         <Form
                             form={form}
                             layout="vertical"
@@ -177,16 +169,16 @@ const Payment = (props: PaymentProps) => {
                             }}
                         >
                             <Form.Item<UserCheckoutValues>
-                                label="Họ và tên:"
+                                label={t("field.fullName")}
                                 name="name"
                                 rules={[
                                     {
                                         required: true,
-                                        message: "Vui lòng nhập họ tên!",
+                                        message: t("validate.required", { field: t("field.fullName") }),
                                     },
                                     {
                                         min: 3,
-                                        message: "Họ tên phải có ít nhất 3 ký tự!",
+                                        message: t("validate.minLength", { field: t("field.fullName"), min: 3 }),
                                     },
                                 ]}
                             >
@@ -194,30 +186,30 @@ const Payment = (props: PaymentProps) => {
                             </Form.Item>
 
                             <Form.Item<UserCheckoutValues>
-                                label="Email:"
+                                label={t("field.email")}
                                 name="email"
                                 rules={[
                                     {
                                         required: true,
-                                        message: "Vui lòng nhập email!",
+                                        message: t("validate.required", { field: t("field.email") }),
                                     },
-                                    { type: "email", message: "Email không hợp lệ!" },
+                                    { type: "email", message: t("validate.emailInvalidShort") },
                                 ]}
                             >
                                 <Input size="large" />
                             </Form.Item>
 
                             <Form.Item<UserCheckoutValues>
-                                label="Số điện thoại:"
+                                label={t("field.phone")}
                                 name="phone"
                                 rules={[
                                     {
                                         required: true,
-                                        message: "Vui lòng nhập số điện thoại!",
+                                        message: t("validate.required", { field: t("field.phone") }),
                                     },
                                     {
                                         pattern: /^[0-9]{10}$/,
-                                        message: "Số điện thoại phải có 10 chữ số!",
+                                        message: t("validate.phoneDigits"),
                                     },
                                 ]}
                             >
@@ -225,28 +217,28 @@ const Payment = (props: PaymentProps) => {
                             </Form.Item>
 
                             <Form.Item<UserCheckoutValues>
-                                label="Địa chỉ:"
+                                label={t("field.address")}
                                 name="address"
                                 rules={[
                                     {
                                         required: true,
-                                        message: "Vui lòng nhập địa chỉ!",
+                                        message: t("validate.required", { field: t("field.address") }),
                                     },
                                     {
                                         min: 10,
-                                        message: "Địa chỉ phải có ít nhất 10 ký tự!",
+                                        message: t("validate.minLength", { field: t("field.address"), min: 10 }),
                                     },
                                 ]}
                             >
                                 <Input.TextArea
                                     size="large"
                                     rows={3}
-                                    placeholder="Số nhà, tên đường, phường/xã, quận/huyện, tỉnh/thành phố"
+                                    placeholder={t("payment.addressPlaceholder")}
                                 />
                             </Form.Item>
 
                             <Form.Item<UserCheckoutValues>
-                                label="Hình thức thanh toán:"
+                                label={t("payment.method")}
                                 name="paymentMethod"
                             >
                                 <Radio.Group
@@ -258,9 +250,9 @@ const Payment = (props: PaymentProps) => {
                                             <ShoppingOutlined style={{ fontSize: 20 }} />
                                             <div>
                                                 <strong>
-                                                    Thanh toán khi nhận hàng (COD)
+                                                    {t("payment.cod")}
                                                 </strong>
-                                                <p>Thanh toán bằng tiền mặt khi nhận hàng</p>
+                                                <p>{t("payment.codNote")}</p>
                                             </div>
                                         </div>
                                     </Radio>
@@ -268,8 +260,8 @@ const Payment = (props: PaymentProps) => {
                                         <div className="payment-option">
                                             <QrcodeOutlined style={{ fontSize: 20 }} />
                                             <div>
-                                                <strong>Thanh toán bằng MoMo</strong>
-                                                <p>Quét mã QR với MoMo</p>
+                                                <strong>{t("payment.momo")}</strong>
+                                                <p>{t("payment.momoNote")}</p>
                                             </div>
                                         </div>
                                     </Radio>
@@ -277,8 +269,8 @@ const Payment = (props: PaymentProps) => {
                                         <div className="payment-option">
                                             <CreditCardOutlined style={{ fontSize: 20 }} />
                                             <div>
-                                                <strong>Ví VNPay</strong>
-                                                <p>Thanh toán trực tuyến qua cổng VNPay</p>
+                                                <strong>{t("payment.vnpay")}</strong>
+                                                <p>{t("payment.vnpayNote")}</p>
                                             </div>
                                         </div>
                                     </Radio>
@@ -287,7 +279,7 @@ const Payment = (props: PaymentProps) => {
 
                             <div className="payment-actions">
                                 <Button size="large" onClick={onBackToCart}>
-                                    Quay lại giỏ hàng
+                                    {t("payment.backToCart")}
                                 </Button>
                                 <Button
                                     type="primary"
@@ -296,7 +288,7 @@ const Payment = (props: PaymentProps) => {
                                     className="submit-order-btn"
                                     loading={isPaymentLoading}
                                 >
-                                    Thanh toán
+                                    {t("payment.pay")}
                                 </Button>
                             </div>
                         </Form>
@@ -305,18 +297,13 @@ const Payment = (props: PaymentProps) => {
 
                 <div className="cart-summary-section">
                     <div className="summary-card">
-                        <h2>Chi tiết đơn hàng</h2>
+                        <h2>{t("payment.orderDetail")}</h2>
 
                         <div className="order-items-summary">
                             {carts.map((item) => (
                                 <div key={item.id} className="order-item-summary">
                                     <img
-                                        src={
-                                            item.detail.images &&
-                                                item.detail.images.length > 0
-                                                ? `${baseImageUrl}/${item.detail.images[0]}`
-                                                : "https://via.placeholder.com/50x65?text=No+Image"
-                                        }
+                                        src={getBookImageUrl(item.detail.images)}
                                         alt={item.detail.name}
                                     />
                                     <div className="order-item-info">
@@ -337,19 +324,19 @@ const Payment = (props: PaymentProps) => {
                         <div className="summary-divider"></div>
 
                         <div className="summary-item">
-                            <span>Tạm tính:</span>
+                            <span>{t("payment.subtotal")}</span>
                             <span className="summary-value">
                                 {formatPrice(totalPrice)}
                             </span>
                         </div>
 
                         <div className="summary-item">
-                            <span>Phí vận chuyển:</span>
+                            <span>{t("payment.shipping")}</span>
                             <span className="summary-value">
-                                {totalPrice >= 150000 ? (
-                                    <span className="free-ship">Miễn phí</span>
+                                {calculateShippingFee(totalPrice) === 0 ? (
+                                    <span className="free-ship">{t("payment.free")}</span>
                                 ) : (
-                                    formatPrice(30000)
+                                    formatPrice(calculateShippingFee(totalPrice))
                                 )}
                             </span>
                         </div>
@@ -357,11 +344,9 @@ const Payment = (props: PaymentProps) => {
                         <div className="summary-divider"></div>
 
                         <div className="summary-total">
-                            <span>Tổng cộng:</span>
+                            <span>{t("payment.grandTotal")}</span>
                             <span className="total-value">
-                                {formatPrice(
-                                    totalPrice + (totalPrice >= 150000 ? 0 : 30000)
-                                )}
+                                {formatPrice(finalTotalPrice)}
                             </span>
                         </div>
                     </div>

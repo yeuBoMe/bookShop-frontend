@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { Button, Input, FloatButton, Spin, App } from "antd";
 import { MessageOutlined, SendOutlined, CloseOutlined } from "@ant-design/icons";
 import { chatbotAPI } from "@/services/api.service";
@@ -17,6 +18,8 @@ const ChatbotPopup = () => {
     const { user } = useCurrentApp();
     const navigate = useNavigate();
     const { notification } = App.useApp();
+
+    const { t } = useTranslation();
     const [open, setOpen] = useState(false);
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState("");
@@ -62,7 +65,7 @@ const ChatbotPopup = () => {
 
         try {
             const res = await chatbotAPI(userText);
-            const botReply = res.data?.message || "Mình chưa hiểu, hỏi lại nhé!";
+            const botReply = res.data?.message || t("bot.fallback");
 
             setLoading(false);
             setMessages(prev => [...prev, { from: "bot", text: "" }]);
@@ -83,7 +86,7 @@ const ChatbotPopup = () => {
             }
         } catch (err: any) {
             if (err.name !== "AbortError") {
-                setMessages(prev => [...prev, { from: "bot", text: "Oops! Bot đang ngủ gật rồi!" }]);
+                setMessages(prev => [...prev, { from: "bot", text: t("bot.error") }]);
             }
         } finally {
             controllerRef.current = null;
@@ -93,8 +96,8 @@ const ChatbotPopup = () => {
     const handleOpenPopUp = () => {
         if (!user?.id) {
             notification.warning({
-                message: "Chưa đăng nhập",
-                description: "Vui lòng đăng nhập để trò chuyện với BookShop AI nhé",
+                message: t("chat.notLoggedIn"),
+                description: t("bot.notLoggedInDesc"),
                 placement: "topRight",
             });
             setTimeout(() => navigate("/login"), 1000);
@@ -129,7 +132,7 @@ const ChatbotPopup = () => {
                         <div className="chatbot-messages">
                             {messages.length === 0 && !loading && (
                                 <div className="chatbot-empty">
-                                    Chào bạn! <br />Mình là trợ lý AI của BookShop
+                                    {t("bot.greeting")} <br />{t("bot.intro")}
                                 </div>
                             )}
 
@@ -141,7 +144,7 @@ const ChatbotPopup = () => {
 
                             {loading && (
                                 <div className="msg bot">
-                                    <Spin size="small" /> Đang suy nghĩ...
+                                    <Spin size="small" /> {t("bot.thinking")}
                                 </div>
                             )}
 
@@ -150,7 +153,7 @@ const ChatbotPopup = () => {
 
                         <div className="chatbot-input">
                             <Input
-                                placeholder="Nhập tin nhắn..."
+                                placeholder={t("chat.inputPlaceholder")}
                                 value={input}
                                 onChange={e => setInput(e.target.value)}
                                 onPressEnter={handleSend}

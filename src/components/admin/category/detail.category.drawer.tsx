@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import {
     Descriptions,
     Drawer,
@@ -13,6 +14,7 @@ interface DrawerCategoryProps {
 }
 
 const DetailCategoryDrawer = (props: DrawerCategoryProps) => {
+    const { t } = useTranslation();
     const { isDrawerOpen, setIsDrawerOpen, dataDetail, setDataDetail } = props;
 
     const handleClearDataAndCloseDrawer = () => {
@@ -28,22 +30,22 @@ const DetailCategoryDrawer = (props: DrawerCategoryProps) => {
         ...(dataDetail ? [
             {
                 key: '1',
-                label: 'Id',
+                label: t("admin.table.id"),
                 children: <p>{dataDetail.id}</p>,
             },
             {
                 key: '2',
-                label: 'Name',
+                label: t("admin.table.name"),
                 children: <p>{dataDetail.name}</p>,
             },
             {
                 key: '3',
-                label: 'Created At',
+                label: t("admin.table.createdAt"),
                 children: <p>{formatDateTime(dataDetail.createdAt)}</p>,
             },
             {
                 key: '4',
-                label: 'Updated At',
+                label: t("admin.table.updatedAt"),
                 children: <p>{formatDateTime(dataDetail.updatedAt)}</p>,
             },
         ] : [])
@@ -52,14 +54,14 @@ const DetailCategoryDrawer = (props: DrawerCategoryProps) => {
     return (
         <>
             <Drawer
-                title="Category Detail"
+                title={t("admin.detail.title", { entity: t("admin.entity.category") })}
                 placement={"right"}
                 onClose={handleClearDataAndCloseDrawer}
                 open={isDrawerOpen}
                 width={"50vw"}
             >
                 <Descriptions
-                    title="Category Info"
+                    title={t("admin.detail.info", { entity: t("admin.entity.category") })}
                     items={items}
                     size="small"
                     bordered

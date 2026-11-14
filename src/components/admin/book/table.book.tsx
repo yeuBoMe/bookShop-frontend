@@ -1,15 +1,17 @@
 import { deleteBookAPI, fetchAllBooksAPI } from '@/services/api.service';
+import { exportBooksCsvAPI } from "@/services/api.service";
+import { downloadBlobAsFile } from "@/services/helper";
 import { dateRangeValidate } from '@/services/helper';
 import { CloudDownloadOutlined, DeleteOutlined, EditOutlined, ExportOutlined, PlusOutlined, ReadOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
 import { App, Button, Popconfirm, Space } from 'antd';
 import { useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import CreateBookModal from 'components/admin/book/create.book.modal';
 import ImportBookModal from 'components/admin/book/import.book.modal';
 import UpdateBookModal from 'components/admin/book/update.book.modal';
 import DetailBookDrawer from 'components/admin/book/detail.book.drawer';
-import { CSVLink } from 'react-csv';
 import { Link } from 'react-router-dom';
 
 type TSearch = {
@@ -23,6 +25,8 @@ type TSearch = {
 const TableBook = () => {
     const actionRef = useRef<ActionType | null>(null);
     const { notification, message } = App.useApp();
+
+    const { t } = useTranslation();
     const [meta, setMeta] = useState({
         current: 1,
         pageSize: 5,
@@ -41,7 +45,10 @@ const TableBook = () => {
 
     const [isDeleteBook, setIsDeleteBook] = useState<boolean>(false);
 
-    const [currentDataTable, setCurrentDataTable] = useState<IBook[]>([]);
+    const [isExporting, setIsExporting] = useState<boolean>(false);
+
+    // Giữ lại bộ lọc đang áp trên bảng để nút Export tải đúng tập dữ liệu người dùng đang xem
+    const exportFilterRef = useRef<IBookSearchParams>({});
 
     const handleDeleteBook = async (id: number) => {
         setIsDeleteBook(true);
@@ -50,13 +57,13 @@ const TableBook = () => {
             const deleteBookResponse = await deleteBookAPI(id);
             await new Promise<void>((resolve) => setTimeout(resolve, 400));
             if (deleteBookResponse) {
-                message.success("Delete book successfully!");
+                message.success(t("admin.msg.deleteSuccess", { entity: t("admin.entity.book") }));
                 refreshTable();
                 console.log("Check response >>> ", deleteBookResponse);
             }
         } catch (error: any) {
             notification.error({
-                message: "Error",
+                message: t("common.error"),
                 description: error?.message,
                 duration: 5,
                 placement: "topRight"
@@ -77,7 +84,7 @@ const TableBook = () => {
             width: 48,
         },
         {
-            title: 'Id',
+            title: t("admin.table.id"),
             dataIndex: 'id',
             sorter: true,
             hideInSearch: true,
@@ -97,20 +104,20 @@ const TableBook = () => {
             },
         },
         {
-            title: 'Name',
+            title: t("admin.table.name"),
             dataIndex: 'name',
             copyable: true,
             ellipsis: true,
             sorter: true,
         },
         {
-            title: 'Category',
+            title: t("admin.table.category"),
             dataIndex: 'category',
             copyable: true,
             sorter: true,
         },
         {
-            title: 'Price',
+            title: t("admin.table.price"),
             dataIndex: 'price',
             valueType: 'digit',
             fieldProps: {
@@ -122,26 +129,26 @@ const TableBook = () => {
             }
         },
         {
-            title: 'Author',
+            title: t("admin.table.author"),
             dataIndex: 'author',
             sorter: true,
             copyable: true,
         },
         {
-            title: 'Created At',
+            title: t("admin.table.createdAt"),
             dataIndex: 'createdAt',
             valueType: 'date',
             sorter: true,
             hideInSearch: true,
         },
         {
-            title: 'Created At',
+            title: t("admin.table.createdAt"),
             dataIndex: 'createdAtRange',
             valueType: 'dateRange',
             hideInTable: true,
         },
         {
-            title: 'Action',
+            title: t("admin.table.action"),
             hideInSearch: true,
             render(_, entity) {
                 return (
@@ -163,10 +170,10 @@ const TableBook = () => {
                             />
                             <Popconfirm
                                 placement='topLeft'
-                                title="Delete book"
-                                description="Are you sure to delete this book?"
-                                okText="Yes"
-                                cancelText="No"
+                                title={t("admin.confirm.deleteTitle", { entity: t("admin.entity.book") })}
+                                description={t("admin.confirm.deleteDescription", { entity: t("admin.entity.book") })}
+                                okText={t("common.yes")}
+                                cancelText={t("common.no")}
                                 onConfirm={() => handleDeleteBook(entity.id)}
                                 okButtonProps={{ loading: isDeleteBook }}
                             >
@@ -181,6 +188,28 @@ const TableBook = () => {
         },
     ];
 
+    /**
+     * Tải toàn bộ dữ liệu theo bộ lọc đang chọn, không chỉ trang đang hiển thị.
+     *
+     * Trước đây dùng CSVLink với `currentDataTable` nên chỉ xuất được đúng số dòng
+     * đang nằm trên màn hình — lọc ra 3.000 cuốn thì vẫn chỉ tải về 10 dòng.
+     */
+    const handleExport = async () => {
+        try {
+            setIsExporting(true);
+            const blob = await exportBooksCsvAPI(exportFilterRef.current);
+            downloadBlobAsFile(blob as unknown as Blob, "export-book.csv");
+        } catch (error: any) {
+            notification.error({
+                message: t("common.error"),
+                description: error?.message ?? t("admin.table.exportFail"),
+                placement: "topRight",
+            });
+        } finally {
+            setIsExporting(false);
+        }
+    };
+
     return (
         <>
             <ProTable<IBook, TSearch>
@@ -190,6 +219,12 @@ const TableBook = () => {
                 request={async (params, sort, filter) => {
                     console.log(params, sort, filter);
                     await new Promise<void>((resolve) => setTimeout(resolve, 500));
+
+                    exportFilterRef.current = {
+                        keyword: params.name || params.author || undefined,
+                        categoryName: params.category || undefined,
+                        minPrice: params.price ? Number(params.price) : undefined,
+                    };
 
                     let query = `page=${params.current}&size=${params.pageSize}`;
                     let filterConditions = [];
@@ -238,7 +273,6 @@ const TableBook = () => {
 
                     if (fetchAllBooksResponse.data) {
                         setMeta(fetchAllBooksResponse.data.meta);
-                        setCurrentDataTable(fetchAllBooksResponse.data.result ?? []);
                     }
 
                     return {
@@ -290,34 +324,30 @@ const TableBook = () => {
                     showTotal: (total, range) => {
                         return (
                             <div>
-                                {range[0]} - {range[1]} on {total} rows
+                                {t("admin.table.paginationTotal", { from: range[0], to: range[1], total })}
                             </div>
                         )
                     },
                 }}
                 dateFormatter="string"
-                headerTitle="Table Book"
+                headerTitle={t("admin.table.header", { entity: t("admin.entityPlural.book") })}
                 toolBarRender={() => [
-                    <CSVLink
-                        data={currentDataTable}
-                        filename='export-book.csv'
+                    <Button
+                        key="export"
+                        icon={<ExportOutlined />}
+                        type="primary"
+                        loading={isExporting}
+                        onClick={handleExport}
                     >
-                        <Button
-                            key="export"
-                            icon={<ExportOutlined />}
-                            type="primary"
-                        >
-                            Export
-                        </Button>
-                    </CSVLink>
-                    ,
+                        {t("admin.table.export")}
+                    </Button>,
                     <Button
                         key="import"
                         icon={<CloudDownloadOutlined />}
                         onClick={() => setIsModalImportOpen(true)}
                         type="primary"
                     >
-                        Import
+                        {t("admin.table.import")}
                     </Button>,
                     <Button
                         key="add"
@@ -327,7 +357,7 @@ const TableBook = () => {
                         }}
                         type="primary"
                     >
-                        Add new
+                        {t("admin.table.addNew")}
                     </Button>,
                 ]}
             />

@@ -1,11 +1,14 @@
 import { FilterTwoTone, ReloadOutlined, ShoppingCartOutlined } from "@ant-design/icons";
-import { Col, Form, Row, Checkbox, Divider, InputNumber, Button, Rate, Tabs, Pagination, Spin, Empty, App } from "antd";
+import { Col, Form, Row, Checkbox, Divider, InputNumber, Button, Rate, Tabs, Spin, Empty, App } from "antd";
+import { useTranslation } from "react-i18next";
 import type { FormProps, TabsProps } from "antd";
 import { useEffect, useState } from "react";
-import { fetchAllBooksAPI, fetchAllBooksWithAverageRatingAPI, fetchAllCategoriesSelectAPI } from "@/services/api.service";
+import { useDebounce } from "@/hooks/use-debounce";
+import { fetchAllCategoriesSelectAPI, searchBooksAPI } from "@/services/api.service";
 import "styles/client/book/client.book.scss";
 import { useNavigate, useOutletContext } from "react-router-dom";
-import { useCurrentApp } from "@/components/context/app.context";
+import { useAddToCart } from "@/hooks/use-add-to-cart";
+import { formatPrice, getBookImageUrl } from "@/services/helper";
 
 interface FilterValues {
     category?: string[];
@@ -17,10 +20,14 @@ interface FilterValues {
 }
 
 const BookPage = () => {
-    const [searchTerm] = useOutletContext() as any;
+    const [searchTerm] = useOutletContext() as [string];
+    // Chờ người dùng ngừng gõ 400ms rồi mới gọi API, thay vì bắn request mỗi ký tự
+    const debouncedSearchTerm = useDebounce(searchTerm, 400);
     const navigate = useNavigate();
-    const { user, setCarts } = useCurrentApp();
-    const { notification, message } = App.useApp();
+    const { notification } = App.useApp();
+
+    const { t } = useTranslation();
+    const addBookToCart = useAddToCart();
     const [form] = Form.useForm();
 
     const [loading, setLoading] = useState<boolean>(true);
@@ -29,16 +36,13 @@ const BookPage = () => {
     const [books, setBooks] = useState<IBook[]>([]);
 
     const [filter, setFilter] = useState<FilterValues>({});
-    const [sort, setSort] = useState<string>("updatedAt,desc");
+    const [sort, setSort] = useState<TBookSort>("NEWEST");
 
-    const baseImageUrl = import.meta.env.VITE_IMAGE_URL || "https://res.cloudinary.com/dvglvfask/image/upload";
-
-    const [meta, setMeta] = useState({
-        current: 1,
-        pageSize: 12,
-        pages: 0,
-        total: 0
-    });
+    // Phan trang theo con tro: chi nho "cho vua dung", khong nho so trang.
+    // Doi lai khong biet tong so trang - dung y voi cach hien thi "xem them".
+    const [cursor, setCursor] = useState<string | null>(null);
+    const [hasNext, setHasNext] = useState<boolean>(false);
+    const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
 
     useEffect(() => {
         window.scrollTo({ top: 0, behavior: "smooth" });
@@ -52,76 +56,93 @@ const BookPage = () => {
                 setCategories(fetchAllCategoriesResponse.data.result);
             }
         } catch (error: any) {
-            console.error("Failed to fetch categories:", error);
+            notification.error({
+                message: t("book.loadCategoriesFail"),
+                description: error?.message ?? t("book.tryAgainLater"),
+                placement: "topRight",
+            });
         }
     };
 
-    const buildQuery = (page: number) => {
-        let query = `page=${page}&size=${meta.pageSize}`;
-        let filterConditions: string[] = [];
+    /** Ten the loai o o tich -> id, vi backend loc theo id. */
+    const resolveCategoryIds = () => {
+        if (!filter.category || filter.category.length === 0) {
+            return undefined;
+        }
+        return categories
+            .filter((category) => filter.category!.includes(category.name))
+            .map((category) => category.id);
+    };
 
-        if (filter.category && filter.category.length > 0) {
-            const categoryConditions = filter.category.map(name => `category.name='${name}'`).join(" or ");
-            filterConditions.push(`(${categoryConditions})`);
-        }
-        if (filter.range?.from) {
-            filterConditions.push(`price>=${filter.range.from}`);
-        }
-        if (filter.range?.to) {
-            filterConditions.push(`price<=${filter.range.to}`);
-        }
-        if (searchTerm) {
-            filterConditions.push(`name~~'${searchTerm}'`);
-        }
+    const buildSearchParams = (nextCursor: string | null): IBookSearchParams => ({
+        keyword: debouncedSearchTerm || undefined,
+        categoryIds: resolveCategoryIds(),
+        minPrice: filter.range?.from,
+        maxPrice: filter.range?.to,
+        minRating: filter.rating,
+        sort,
+        cursor: nextCursor,
+        size: 12,
+    });
 
-        if (filterConditions.length > 0) {
-            query += `&filter=${filterConditions.join(" and ")}`;
-        }
-
-        if (sort) {
-            query += `&sort=${sort}`;
-        }
-
-        return query;
-    }
-
-    const fetchBooks = async (page: number) => {
+    /**
+     * `append` = true khi bam "xem them": noi them vao danh sach dang co.
+     * false khi doi bo loc: thay moi tu dau va bo con tro cu di.
+     */
+    const fetchBooks = async (nextCursor: string | null, append: boolean) => {
         try {
-            setLoading(true);
-            const queryBuilt = buildQuery(page);
-
-            if (filter.rating) {
-                const fetchAllBooksWithAverageRatingResponse = await fetchAllBooksWithAverageRatingAPI(filter.rating, queryBuilt);
-                if (fetchAllBooksWithAverageRatingResponse.data) {
-                    setBooks(fetchAllBooksWithAverageRatingResponse.data.result);
-                    setMeta(fetchAllBooksWithAverageRatingResponse.data.meta);
-                }
+            if (append) {
+                setIsLoadingMore(true);
             } else {
-                const fetchAllBooksResponse = await fetchAllBooksAPI(queryBuilt);
-                if (fetchAllBooksResponse.data) {
-                    console.log("Check query >>> ", queryBuilt);
-                    setBooks(fetchAllBooksResponse.data.result);
-                    setMeta(fetchAllBooksResponse.data.meta);
-                }
+                setLoading(true);
+            }
+
+            const response = await searchBooksAPI(buildSearchParams(nextCursor));
+            if (response.data) {
+                const page = response.data;
+                setBooks((previous) => (append ? [...previous, ...page.items] : page.items));
+                setCursor(page.nextCursor);
+                setHasNext(page.hasNext);
             }
         } catch (error: any) {
-            console.error("Failed to fetch books:", error);
+            notification.error({
+                message: t("book.loadBooksFail"),
+                description: error?.message ?? t("book.tryAgainLater"),
+                placement: "topRight",
+            });
         } finally {
             setLoading(false);
+            setIsLoadingMore(false);
         }
     };
 
-    useEffect(() => {
-        fetchBooks(1);
-    }, [filter, sort, searchTerm]);
+    /**
+     * Gộp mọi tiêu chí thành một khoá chuỗi rồi mới cho vào mảng phụ thuộc.
+     *
+     * Không dùng thẳng `filter` và `categories`: `filter` đổi tham chiếu mỗi lần form
+     * re-render, còn `categories` nạp xong mới có id để ánh xạ — để nguyên hai thứ đó
+     * thì mỗi lần mở trang sẽ gọi API hai lần dù tiêu chí không hề đổi.
+     */
+    const searchKey = [
+        debouncedSearchTerm,
+        sort,
+        (resolveCategoryIds() ?? []).join("."),
+        filter.range?.from ?? "",
+        filter.range?.to ?? "",
+        filter.rating ?? "",
+    ].join("|");
 
-    const handleChangeFilter = (changedValues: any, values: any) => {
-        console.log("Filter changed:", changedValues, values);
+    // Đổi tiêu chí là phải bắt đầu lại từ đầu, không giữ con trỏ cũ
+    useEffect(() => {
+        fetchBooks(null, false);
+    }, [searchKey]);
+
+
+    const handleChangeFilter = (_changedValues: any, values: any) => {
         setFilter(values);
     };
 
     const onFinish: FormProps<FilterValues>['onFinish'] = async (values: any) => {
-        console.log("Apply filter:", values);
         setFilter(values);
     };
 
@@ -130,29 +151,14 @@ const BookPage = () => {
         setFilter({});
     }
 
-    const handlePageChange = (page: number) => {
-        fetchBooks(page);
-        window.scrollTo({ top: 0, behavior: "smooth" });
-    };
-
     const handleTabChange = (key: string) => {
-        console.log("Tab changed:", key);
-        switch (key) {
-            case "1":
-                setSort("updatedAt,desc");
-                break;
-            case "2":
-                setSort("createdAt,asc");
-                break;
-            case "3":
-                setSort("price,asc");
-                break;
-            case "4":
-                setSort("price,desc");
-                break;
-            default:
-                break;
-        }
+        const sortByTabKey: Record<string, TBookSort> = {
+            "1": "RATING_DESC",
+            "2": "NEWEST",
+            "3": "PRICE_ASC",
+            "4": "PRICE_DESC",
+        };
+        setSort(sortByTabKey[key] ?? "NEWEST");
     };
 
     const handleRatingClick = (rating: number) => {
@@ -175,55 +181,14 @@ const BookPage = () => {
 
     const handleAddToCart = (e: React.MouseEvent, book: IBook) => {
         e.stopPropagation();
-
-        if (!user || !user.id) {
-            notification.warning({
-                message: "Chưa đăng nhập",
-                description: "Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng",
-                duration: 3,
-                placement: "topRight"
-            });
-            setTimeout(() => {
-                navigate("/login");
-            }, 1000);
-            return;
-        }
-
-        if (!book) return;
-
-        const cartStorage = localStorage.getItem("carts");
-        if (cartStorage) {
-            const carts = JSON.parse(cartStorage) as ICart[];
-            let isExistIndex = carts.findIndex((cart) => cart.id === book.id);
-            if (isExistIndex > -1) {
-                carts[isExistIndex].quantity = carts[isExistIndex].quantity + 1;
-            } else {
-                carts.push({
-                    id: book.id,
-                    quantity: 1,
-                    detail: book
-                });
-            }
-            localStorage.setItem("carts", JSON.stringify(carts));
-            setCarts(carts);
-        } else {
-            const data = [{
-                id: book.id,
-                quantity: 1,
-                detail: book
-            }];
-            localStorage.setItem("carts", JSON.stringify(data));
-            setCarts(data);
-        }
-
-        message.success(`Đã thêm 1 sản phẩm "${book.name}" vào giỏ hàng`);
+        addBookToCart(book, 1);
     };
 
     const items: TabsProps["items"] = [
-        { key: "1", label: "Phổ biến" },
-        { key: "2", label: "Hàng Mới" },
-        { key: "3", label: "Giá Thấp Đến Cao" },
-        { key: "4", label: "Giá Cao Đến Thấp" },
+        { key: "1", label: t("book.sortPopular") },
+        { key: "2", label: t("book.sortNewest") },
+        { key: "3", label: t("book.sortPriceAsc") },
+        { key: "4", label: t("book.sortPriceDesc") },
     ];
 
     return (
@@ -234,7 +199,7 @@ const BookPage = () => {
                     <div className="filter-sidebar">
                         <div className="filter-header">
                             <span>
-                                <FilterTwoTone /> Bộ lọc tìm kiếm
+                                <FilterTwoTone /> {t("book.filters")}
                             </span>
                             <ReloadOutlined onClick={handleReset} />
                         </div>
@@ -246,7 +211,7 @@ const BookPage = () => {
                             onValuesChange={handleChangeFilter}
                             layout="vertical"
                         >
-                            <Form.Item label={<strong>Danh mục sản phẩm</strong>}>
+                            <Form.Item label={<strong>{t("book.categories")}</strong>}>
                                 <Form.Item<FilterValues>
                                     name="category"
                                     noStyle
@@ -267,7 +232,7 @@ const BookPage = () => {
 
                             <Divider />
 
-                            <Form.Item label={<strong>Khoảng giá</strong>}>
+                            <Form.Item label={<strong>{t("book.priceRange")}</strong>}>
                                 <div className="price-range-inputs">
                                     <Form.Item<FilterValues>
                                         name={["range", "from"]}
@@ -275,7 +240,7 @@ const BookPage = () => {
                                     >
                                         <InputNumber
                                             min={0}
-                                            placeholder="đ TỪ"
+                                            placeholder={t("book.priceFrom")}
                                             formatter={(value) =>
                                                 `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                                             }
@@ -288,7 +253,7 @@ const BookPage = () => {
                                     >
                                         <InputNumber
                                             min={0}
-                                            placeholder="đ ĐẾN"
+                                            placeholder={t("book.priceTo")}
                                             formatter={(value) =>
                                                 `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                                             }
@@ -299,7 +264,7 @@ const BookPage = () => {
 
                             <Divider />
 
-                            <Form.Item label={<strong>Đánh giá</strong>}>
+                            <Form.Item label={<strong>{t("book.rating")}</strong>}>
                                 <div className="rating-options">
                                     {[5, 4, 3, 2, 1].map((rating) => (
                                         <div
@@ -309,7 +274,7 @@ const BookPage = () => {
                                             style={{ cursor: 'pointer' }}
                                         >
                                             <Rate value={rating} disabled />
-                                            {rating < 5 && <span className="rating-text">trở lên</span>}
+                                            {rating < 5 && <span className="rating-text">{t("book.ratingAndUp")}</span>}
                                         </div>
                                     ))}
                                 </div>
@@ -330,11 +295,11 @@ const BookPage = () => {
 
                         {loading ? (
                             <div className="loading-container">
-                                <Spin size="large" tip="Đang tải sản phẩm..." />
+                                <Spin size="large" tip={t("book.loading")} />
                             </div>
                         ) : books.length === 0 ? (
                             <div className="empty-container">
-                                <Empty description="Không có sản phẩm nào phù hợp" />
+                                <Empty description={t("book.noMatch")} />
                             </div>
                         ) : (
                             <>
@@ -347,14 +312,10 @@ const BookPage = () => {
                                                     onClick={() => handleNavigateBookItem(book.id)}
                                                 >
                                                     <img
-                                                        src={
-                                                            book.images && book.images.length > 0
-                                                                ? `${baseImageUrl}/${book.images[0]}`
-                                                                : "https://via.placeholder.com/200x280?text=No+Image"
-                                                        }
+                                                        src={getBookImageUrl(book.images)}
                                                         alt={book.name}
                                                     />
-                                                    <div className="book-badge">Hot</div>
+                                                    <div className="book-badge">{t("common.hot")}</div>
                                                 </div>
 
                                                 <div className="book-info">
@@ -366,15 +327,12 @@ const BookPage = () => {
                                                     </div>
 
                                                     <div className="book-price">
-                                                        {new Intl.NumberFormat("vi-VN", {
-                                                            style: "currency",
-                                                            currency: "VND",
-                                                        }).format(book.price)}
+                                                        {formatPrice(book.price)}
                                                     </div>
 
                                                     <div className="book-rating">
-                                                        <Rate value={book.averageStars} allowHalf disabled />
-                                                        <span className="sold-count">Đã bán 1.2k</span>
+                                                        <Rate value={book.averageStars ?? 0} allowHalf disabled />
+                                                        <span className="sold-count">{t("book.soldCount")}</span>
                                                     </div>
 
                                                     <Button
@@ -384,7 +342,7 @@ const BookPage = () => {
                                                         onClick={(e) => handleAddToCart(e, book)}
                                                         block
                                                     >
-                                                        Thêm vào giỏ
+                                                        {t("book.addToCart")}
                                                     </Button>
                                                 </div>
                                             </div>
@@ -392,16 +350,17 @@ const BookPage = () => {
                                     ))}
                                 </Row>
 
-                                <div className="pagination-wrapper">
-                                    <Pagination
-                                        current={meta.current}
-                                        total={meta.total}
-                                        pageSize={meta.pageSize}
-                                        responsive
-                                        onChange={handlePageChange}
-                                        showSizeChanger={false}
-                                    />
-                                </div>
+                                {hasNext && (
+                                    <div className="load-more-wrapper">
+                                        <Button
+                                            size="large"
+                                            loading={isLoadingMore}
+                                            onClick={() => fetchBooks(cursor, true)}
+                                        >
+                                            {t("book.loadMore")}
+                                        </Button>
+                                    </div>
+                                )}
                             </>
                         )}
                     </div>

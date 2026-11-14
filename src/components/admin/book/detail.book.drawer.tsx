@@ -11,6 +11,7 @@ import {
 } from "antd";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { v4 as uuidv4 } from 'uuid';
 
 interface DrawerBookProps {
@@ -35,6 +36,8 @@ const DetailBookDrawer = (props: DrawerBookProps) => {
     const baseImageUrl = import.meta.env.VITE_IMAGE_URL || "https://res.cloudinary.com/dvglvfask/image/upload";
 
     const [previewOpen, setPreviewOpen] = useState<boolean>(false);
+
+    const { t } = useTranslation();
     const [previewImage, setPreviewImage] = useState("");
     const [fileList, setFileList] = useState<UploadFile[]>([]);
 
@@ -90,23 +93,23 @@ const DetailBookDrawer = (props: DrawerBookProps) => {
         ...(dataDetail ? [
             {
                 key: '1',
-                label: 'Name',
+                label: t("admin.table.name"),
                 span: 2,
                 children: <p>{dataDetail.name}</p>,
             },
             {
                 key: '2',
-                label: 'Id',
+                label: t("admin.table.id"),
                 children: <p>{dataDetail.id}</p>,
             },
             {
                 key: '3',
-                label: 'Author',
+                label: t("admin.table.author"),
                 children: <p>{dataDetail.author}</p>,
             },
             {
                 key: '4',
-                label: 'Category',
+                label: t("admin.table.category"),
                 children: (
                     <Badge
                         status="processing"
@@ -116,17 +119,17 @@ const DetailBookDrawer = (props: DrawerBookProps) => {
             },
             {
                 key: '5',
-                label: 'Price',
+                label: t("admin.table.price"),
                 children: <p>{formatCurrencyVND(dataDetail.price)}</p>,
             },
             {
                 key: '6',
-                label: 'Created At',
+                label: t("admin.table.createdAt"),
                 children: <p>{formatDateTime(dataDetail.createdAt)}</p>,
             },
             {
                 key: '7',
-                label: 'Updated At',
+                label: t("admin.table.updatedAt"),
                 children: <p>{formatDateTime(dataDetail.updatedAt)}</p>,
             },
         ] : [])
@@ -135,14 +138,14 @@ const DetailBookDrawer = (props: DrawerBookProps) => {
     return (
         <>
             <Drawer
-                title="Book Detail"
+                title={t("admin.detail.title", { entity: t("admin.entity.book") })}
                 placement={"right"}
                 onClose={handleClearDataAndCloseDrawer}
                 open={isDrawerOpen}
                 width={"50vw"}
             >
                 <Descriptions
-                    title="Book Info"
+                    title={t("admin.detail.info", { entity: t("admin.entity.book") })}
                     items={items}
                     size="small"
                     bordered
@@ -154,10 +157,10 @@ const DetailBookDrawer = (props: DrawerBookProps) => {
                         fontWeight: 600,
                         fontSize: "16px",
                         margin: "25px 0 10px 0",
-                        color: "#1677ff", // màu primary của antd
+                        color: "var(--admin-primary)", // biến CSS đặt ở body.admin-theme
                     }}
                 >
-                    Book Image
+                    {t("admin.book.image")}
                 </div>
 
                 <Upload

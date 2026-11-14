@@ -1,0 +1,365 @@
+@use "../abstracts/tokens" as t;
+@use "../abstracts/mixins" as m;
+
+// ===========================================================================
+// TỔNG QUAN
+//
+// Trước đây toàn bộ trang nằm trong inline style của dashboard.tsx: tự vẽ thêm
+// một lớp nền xám #f0f2f5 và padding 24px chồng lên padding sẵn có của
+// .admin-content, cùng 5 màu antd v4 (#1890ff, #52c41a, #faad14, #722ed1) không
+// có trong hệ thống thiết kế. Đưa hết về SCSS + token ở đây.
+// ===========================================================================
+
+.admin-dashboard {
+  &__head {
+    margin-bottom: t.$space-6;
+
+    h1 {
+      font-size: t.$fs-2xl;
+      margin-bottom: t.$space-1;
+    }
+
+    p {
+      color: t.$text-muted;
+      font-size: t.$fs-base;
+    }
+  }
+
+  &__grid {
+    @include m.auto-grid(240px, t.$space-4);
+  }
+}
+
+.stat-card {
+  @include m.card(t.$space-5);
+  display: flex;
+  flex-direction: column;
+  gap: t.$space-4;
+  // Vạch màu nhận dạng chạy dọc mép trái
+  border-left: 3px solid var(--accent);
+  transition: transform t.$transition-base, box-shadow t.$transition-base;
+
+  @include m.hover {
+    transform: translateY(-2px);
+    box-shadow: t.$shadow-lg;
+  }
+
+  // Cả thẻ là một liên kết — bỏ gạch chân, giữ màu chữ bình thường
+  color: inherit;
+
+  &:hover,
+  &:focus-visible {
+    color: inherit;
+  }
+
+  @include m.focus-ring(var(--accent));
+
+  &__top {
+    display: flex;
+    align-items: center;
+    gap: t.$space-3;
+  }
+
+  // Ô icon: nền nhạt cùng tông với vạch màu
+  &__icon {
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+    border-radius: t.$radius-md;
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-size: t.$fs-lg;
+  }
+
+  &__label {
+    font-size: t.$fs-base;
+    font-weight: t.$fw-semibold;
+    color: t.$text-body;
+    @include m.truncate;
+  }
+
+  &__value {
+    font-size: t.$fs-3xl;
+    font-weight: t.$fw-extra;
+    line-height: 1;
+    color: t.$text-strong;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__more {
+    display: flex;
+    align-items: center;
+    gap: t.$space-1;
+    padding-top: t.$space-3;
+    border-top: 1px solid t.$border;
+    font-size: t.$fs-sm;
+    font-weight: t.$fw-semibold;
+    color: var(--accent);
+
+    .arrow {
+      transition: transform t.$transition-fast;
+    }
+  }
+
+  @include m.hover {
+    .stat-card__more .arrow {
+      transform: translateX(3px);
+    }
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Khối thống kê kinh doanh (doanh thu, biểu đồ, bảng xếp hạng)
+   Dùng lại đúng bộ biến màu của phần thẻ đếm phía trên nên tự hợp chế độ tối.
+--------------------------------------------------------------------------- */
+
+.admin-dashboard__toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 32px 0 16px;
+
+    h2 {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 0;
+        font-size: 18px;
+    }
+}
+
+.admin-dashboard__revenue {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.revenue-card {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 18px 20px;
+    border: 1px solid var(--border-color, rgba(0, 0, 0, 0.08));
+    border-radius: 12px;
+    background: var(--card-bg, #fff);
+
+    &--primary {
+        border-color: var(--accent-emerald, #10b981);
+    }
+
+    &__icon {
+        font-size: 20px;
+        color: var(--accent-emerald, #10b981);
+    }
+
+    &__label {
+        font-size: 13px;
+        opacity: 0.75;
+    }
+
+    &__value {
+        font-size: 24px;
+        font-weight: 600;
+        line-height: 1.2;
+    }
+
+    &__hint {
+        font-size: 12px;
+        opacity: 0.6;
+    }
+}
+
+.admin-dashboard__panels {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 16px;
+}
+
+.admin-dashboard__panel {
+    margin-bottom: 20px;
+    padding: 18px 20px;
+    border: 1px solid var(--border-color, rgba(0, 0, 0, 0.08));
+    border-radius: 12px;
+    background: var(--card-bg, #fff);
+
+    /* Bảng rộng phải tự cuộn trong khung, không đẩy cả trang trượt ngang */
+    overflow-x: auto;
+
+    h3 {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 0 0 14px;
+        font-size: 15px;
+        font-weight: 600;
+    }
+
+    &--warning h3 {
+        color: var(--accent-amber, #f59e0b);
+    }
+}
+
+.dashboard-chart {
+    position: relative;
+
+    svg {
+        display: block;
+        width: 100%;
+        height: auto;
+    }
+
+    &__grid {
+        stroke: var(--border-color, rgba(0, 0, 0, 0.08));
+        stroke-width: 1;
+    }
+
+    &__axis {
+        font-size: 11px;
+        fill: currentColor;
+        opacity: 0.6;
+    }
+
+    &__area {
+        fill: var(--accent-emerald-soft, rgba(16, 185, 129, 0.15));
+    }
+
+    &__line {
+        fill: none;
+        stroke: var(--accent-emerald, #10b981);
+        stroke-width: 2;
+        stroke-linejoin: round;
+        stroke-linecap: round;
+    }
+
+    &__dot {
+        fill: var(--accent-emerald, #10b981);
+        cursor: pointer;
+        transition: r 0.12s ease;
+    }
+
+    &__empty {
+        margin: 0;
+        padding: 32px 0;
+        text-align: center;
+        opacity: 0.6;
+    }
+
+    &__tooltip {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        padding: 8px 12px;
+        border: 1px solid var(--border-color, rgba(0, 0, 0, 0.08));
+        border-radius: 8px;
+        background: var(--card-bg, #fff);
+        font-size: 12px;
+        pointer-events: none;
+    }
+}
+
+.dashboard-pie {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 24px;
+
+    &__figure {
+        flex: 0 0 220px;
+        max-width: 220px;
+    }
+
+    svg {
+        display: block;
+        width: 100%;
+        height: auto;
+    }
+
+    circle {
+        cursor: pointer;
+        transition: stroke-width 0.12s ease, opacity 0.12s ease;
+    }
+
+    &__center-label {
+        font-size: 12px;
+        fill: currentColor;
+        opacity: 0.6;
+    }
+
+    &__center-value {
+        font-size: 14px;
+        font-weight: 600;
+        fill: currentColor;
+    }
+
+    &__legend {
+        flex: 1 1 260px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+
+        li {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 8px;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        li.is-active {
+            background: var(--hover-bg, rgba(0, 0, 0, 0.04));
+        }
+    }
+
+    &__dot {
+        flex: 0 0 10px;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+    }
+
+    &__name {
+        flex: 1 1 auto;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    &__percent {
+        flex: 0 0 auto;
+        font-weight: 600;
+    }
+
+    &__money {
+        flex: 0 0 auto;
+        opacity: 0.6;
+    }
+}
+
+.status-breakdown {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+
+    &__item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        border: 1px solid var(--border-color, rgba(0, 0, 0, 0.08));
+        border-radius: 8px;
+
+        strong {
+            font-size: 16px;
+        }
+    }
+}

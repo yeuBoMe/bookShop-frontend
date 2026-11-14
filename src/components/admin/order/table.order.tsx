@@ -5,6 +5,7 @@ import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
 import { App, Button, Popconfirm, Space, Tag } from 'antd';
 import { useRef, useState, type JSX } from 'react';
+import { useTranslation } from 'react-i18next';
 import { CSVLink } from 'react-csv';
 import { Link } from 'react-router-dom';
 import DetailOrderDrawer from 'components/admin/order/detail.order.drawer';
@@ -21,6 +22,8 @@ type TSearch = {
 const TableOrder = () => {
     const actionRef = useRef<ActionType | null>(null);
     const { notification, message } = App.useApp();
+
+    const { t } = useTranslation();
     const [meta, setMeta] = useState({
         current: 1,
         pageSize: 5,
@@ -47,12 +50,12 @@ const TableOrder = () => {
             await new Promise((resolve) => setTimeout(resolve, 400));
             const deleteOrderResponse = await deleteOrderAPI(id);
             if (deleteOrderResponse) {
-                message.success("Delete order successfully!");
+                message.success(t("admin.msg.deleteSuccess", { entity: t("admin.entity.order") }));
                 refreshTable();
             }
         } catch (error: any) {
             notification.error({
-                message: "Error",
+                message: t("common.error"),
                 description: error?.message,
                 duration: 5,
                 placement: "topRight"
@@ -67,32 +70,32 @@ const TableOrder = () => {
 
         const configs: Record<string, { text: string; color: string; icon: JSX.Element }> = {
             PENDING: {
-                text: "PENDING",
+                text: t("admin.order.status.PENDING"),
                 color: "orange",
                 icon: <ClockCircleOutlined />,
             },
             SHIPPING: {
-                text: "SHIPPING",
+                text: t("admin.order.status.SHIPPING"),
                 color: "cyan",
                 icon: <TruckOutlined />,
             },
             SUCCESS: {
-                text: "SUCCESS",
+                text: t("admin.order.status.SUCCESS"),
                 color: "green",
                 icon: <CheckCircleOutlined />,
             },
             CANCEL: {
-                text: "CANCEL",
+                text: t("admin.order.status.CANCEL"),
                 color: "red",
                 icon: <CloseCircleOutlined />,
             },
             PAID: {
-                text: "PAID",
+                text: t("admin.order.status.PAID"),
                 color: "blue",
                 icon: <DollarCircleOutlined />
             },
             UNPAID: {
-                text: "UNPAID",
+                text: t("admin.order.status.UNPAID"),
                 color: "magenta",
                 icon: <ExclamationCircleOutlined />,
             },
@@ -114,7 +117,7 @@ const TableOrder = () => {
             width: 48,
         },
         {
-            title: 'Id',
+            title: t("admin.table.id"),
             dataIndex: 'id',
             copyable: true,
             hideInSearch: true,
@@ -134,18 +137,18 @@ const TableOrder = () => {
             },
         },
         {
-            title: 'Name',
+            title: t("admin.table.name"),
             dataIndex: 'name',
             sorter: true,
         },
         {
-            title: 'Address',
+            title: t("admin.table.address"),
             dataIndex: 'address',
             sorter: true,
             ellipsis: true,
         },
         {
-            title: 'Total Price',
+            title: t("admin.table.totalPrice"),
             dataIndex: 'totalPrice',
             valueType: 'digit',
             fieldProps: {
@@ -158,38 +161,38 @@ const TableOrder = () => {
             }
         },
         {
-            title: 'Status',
+            title: t("admin.table.status"),
             dataIndex: 'status',
             sorter: true,
             valueEnum: {
-                pending: { text: 'Pending', status: 'Warning' },
-                shipping: { text: 'Shipping', status: 'Processing' },
-                success: { text: 'Success', status: 'Success' },
-                cancel: { text: 'Cancel', status: 'Error' },
+                pending: { text: t("admin.order.status.PENDING"), status: "Warning" },
+                shipping: { text: t("admin.order.status.SHIPPING"), status: "Processing" },
+                success: { text: t("admin.order.status.SUCCESS"), status: "Success" },
+                cancel: { text: t("admin.order.status.CANCEL"), status: "Error" },
             },
             render: (_, entity) => getStatusTag(entity.status),
         },
         {
-            title: 'Payment Method',
+            title: t("admin.table.paymentMethod"),
             dataIndex: 'paymentMethod',
             sorter: true,
             hideInSearch: true,
         },
         {
-            title: 'Created At',
+            title: t("admin.table.createdAt"),
             dataIndex: 'createdAt',
             valueType: 'date',
             sorter: true,
             hideInSearch: true,
         },
         {
-            title: 'Created At',
+            title: t("admin.table.createdAt"),
             dataIndex: 'createdAtRange',
             valueType: 'dateRange',
             hideInTable: true,
         },
         {
-            title: 'Action',
+            title: t("admin.table.action"),
             hideInSearch: true,
             render(_, entity) {
                 return (
@@ -211,10 +214,10 @@ const TableOrder = () => {
                             />
                             <Popconfirm
                                 placement='topLeft'
-                                title="Delete order"
-                                description="Are you sure to delete this order?"
-                                okText="Yes"
-                                cancelText="No"
+                                title={t("admin.confirm.deleteTitle", { entity: t("admin.entity.order") })}
+                                description={t("admin.confirm.deleteDescription", { entity: t("admin.entity.order") })}
+                                okText={t("common.yes")}
+                                cancelText={t("common.no")}
                                 onConfirm={() => handleDeleteOrder(entity.id)}
                                 okButtonProps={{ loading: isDeleteOrder }}
                             >
@@ -336,13 +339,13 @@ const TableOrder = () => {
                     showTotal(total, range) {
                         return (
                             <div>
-                                {range[0]} - {range[1]} on {total} rows
+                                {t("admin.table.paginationTotal", { from: range[0], to: range[1], total })}
                             </div>
                         )
                     },
                 }}
                 dateFormatter="string"
-                headerTitle="Table Order"
+                headerTitle={t("admin.table.header", { entity: t("admin.entityPlural.order") })}
                 toolBarRender={() => [
                     <CSVLink
                         data={currentDataTable}
@@ -353,7 +356,7 @@ const TableOrder = () => {
                             icon={<ExportOutlined />}
                             type="primary"
                         >
-                            Export
+                            {t("admin.table.export")}
                         </Button>
                     </CSVLink>
                     ,

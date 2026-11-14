@@ -1,6 +1,7 @@
 import { updateUserAPI } from "@/services/api.service";
 import { App, Col, Form, Input, Modal, Row, type FormProps } from "antd";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 interface UserUpdateValues {
     fullName: string;
@@ -26,6 +27,8 @@ const UpdateUserModal = (props: UpdateUserProps) => {
     } = props;
     const [form] = Form.useForm<UserUpdateValues>();
     const { notification, message } = App.useApp();
+
+    const { t } = useTranslation();
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
     useEffect(() => {
@@ -47,12 +50,12 @@ const UpdateUserModal = (props: UpdateUserProps) => {
             const updateUserResponse = await updateUserAPI(dataUpdate?.id, fullName, phone);
             if (updateUserResponse.data) {
                 handleClearDataAndCloseModal();
-                message.success("Update user successfully!");
+                message.success(t("admin.msg.updateSuccess", { entity: t("admin.entity.user") }));
                 refreshTable();
             }
         } catch (error: any) {
             notification.error({
-                message: "Error",
+                message: t("common.error"),
                 description: error?.message,
                 duration: 5,
                 placement: "topRight",
@@ -71,8 +74,8 @@ const UpdateUserModal = (props: UpdateUserProps) => {
     return (
         <>
             <Modal
-                title="Update user"
-                okText="Update"
+                title={t("admin.form.updateTitle", { entity: t("admin.entity.user") })}
+                okText={t("common.update")}
                 closable={false}
                 maskClosable={false}
                 open={isModalUpdateOpen}
@@ -92,14 +95,14 @@ const UpdateUserModal = (props: UpdateUserProps) => {
                             autoComplete="off"
                         >
                             <Form.Item<UserUpdateValues>
-                                label="Full Name:"
+                                label={t("field.fullName")}
                                 name="fullName"
                                 rules={[
-                                    { required: true, message: 'Name is required' },
-                                    { max: 100, message: 'Name must be less than 100 characters' },
+                                    { required: true, message: t("validate.required", { field: t("field.fullName") }) },
+                                    { max: 100, message: t("validate.maxLength", { field: t("field.fullName"), max: 100 }) },
                                     {
                                         pattern: /^[A-Za-zÀ-ỹà-ỹ'\-.\s]{1,100}$/,
-                                        message: "Name must only contain letters, spaces, apostrophes, dashes or dots"
+                                        message: t("validate.nameCharset")
                                     }
                                 ]}
                             >
@@ -107,14 +110,14 @@ const UpdateUserModal = (props: UpdateUserProps) => {
                             </Form.Item>
 
                             <Form.Item<UserUpdateValues>
-                                label="Email:"
+                                label={t("field.email")}
                                 name="email"
                                 rules={[
-                                    { required: true, message: 'Email is required' },
-                                    { max: 150, message: 'Email must not exceed 150 characters' },
+                                    { required: true, message: t("validate.required", { field: t("field.email") }) },
+                                    { max: 150, message: t("validate.maxLength", { field: t("field.email"), max: 150 }) },
                                     {
                                         pattern: /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z]{2,6}$/,
-                                        message: "Email format is invalid"
+                                        message: t("validate.emailInvalid")
                                     }
                                 ]}
                             >
@@ -122,13 +125,13 @@ const UpdateUserModal = (props: UpdateUserProps) => {
                             </Form.Item>
 
                             <Form.Item<UserUpdateValues>
-                                label="Phone:"
+                                label={t("field.phone")}
                                 name="phone"
                                 rules={[
-                                    { required: true, message: 'Phone is required' },
+                                    { required: true, message: t("validate.required", { field: t("field.phone") }) },
                                     {
                                         pattern: /^(0[3|5|7|8|9])[0-9]{8}$/,
-                                        message: 'Phone number is invalid (Vietnamese format)'
+                                        message: t("validate.phoneInvalid")
                                     }
                                 ]}
                             >

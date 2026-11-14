@@ -1,4 +1,5 @@
 import { Outlet, useSearchParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import Header from "@/components/layout/client.header";
 import Footer from "@/components/layout/client.footer";
 import { useEffect, useState, useRef } from "react";
@@ -13,6 +14,8 @@ const Layout = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [searchParams, setSearchParams] = useSearchParams();
   const { message } = App.useApp();
+
+  const { t } = useTranslation();
   const { setUser, setIsAuthenticated } = useCurrentApp();
 
   const hasProcessedLogin = useRef(false);
@@ -34,8 +37,6 @@ const Layout = () => {
     hasProcessedLogin.current = true;
 
     try {
-      console.log('>>> Processing Google login...');
-
       // Lưu access token
       localStorage.setItem('access_token', accessToken);
 
@@ -55,13 +56,11 @@ const Layout = () => {
         setUser(mappedUser);
         setIsAuthenticated(true);
 
-        message.success('Đăng nhập Google thành công!');
-        console.log('>>> Google login success:', mappedUser);
+        message.success(t("error.googleLoginSuccess"));
       }
 
-    } catch (error: any) {
-      console.error('>>> Google login error:', error);
-      message.error('Có lỗi xảy ra khi đăng nhập với Google');
+    } catch {
+      message.error(t("error.googleLoginFail"));
 
       // ✅ Reset flag nếu lỗi để có thể retry
       hasProcessedLogin.current = false;

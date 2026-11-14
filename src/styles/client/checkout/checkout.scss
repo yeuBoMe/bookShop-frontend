@@ -1,3 +1,6 @@
+@use "../../abstracts/tokens" as t;
+@use "../../abstracts/mixins" as m;
+
 .cart-page-container {
   max-width: 1200px;
   margin: 0 auto;
@@ -12,8 +15,8 @@
       .ant-steps-item {
         &.ant-steps-item-active {
           .ant-steps-item-icon {
-            background: #1890ff;
-            border-color: #1890ff;
+            background: t.$primary;
+            border-color: t.$primary-text;
 
             .ant-steps-icon {
               color: white;
@@ -21,15 +24,15 @@
           }
 
           .ant-steps-item-title {
-            color: #1890ff;
+            color: t.$primary-text;
             font-weight: 600;
           }
         }
 
         &.ant-steps-item-finish {
           .ant-steps-item-icon {
-            background: #52c41a;
-            border-color: #52c41a;
+            background: t.$success;
+            border-color: t.$success-text;
 
             .ant-steps-icon {
               color: white;
@@ -50,7 +53,7 @@
     h1 {
       font-size: 28px;
       font-weight: 700;
-      color: #333;
+      color: t.$text-body;
       margin: 0;
       display: flex;
       align-items: center;
@@ -59,17 +62,17 @@
 
     .cart-count {
       font-size: 16px;
-      color: #666;
+      color: t.$text-muted;
       margin: 0;
     }
   }
 
   // Empty cart
   .cart-empty {
-    background: #fff;
+    background: t.$surface;
     padding: 80px 20px;
     border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
     text-align: center;
 
     .empty-text {
@@ -79,13 +82,13 @@
       h3 {
         font-size: 20px;
         font-weight: 600;
-        color: #333;
+        color: t.$text-body;
         margin-bottom: 10px;
       }
 
       p {
         font-size: 14px;
-        color: #999;
+        color: t.$text-subtle;
       }
     }
   }

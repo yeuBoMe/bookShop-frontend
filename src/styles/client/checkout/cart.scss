@@ -1,7 +1,10 @@
+@use "../../abstracts/tokens" as t;
+@use "../../abstracts/mixins" as m;
+
 .cart-items-section {
-  background: #fff;
+  background: t.$surface;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
   overflow: hidden;
 
   .cart-items-header {
@@ -12,7 +15,7 @@
     background: #f7f7f7;
     font-weight: 600;
     font-size: 14px;
-    color: #666;
+    color: t.$text-muted;
     text-transform: uppercase;
   }
 
@@ -22,12 +25,12 @@
       grid-template-columns: 2fr 1fr 1fr 1fr 80px;
       gap: 20px;
       padding: 25px;
-      border-bottom: 1px solid #f0f0f0;
+      border-bottom: 1px solid t.$border;
       align-items: center;
       transition: background 0.2s;
 
       &:hover {
-        background: #fafafa;
+        background: t.$surface-subtle;
       }
 
       &:last-child {
@@ -57,7 +60,7 @@
           .item-name {
             font-size: 16px;
             font-weight: 600;
-            color: #333;
+            color: t.$text-body;
             margin-bottom: 8px;
             cursor: pointer;
             line-height: 1.4;
@@ -67,19 +70,19 @@
             overflow: hidden;
 
             &:hover {
-              color: #1890ff;
+              color: t.$primary-text;
             }
           }
 
           .item-category {
             font-size: 13px;
-            color: #999;
+            color: t.$text-subtle;
             margin-bottom: 5px;
           }
 
           .item-stock {
             font-size: 13px;
-            color: #52c41a;
+            color: t.$success-text;
             font-weight: 500;
           }
         }
@@ -88,7 +91,7 @@
       .item-price {
         font-size: 16px;
         font-weight: 600;
-        color: #333;
+        color: t.$text-body;
       }
 
       .item-quantity {
@@ -122,7 +125,7 @@
       .item-total {
         font-size: 18px;
         font-weight: 700;
-        color: #ff4d4f;
+        color: t.$danger-text;
         text-align: center;
       }
 
@@ -140,8 +143,8 @@
     padding: 20px 25px;
     display: flex;
     justify-content: space-between;
-    background: #fafafa;
-    border-top: 1px solid #f0f0f0;
+    background: t.$surface-subtle;
+    border-top: 1px solid t.$border;
 
     .ant-btn {
       min-width: 150px;
@@ -181,7 +184,7 @@
 
           &:before {
             font-weight: 600;
-            color: #666;
+            color: t.$text-muted;
             font-size: 14px;
           }
         }
@@ -266,9 +269,9 @@
 
 .cart-summary-section {
   .summary-card {
-    background: #fff;
+    background: t.$surface;
     border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
     padding: 25px;
     position: sticky;
     top: 20px;
@@ -276,7 +279,7 @@
     h2 {
       font-size: 20px;
       font-weight: 700;
-      color: #333;
+      color: t.$text-body;
       margin-bottom: 20px;
     }
 
@@ -285,21 +288,21 @@
       justify-content: space-between;
       padding: 12px 0;
       font-size: 15px;
-      color: #666;
+      color: t.$text-muted;
 
       .summary-value {
         font-weight: 600;
-        color: #333;
+        color: t.$text-body;
 
         .free-ship {
-          color: #52c41a;
+          color: t.$success-text;
           font-weight: 700;
         }
       }
     }
 
     .summary-promotion {
-      background: linear-gradient(135deg, #fff9e6 0%, #fff3cc 100%);
+      background: linear-gradient(135deg, t.$warning-soft 0%, t.$warning-soft 100%);
       padding: 12px;
       border-radius: 8px;
       margin: 15px 0;
@@ -310,18 +313,18 @@
     }
 
     .summary-note {
-      background: #f0f9ff;
+      background: t.$brand-50;
       padding: 12px;
       border-radius: 8px;
       margin: 15px 0;
       text-align: center;
       font-size: 13px;
-      color: #1890ff;
+      color: t.$primary-text;
     }
 
     .summary-divider {
       height: 1px;
-      background: #f0f0f0;
+      background: t.$surface-muted;
       margin: 20px 0;
     }
 
@@ -331,10 +334,10 @@
       padding: 15px 0;
       font-size: 18px;
       font-weight: 700;
-      color: #333;
+      color: t.$text-body;
 
       .total-value {
-        color: #ff4d4f;
+        color: t.$danger-text;
         font-size: 24px;
       }
     }
@@ -350,12 +353,12 @@
     .summary-guarantee {
       margin-top: 25px;
       padding-top: 25px;
-      border-top: 1px solid #f0f0f0;
+      border-top: 1px solid t.$border;
 
       h3 {
         font-size: 16px;
         font-weight: 600;
-        color: #333;
+        color: t.$text-body;
         margin-bottom: 15px;
       }
 
@@ -366,7 +369,7 @@
 
         li {
           font-size: 14px;
-          color: #666;
+          color: t.$text-muted;
           padding: 8px 0;
           line-height: 1.5;
         }

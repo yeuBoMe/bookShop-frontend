@@ -4,6 +4,7 @@ import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
 import { App, Button, Popconfirm, Space } from 'antd';
 import { useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { CSVLink } from 'react-csv';
 import DetailRatingDrawer from 'components/admin/rating/detail.rating.drawer';
 import { dateRangeValidate } from '@/services/helper';
@@ -19,6 +20,8 @@ type TSearch = {
 const TableRating = () => {
     const actionRef = useRef<ActionType | null>(null);
     const { notification, message } = App.useApp();
+
+    const { t } = useTranslation();
     const [meta, setMeta] = useState({
         current: 1,
         pageSize: 5,
@@ -39,13 +42,13 @@ const TableRating = () => {
             await new Promise((resolver) => setTimeout(resolver, 1000));
 
             if (deleteRatingResponse) {
-                message.success("Delete rating successfully!");
+                message.success(t("admin.msg.deleteSuccess", { entity: t("admin.entity.rating") }));
                 refreshTable();
             }
         } catch (error: any) {
             notification.error({
-                message: "Lỗi",
-                description: error?.message || "Không thể gửi đánh giá",
+                message: t("common.error"),
+                description: error?.message || t("common.error"),
                 duration: 5,
                 placement: "topRight",
             });
@@ -65,25 +68,25 @@ const TableRating = () => {
             width: 48,
         },
         {
-            title: 'Id',
+            title: t("admin.table.id"),
             dataIndex: 'id',
             sorter: true,
             hideInSearch: true,
         },
         {
-            title: 'Stars',
+            title: t("admin.table.stars"),
             dataIndex: 'stars',
             valueType: "digit",
             sorter: true,
         },
         {
-            title: 'Comment',
+            title: t("admin.table.comment"),
             dataIndex: 'comment',
             sorter: true,
             ellipsis: true,
         },
         {
-            title: 'User',
+            title: t("admin.table.user"),
             dataIndex: 'user',
             sorter: true,
             render(_, entity) {
@@ -93,27 +96,27 @@ const TableRating = () => {
             },
         },
         {
-            title: 'Book',
+            title: t("admin.table.book"),
             dataIndex: 'book',
             sorter: true,
             ellipsis: true,
             copyable: true,
         },
         {
-            title: 'Created at',
+            title: t("admin.table.createdAt"),
             dataIndex: 'createdAt',
             valueType: "date",
             hideInSearch: true,
             sorter: true,
         },
         {
-            title: 'Created At',
+            title: t("admin.table.createdAt"),
             dataIndex: 'createdAtRange',
             valueType: "dateRange",
             hideInTable: true,
         },
         {
-            title: 'Action',
+            title: t("admin.table.action"),
             hideInSearch: true,
             render(_, entity) {
                 return (
@@ -128,10 +131,10 @@ const TableRating = () => {
                             />
                             <Popconfirm
                                 placement='topLeft'
-                                title="Delete rating"
-                                description="Are you sure to delete this rating?"
-                                okText="Yes"
-                                cancelText="No"
+                                title={t("admin.confirm.deleteTitle", { entity: t("admin.entity.rating") })}
+                                description={t("admin.confirm.deleteDescription", { entity: t("admin.entity.rating") })}
+                                okText={t("common.yes")}
+                                cancelText={t("common.no")}
                                 onConfirm={() => handleDeleteRating(entity.id)}
                                 okButtonProps={{ loading: isDeleteRating }}
                             >
@@ -254,13 +257,13 @@ const TableRating = () => {
                     showTotal: (total, range) => {
                         return (
                             <div>
-                                {range[0]} - {range[1]} on {total} rows
+                                {t("admin.table.paginationTotal", { from: range[0], to: range[1], total })}
                             </div>
                         )
                     },
                 }}
                 dateFormatter="string"
-                headerTitle="Table Rating"
+                headerTitle={t("admin.table.header", { entity: t("admin.entityPlural.rating") })}
                 toolBarRender={() => [
                     <CSVLink
                         data={currentDataTable}
@@ -271,7 +274,7 @@ const TableRating = () => {
                             icon={<ExportOutlined />}
                             type="primary"
                         >
-                            Export
+                            {t("admin.table.export")}
                         </Button>
                     </CSVLink>
                 ]}

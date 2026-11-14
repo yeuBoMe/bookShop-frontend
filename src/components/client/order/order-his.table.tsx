@@ -1,6 +1,7 @@
 import { updateOrderAPI } from "@/services/api.service";
 import { EyeOutlined, DeleteOutlined, ClockCircleOutlined, CheckCircleOutlined, CloseCircleOutlined, TruckOutlined, DollarCircleOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
 import { Button, Table, Tag, Space, type TableProps, Popconfirm, App } from "antd";
+import { useTranslation } from "react-i18next";
 import { useState, type JSX } from "react";
 import "styles/client/order/order-his.table.scss";
 
@@ -19,6 +20,8 @@ interface OrderHistoryTableProps {
 const OrderHistoryTable = (props: OrderHistoryTableProps) => {
     const { orders, onViewDetail, meta, fetchOrders } = props;
     const { notification, message } = App.useApp();
+
+    const { t } = useTranslation();
     const [isDeleteOrder, setIsDeleteOrder] = useState<boolean>(false);
 
     // Format giá tiền
@@ -45,32 +48,32 @@ const OrderHistoryTable = (props: OrderHistoryTableProps) => {
     const getStatusConfig = (status: string) => {
         const configs: Record<string, { text: string; color: string; icon: JSX.Element }> = {
             PENDING: {
-                text: "Chờ xác nhận",
+                text: t("order.statusText.PENDING"),
                 color: "orange",
                 icon: <ClockCircleOutlined />
             },
             SHIPPING: {
-                text: "Đang giao",
+                text: t("order.statusText.SHIPPING"),
                 color: "cyan",
                 icon: <TruckOutlined />
             },
             SUCCESS: {
-                text: "Thành công",
+                text: t("order.statusText.SUCCESS"),
                 color: "green",
                 icon: <CheckCircleOutlined />
             },
             CANCEL: {
-                text: "Đã huỷ",
+                text: t("order.statusText.CANCEL"),
                 color: "red",
                 icon: <CloseCircleOutlined />
             },
             PAID: {
-                text: "Đã thanh toán",
+                text: t("order.statusText.PAID"),
                 color: "blue",
                 icon: <DollarCircleOutlined />
             },
             UNPAID: {
-                text: "UNPAID",
+                text: t("order.statusText.UNPAID"),
                 color: "magenta",
                 icon: <ExclamationCircleOutlined />,
             },
@@ -85,13 +88,13 @@ const OrderHistoryTable = (props: OrderHistoryTableProps) => {
             await new Promise((resolve) => setTimeout(resolve, 400));
             const updateOrderResponse = await updateOrderAPI(orderId, "CANCEL");
             if (updateOrderResponse.data) {
-                message.success("Hủy đơn hàng thành công!");
+                message.success(t("order.cancelSuccess"));
                 fetchOrders();
             }
         } catch (error: any) {
             notification.error({
-                message: "Error",
-                description: error?.message || "Có lỗi xảy ra khi thao tác đơn hàng",
+                message: t("common.error"),
+                description: error?.message || t("order.actionError"),
                 duration: 5,
                 placement: "topRight"
             });
@@ -103,54 +106,54 @@ const OrderHistoryTable = (props: OrderHistoryTableProps) => {
     // Định nghĩa các cột của bảng
     const columns: TableProps<IOrder>['columns'] = [
         {
-            title: 'STT',
+            title: t("common.index"),
             key: 'stt',
             width: 60,
             align: 'center',
             render: (_, __, index) => index + 1,
         },
         {
-            title: 'Mã đơn hàng',
+            title: t("order.code"),
             dataIndex: 'id',
             key: 'id',
             width: 150,
             render: (id) => <strong>#{id}</strong>,
         },
         {
-            title: 'Thời gian đặt',
+            title: t("order.placedAt"),
             dataIndex: 'createdAt',
             key: 'createdAt',
             width: 150,
             render: (createdAt) => formatDate(createdAt),
         },
         {
-            title: 'Sản phẩm',
+            title: t("order.products"),
             dataIndex: 'detail',
             key: 'detail',
             render: (detail: IOrderDetail[]) => (
                 <div>
                     {detail.map((item) => (
                         <div key={item.id} style={{ marginBottom: 4 }}>
-                            {item.bookName} <span style={{ color: '#999' }}>x{item.quantity}</span>
+                            {item.bookName} <span className="order-item__qty">x{item.quantity}</span>
                         </div>
                     ))}
                 </div>
             ),
         },
         {
-            title: 'Tổng tiền',
+            title: t("order.total"),
             dataIndex: 'totalPrice',
             key: 'totalPrice',
             width: 130,
             align: 'right',
             render: (totalPrice) => (
-                <strong style={{ color: '#ff4d4f', fontSize: 15 }}>
+                <strong className="order-total">
                     {formatPrice(totalPrice)}
                 </strong>
             ),
         },
         {
-            title: 'Trạng thái',
+            title: t("order.status"),
             dataIndex: 'status',
             key: 'status',
             width: 140,
@@ -165,7 +168,7 @@ const OrderHistoryTable = (props: OrderHistoryTableProps) => {
             },
         },
         {
-            title: 'Thao tác',
+            title: t("order.actions"),
             key: 'action',
             width: 180,
             align: 'center',
@@ -177,15 +180,15 @@ const OrderHistoryTable = (props: OrderHistoryTableProps) => {
                         size="small"
                         onClick={() => onViewDetail(record)}
                     >
-                        Chi tiết
+                        {t("order.detail")}
                     </Button>
                     {record.status === "PENDING" && (
                         <Popconfirm
                             placement='topLeft'
-                            title="Hủy đơn hàng"
-                            description="Bạn có chắc muốn hủy đơn hàng này?"
-                            okText="OK"
-                            cancelText="Không"
+                            title={t("order.cancelTitle")}
+                            description={t("order.cancelConfirm")}
+                            okText={t("common.yes")}
+                            cancelText={t("common.no")}
                             onConfirm={() => handleCancelOrder(record.id)}
                             okButtonProps={{ loading: isDeleteOrder }}
                         >
@@ -194,7 +197,7 @@ const OrderHistoryTable = (props: OrderHistoryTableProps) => {
                                 icon={<DeleteOutlined />}
                                 size="small"
                             >
-                                Huỷ
+                                {t("order.cancel")}
                             </Button>
                         </Popconfirm>
                     )}

@@ -8,6 +8,7 @@ import {
 } from '@ant-design/icons';
 import { Drawer, Tag, Divider, Descriptions, Badge } from "antd";
 import type { JSX } from 'react';
+import { useTranslation } from "react-i18next";
 import type { DescriptionsProps } from "antd";
 
 interface DrawerOrderProps {
@@ -18,6 +19,7 @@ interface DrawerOrderProps {
 }
 
 const DetailOrderDrawer = (props: DrawerOrderProps) => {
+    const { t } = useTranslation();
     const { isDrawerDetailOpen, setIsDrawerDetailOpen, dataDetail, setDataDetail } = props;
 
     const handleClearDataAndCloseDrawer = () => {
@@ -50,32 +52,32 @@ const DetailOrderDrawer = (props: DrawerOrderProps) => {
 
         const configs: Record<string, { text: string; color: string; icon: JSX.Element }> = {
             PENDING: {
-                text: "PENDING",
+                text: t("admin.order.status.PENDING"),
                 color: "orange",
                 icon: <ClockCircleOutlined />,
             },
             SHIPPING: {
-                text: "SHIPPING",
+                text: t("admin.order.status.SHIPPING"),
                 color: "cyan",
                 icon: <TruckOutlined />,
             },
             SUCCESS: {
-                text: "SUCCESS",
+                text: t("admin.order.status.SUCCESS"),
                 color: "green",
                 icon: <CheckCircleOutlined />,
             },
             CANCEL: {
-                text: "CANCEL",
+                text: t("admin.order.status.CANCEL"),
                 color: "red",
                 icon: <CloseCircleOutlined />,
             },
             PAID: {
-                text: "PAID",
+                text: t("admin.order.status.PAID"),
                 color: "blue",
                 icon: <DollarCircleOutlined />
             },
             UNPAID: {
-                text: "UNPAID",
+                text: t("admin.order.status.UNPAID"),
                 color: "magenta",
                 icon: <ExclamationCircleOutlined />,
             },
@@ -95,12 +97,12 @@ const DetailOrderDrawer = (props: DrawerOrderProps) => {
         ...(dataDetail ? [
             {
                 key: '1',
-                label: 'Order ID',
+                label: t("admin.order.orderId"),
                 children: <strong>#{dataDetail.id}</strong>,
             },
             {
                 key: '2',
-                label: 'Status',
+                label: t("admin.table.status"),
                 children: (
                     <Tag color={statusConfig.color} icon={statusConfig.icon}>
                         {statusConfig.text}
@@ -109,23 +111,23 @@ const DetailOrderDrawer = (props: DrawerOrderProps) => {
             },
             {
                 key: '3',
-                label: 'Customer Name',
+                label: t("admin.order.customerName"),
                 children: <p>{dataDetail.name}</p>,
             },
             {
                 key: '4',
-                label: 'Phone Number',
+                label: t("admin.order.phone"),
                 children: <p>{dataDetail.phone || "N/A"}</p>,
             },
             {
                 key: '5',
-                label: 'Shipping Address',
+                label: t("admin.order.address"),
                 children: <p>{dataDetail.address}</p>,
                 span: 2,
             },
             {
                 key: '6',
-                label: 'Payment Method',
+                label: t("admin.order.paymentMethod"),
                 children: (
                     <Badge
                         status={dataDetail.paymentMethod === "cod" ? "warning" : "success"}
@@ -140,12 +142,12 @@ const DetailOrderDrawer = (props: DrawerOrderProps) => {
             },
             {
                 key: '7',
-                label: 'Order Date',
+                label: t("admin.order.orderDate"),
                 children: <p>{formatDate(dataDetail.createdAt)}</p>,
             },
             {
                 key: '8',
-                label: 'Last Updated',
+                label: t("admin.order.lastUpdated"),
                 children: <p>{formatDate(dataDetail.updatedAt)}</p>,
             },
         ] : [])
@@ -154,19 +156,19 @@ const DetailOrderDrawer = (props: DrawerOrderProps) => {
     // Product list
     const productsItems: DescriptionsProps['items'] = dataDetail.detail.map((item, index) => ({
         key: `product-${item.id}`,
-        label: `Product ${index + 1}`,
+        label: t("admin.order.product", { index: index + 1 }),
         children: (
             <div>
                 <p style={{ marginBottom: '8px', fontWeight: 500 }}>{item.bookName}</p>
                 <div>
                     <span style={{ marginRight: '16px' }}>
-                        Quantity: <strong>x{item.quantity}</strong>
+                        {t("admin.order.quantity")}: <strong>x{item.quantity}</strong>
                     </span>
                     <span style={{ marginRight: '16px' }}>
-                        Unit Price: <strong>{formatCurrencyVND(item.price)}</strong>
+                        {t("admin.order.unitPrice")}: <strong>{formatCurrencyVND(item.price)}</strong>
                     </span>
                     <span>
-                        Subtotal: <strong>{formatCurrencyVND(item.price * item.quantity)}</strong>
+                        {t("admin.order.subtotal")}: <strong>{formatCurrencyVND(item.price * item.quantity)}</strong>
                     </span>
                 </div>
             </div>
@@ -178,21 +180,21 @@ const DetailOrderDrawer = (props: DrawerOrderProps) => {
     const summaryItems: DescriptionsProps['items'] = [
         {
             key: 'total',
-            label: 'Total Price',
+            label: t("admin.order.totalPrice"),
             children: <strong>{formatCurrencyVND(dataDetail.totalPrice)}</strong>,
         },
     ];
 
     return (
         <Drawer
-            title="Order Details"
+            title={t("admin.detail.title", { entity: t("admin.entity.order") })}
             placement="right"
             onClose={handleClearDataAndCloseDrawer}
             open={isDrawerDetailOpen}
             width={window.innerWidth > 768 ? "50vw" : "100vw"}
         >
             <Descriptions
-                title="Order Information"
+                title={t("admin.detail.info", { entity: t("admin.entity.order") })}
                 items={orderInfoItems}
                 bordered
                 column={2}
@@ -206,10 +208,10 @@ const DetailOrderDrawer = (props: DrawerOrderProps) => {
                     fontWeight: 600,
                     fontSize: "16px",
                     margin: "0 0 10px 0",
-                    color: "#1677ff",
+                    color: "var(--admin-primary)",
                 }}
             >
-                Ordered Products
+                {t("admin.order.products")}
             </div>
 
             <Descriptions
@@ -226,10 +228,10 @@ const DetailOrderDrawer = (props: DrawerOrderProps) => {
                     fontWeight: 600,
                     fontSize: "16px",
                     margin: "0 0 10px 0",
-                    color: "#1677ff",
+                    color: "var(--admin-primary)",
                 }}
             >
-                Payment Summary
+                {t("admin.order.summary")}
             </div>
 
             <Descriptions

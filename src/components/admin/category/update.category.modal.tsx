@@ -1,6 +1,7 @@
 import { updateCategoryAPI } from "@/services/api.service";
 import { App, Col, Form, Input, Modal, Row, type FormProps } from "antd";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 interface CategoryUpdateValues {
     name: string;
@@ -24,6 +25,8 @@ const UpdateCategoryModal = (props: UpdateCategoryProps) => {
     } = props;
     const [form] = Form.useForm<CategoryUpdateValues>();
     const { notification, message } = App.useApp();
+
+    const { t } = useTranslation();
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
     useEffect(() => {
@@ -42,12 +45,12 @@ const UpdateCategoryModal = (props: UpdateCategoryProps) => {
             const updateCategoryResponse = await updateCategoryAPI(dataUpdate.id, name);
             if (updateCategoryResponse.data) {
                 handleClearDataAndCloseModal();
-                message.success("Update category successfully!");
+                message.success(t("admin.msg.updateSuccess", { entity: t("admin.entity.category") }));
                 refreshTable();
             }
         } catch (error: any) {
             notification.error({
-                message: "Error",
+                message: t("common.error"),
                 description: error?.message,
                 duration: 5,
                 placement: "topRight"
@@ -66,14 +69,14 @@ const UpdateCategoryModal = (props: UpdateCategoryProps) => {
     return (
         <>
             <Modal
-                title="Update category"
+                title={t("admin.form.updateTitle", { entity: t("admin.entity.category") })}
                 closable={false}
                 maskClosable={false}
                 open={isModalUpdateOpen}
                 onOk={() => form.submit()}
                 onCancel={handleClearDataAndCloseModal}
                 loading={isLoading}
-                okText="Update"
+                okText={t("common.update")}
                 width={"50vw"}
             >
                 <Row justify={"center"}>
@@ -89,14 +92,14 @@ const UpdateCategoryModal = (props: UpdateCategoryProps) => {
                             <Row gutter={16}>
                                 <Col span={17}>
                                     <Form.Item<CategoryUpdateValues>
-                                        label="Name:"
+                                        label={t("field.name")}
                                         name="name"
                                         rules={[
-                                            { required: true, message: "Category's name is required" },
-                                            { max: 100, message: "Name must be less than 100 characters" },
+                                            { required: true, message: t("validate.required", { field: t("field.name") }) },
+                                            { max: 100, message: t("validate.maxLength", { field: t("field.name"), max: 100 }) },
                                             {
                                                 pattern: /^[A-Za-zÀ-ỹà-ỹ0-9'\-.:\s]{1,100}$/,
-                                                message: "Invalid name format",
+                                                message: t("validate.invalid", { field: t("field.name") }),
                                             },
                                         ]}
                                     >

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Input, Avatar, Badge, Empty, App } from "antd";
+import { useTranslation } from "react-i18next";
 import { SearchOutlined, SendOutlined, UserOutlined } from "@ant-design/icons";
 import { useCurrentApp } from "@/components/context/app.context";
 import websocketService from "@/services/websocket.service";
@@ -7,20 +8,11 @@ import "@/styles/admin-chat.scss";
 
 const ADMIN_CONVERSATIONS_KEY = "bookshop_admin_conversations";
 
-// ✅ TIN NHẮN TỰ ĐỘNG KHI USER CHAT LẦN ĐẦU
-const AUTO_REPLY_MESSAGE = `Xin chào! 👋
-
-Cảm ơn bạn đã liên hệ với BookShop. Chúng tôi đã nhận được tin nhắn của bạn.
-
-🕐 Thời gian phản hồi: Admin sẽ cố gắng phản hồi sớm nhất có thể 
-📚 Hỗ trợ: Tư vấn sách, đơn hàng, thanh toán
-💬 Admin sẽ trả lời bạn ngay khi có thể!
-
-Vui lòng mô tả chi tiết vấn đề của bạn để được hỗ trợ tốt nhất.`;
 
 const AdminChatWebSocket = () => {
   const { user } = useCurrentApp();
   const { notification } = App.useApp();
+  const { t } = useTranslation();
   const [conversations, setConversations] = useState<IAdminConversation[]>([]);
   const [selectedUserEmail, setSelectedUserEmail] = useState<string | null>(null);
   const [input, setInput] = useState("");
@@ -87,7 +79,7 @@ const AdminChatWebSocket = () => {
     const timestamp = new Date().toISOString();
     const autoMessage: IAdminMessage = {
       from: "ADMIN",
-      text: AUTO_REPLY_MESSAGE,
+      text: t("admin.chat.autoReply"),
       timestamp,
     };
 
@@ -98,7 +90,7 @@ const AdminChatWebSocket = () => {
           ? {
             ...c,
             messages: [...c.messages, autoMessage],
-            lastMessage: "Tin nhắn tự động",
+            lastMessage: t("admin.chat.autoMessage"),
             lastMessageTime: timestamp,
           }
           : c
@@ -109,7 +101,7 @@ const AdminChatWebSocket = () => {
     const wsMessage: IWebSocket = {
       sender: userEmail,
       receiver: user?.email || "ninh@gmail.com",
-      content: AUTO_REPLY_MESSAGE,
+      content: t("admin.chat.autoReply"),
       timestamp,
       from: "ADMIN",
     };
@@ -231,7 +223,7 @@ const AdminChatWebSocket = () => {
         // Notification
         if (shouldNotify) {
           notificationRef.current.info({
-            message: `💬 ${data.sender.split("@")[0]}`,
+            message: t("admin.chat.newMessageFrom", { name: data.sender.split("@")[0] }),
             description: data.content,
             placement: "topRight",
             duration: 4,
@@ -253,8 +245,8 @@ const AdminChatWebSocket = () => {
         setIsConnected(false);
         hasConnected.current = false;
         notification.error({
-          message: "Lỗi kết nối",
-          description: "Không thể kết nối WebSocket",
+          message: t("admin.chat.connectError"),
+          description: t("admin.chat.connectErrorDesc"),
           placement: "topRight",
         });
       },
@@ -290,8 +282,8 @@ const AdminChatWebSocket = () => {
     if (!input.trim() || !isConnected || !selectedUserEmail) {
       if (!isConnected) {
         notification.warning({
-          message: "Chưa kết nối",
-          description: "Vui lòng đợi...",
+          message: t("admin.chat.notConnected"),
+          description: t("admin.chat.pleaseWait"),
           placement: "topRight",
         });
       }
@@ -338,7 +330,7 @@ const AdminChatWebSocket = () => {
   const formatTime = (timestamp: string) => {
     try {
       const date = new Date(timestamp);
-      if (isNaN(date.getTime())) return "Vừa xong";
+      if (isNaN(date.getTime())) return t("time.justNow");
 
       const now = new Date();
       const diff = now.getTime() - date.getTime();
@@ -346,26 +338,26 @@ const AdminChatWebSocket = () => {
       const hours = Math.floor(diff / 3600000);
       const days = Math.floor(diff / 86400000);
 
-      if (minutes < 1) return "Vừa xong";
-      if (minutes < 60) return `${minutes} phút`;
-      if (hours < 24) return `${hours} giờ`;
-      if (days < 7) return `${days} ngày`;
+      if (minutes < 1) return t("time.justNow");
+      if (minutes < 60) return t("time.minutes", { count: minutes });
+      if (hours < 24) return t("time.hours", { count: hours });
+      if (days < 7) return t("time.days", { count: days });
       return date.toLocaleDateString("vi-VN");
     } catch {
-      return "Vừa xong";
+      return t("time.justNow");
     }
   };
 
   const formatMessageTime = (timestamp: string) => {
     try {
       const date = new Date(timestamp);
-      if (isNaN(date.getTime())) return "Vừa xong";
+      if (isNaN(date.getTime())) return t("time.justNow");
       return date.toLocaleTimeString("vi-VN", {
         hour: "2-digit",
         minute: "2-digit",
       });
     } catch {
-      return "Vừa xong";
+      return t("time.justNow");
     }
   };
 
@@ -388,18 +380,23 @@ const AdminChatWebSocket = () => {
     <div className="admin-chat-page">
       <div className="chat-sidebar">
         <div className="sidebar-header">
-          <h2>Đoạn chat ({conversations.length})</h2>
-          <div className="connection-status">
-            {isConnected ? (
-              <span className="status-dot connected"></span>
-            ) : (
-              <span className="status-dot disconnected"></span>
-            )}
+          <h2>{t("admin.chat.conversations", { count: conversations.length })}</h2>
+          {/* Trước đây trạng thái kết nối chỉ là một chấm tròn xanh/đỏ: người mù
+              màu đỏ–lục và người dùng trình đọc màn hình không nhận được thông tin.
+              Nay có thêm nhãn chữ và role="status" để đọc thành tiếng. */}
+          <div
+            className={`connection-status ${isConnected ? "is-connected" : "is-disconnected"}`}
+            role="status"
+          >
+            <span className="status-dot" aria-hidden="true"></span>
+            <span className="status-text">
+              {isConnected ? t("admin.chat.connected") : t("admin.chat.disconnected")}
+            </span>
           </div>
         </div>
         <div className="sidebar-search">
           <Input
-            placeholder="Tìm kiếm..."
+            placeholder={t("admin.chat.searchPlaceholder")}
             prefix={<SearchOutlined />}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -409,7 +406,7 @@ const AdminChatWebSocket = () => {
         <div className="conversations-list">
           {filteredConversations.length === 0 ? (
             <Empty
-              description="Chưa có tin nhắn"
+              description={t("admin.chat.noMessages")}
               image={Empty.PRESENTED_IMAGE_SIMPLE}
             />
           ) : (
@@ -478,7 +475,7 @@ const AdminChatWebSocket = () => {
 
             <div className="chat-input">
               <Input.TextArea
-                placeholder="Aa"
+                placeholder={t("admin.chat.inputPlaceholder")}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onPressEnter={(e) => {
@@ -502,7 +499,7 @@ const AdminChatWebSocket = () => {
         ) : (
           <div className="no-conversation-selected">
             <Empty
-              description="Chọn cuộc trò chuyện"
+              description={t("admin.chat.selectConversation")}
               image={Empty.PRESENTED_IMAGE_SIMPLE}
             />
           </div>

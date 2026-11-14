@@ -1,6 +1,7 @@
 // File: src/components/client/websocket/user.chat.tsx
 
 import { useState, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { Button, Input, FloatButton, App } from "antd";
 import { MessageOutlined, SendOutlined, CloseOutlined } from "@ant-design/icons";
 import { useCurrentApp } from "@/components/context/app.context";
@@ -14,6 +15,8 @@ const UserChatWebSocket = () => {
   const { user } = useCurrentApp();
   const navigate = useNavigate();
   const { notification } = App.useApp();
+
+  const { t } = useTranslation();
 
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<IUserMessage[]>([]);
@@ -101,7 +104,7 @@ const UserChatWebSocket = () => {
         // ✅ Dùng ref thay vì state
         if (!openRef.current) {
           notificationRef.current.info({
-            message: "💬 Admin trả lời",
+            message: t("chat.adminReplied"),
             description: data.content,
             placement: "topRight",
             duration: 4,
@@ -123,8 +126,8 @@ const UserChatWebSocket = () => {
         setIsConnected(false);
         hasConnected.current = false;
         notification.error({
-          message: "Lỗi kết nối",
-          description: "Không thể kết nối chat",
+          message: t("chat.connectError"),
+          description: t("chat.connectErrorDesc"),
           placement: "topRight",
         });
       },
@@ -152,8 +155,8 @@ const UserChatWebSocket = () => {
     if (!input.trim() || !isConnected || !user?.email) {
       if (!isConnected) {
         notification.warning({
-          message: "Chưa kết nối",
-          description: "Đang kết nối lại...",
+          message: t("chat.notConnected"),
+          description: t("chat.reconnecting"),
           placement: "topRight",
         });
       }
@@ -190,8 +193,8 @@ const UserChatWebSocket = () => {
   const handleOpenPopup = () => {
     if (!user?.email) {
       notification.warning({
-        message: "Chưa đăng nhập",
-        description: "Vui lòng đăng nhập để chat",
+        message: t("chat.notLoggedIn"),
+        description: t("chat.notLoggedInChat"),
         placement: "topRight",
       });
       setTimeout(() => navigate("/login"), 1000);
@@ -205,14 +208,14 @@ const UserChatWebSocket = () => {
     try {
       const date = new Date(timestamp);
       if (isNaN(date.getTime())) {
-        return "Vừa xong";
+        return t("chat.justNow");
       }
       return date.toLocaleTimeString("vi-VN", {
         hour: "2-digit",
         minute: "2-digit",
       });
     } catch {
-      return "Vừa xong";
+      return t("chat.justNow");
     }
   };
 
@@ -224,7 +227,7 @@ const UserChatWebSocket = () => {
         type="default"
         className="user-chat-trigger"
         onClick={handleOpenPopup}
-        tooltip="Chat với Admin"
+        tooltip={t("chat.withAdmin")}
       />
 
       {open && (
@@ -233,9 +236,9 @@ const UserChatWebSocket = () => {
           <div className="user-chat-container" onClick={(e) => e.stopPropagation()}>
             <div className="user-chat-header">
               <div>
-                <div style={{ fontWeight: 600 }}>Chat với Admin</div>
+                <div style={{ fontWeight: 600 }}>{t("chat.withAdmin")}</div>
                 <div style={{ fontSize: 11, opacity: 0.9, marginTop: 2 }}>
-                  {isConnected ? "🟢 Đang kết nối" : "🔴 Mất kết nối"}
+                  {isConnected ? t("chat.connected") : t("chat.disconnected")}
                 </div>
               </div>
               <Button
@@ -249,7 +252,7 @@ const UserChatWebSocket = () => {
             <div className="user-chat-messages">
               {messages.length === 0 && (
                 <div className="user-chat-empty">
-                  Chào bạn! 👋<br />Gửi tin nhắn để được hỗ trợ
+                  {t("chat.greeting")}<br />{t("chat.greetingHint")}
                 </div>
               )}
 
@@ -267,7 +270,7 @@ const UserChatWebSocket = () => {
 
             <div className="user-chat-input">
               <Input
-                placeholder="Nhập tin nhắn..."
+                placeholder={t("chat.inputPlaceholder")}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onPressEnter={handleSend}

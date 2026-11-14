@@ -1,30 +1,32 @@
-@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
+@use "../abstracts/tokens" as t;
+@use "../abstracts/mixins" as m;
+
 
 // ─── Tokens ────────────────────────────────────────────────────────────────
-$font: "Plus Jakarta Sans", sans-serif;
-$max-w: 1280px;
-$blue: #2563eb;
-$blue-light: #eff6ff;
-$blue-mid: #dbeafe;
-$indigo: #4f46e5;
-$red: #ef4444;
-$red-light: #fff1f2;
-$amber: #f59e0b;
-$amber-light: #fffbeb;
-$green: #10b981;
-$green-light: #ecfdf5;
-$text: #111827;
-$text-2: #374151;
-$text-3: #6b7280;
-$text-4: #9ca3af;
-$bg: #f8fafc;
-$bg-2: #f1f5f9;
-$white: #ffffff;
-$border: #e5e7eb;
-$border-2: #f3f4f6;
-$radius: 16px;
-$radius-sm: 10px;
-$radius-lg: 24px;
+$font: t.$font-sans;
+$max-w: t.$container-max;
+$blue: t.$primary;
+$blue-light: t.$primary-soft;
+$blue-mid: t.$primary-muted;
+$indigo: t.$primary-text-hover;
+$red: t.$danger;
+$red-light: t.$danger-soft;
+$amber: t.$star;
+$amber-light: t.$warning-soft;
+$green: t.$success;
+$green-light: t.$success-soft;
+$text: t.$text-strong;
+$text-2: t.$text-body;
+$text-3: t.$text-muted;
+$text-4: t.$text-subtle;
+$bg: t.$surface-subtle;
+$bg-2: t.$surface-muted;
+$white: t.$white;
+$border: t.$border;
+$border-2: t.$border;
+$radius: t.$radius-xl;
+$radius-sm: t.$radius-lg;
+$radius-lg: t.$radius-2xl;
 
 @mixin container {
   max-width: $max-w;
@@ -80,13 +82,13 @@ $radius-lg: 24px;
 
 @keyframes pulse-ring {
   0% {
-    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.25);
+    box-shadow: 0 0 0 0 rgba(t.$primary, 0.25);
   }
   70% {
-    box-shadow: 0 0 0 10px rgba(37, 99, 235, 0);
+    box-shadow: 0 0 0 10px rgba(t.$primary, 0);
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0);
+    box-shadow: 0 0 0 0 rgba(t.$primary, 0);
   }
 }
 
@@ -109,7 +111,7 @@ $radius-lg: 24px;
   align-items: center;
   justify-content: center;
   min-height: 70vh;
-  background: $white;
+  background: t.$surface;
 }
 
 // ─── Section Shared ────────────────────────────────────────────────────────
@@ -156,7 +158,7 @@ $radius-lg: 24px;
 
   &:hover {
     background: $blue-mid;
-    color: darken($blue, 10%);
+    color: t.$primary-text-hover;
     transform: translateX(2px);
   }
 }
@@ -179,7 +181,7 @@ $radius-lg: 24px;
       }
 
       li.slick-active button {
-        background: $white;
+        background: t.$surface;
         width: 36px;
       }
     }
@@ -196,9 +198,9 @@ $radius-lg: 24px;
     &--1 {
       background: linear-gradient(
         135deg,
-        #1e3a8a 0%,
-        #1d4ed8 55%,
-        #3b82f6 100%
+        t.$brand-900 0%,
+        t.$primary-hover 55%,
+        t.$brand-500 100%
       );
     }
     &--2 {
@@ -214,7 +216,7 @@ $radius-lg: 24px;
         135deg,
         #164e63 0%,
         #0369a1 55%,
-        #0ea5e9 100%
+        t.$brand-500 100%
       );
     }
 
@@ -295,7 +297,7 @@ $radius-lg: 24px;
     .highlight {
       display: block;
       color: $amber;
-      filter: drop-shadow(0 0 12px rgba(245, 158, 11, 0.45));
+      filter: drop-shadow(0 0 12px rgba(245, 158, 11, 0.3));
     }
   }
 
@@ -315,7 +317,7 @@ $radius-lg: 24px;
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    background: $white;
+    background: t.$surface;
     color: $blue;
     border: none;
     padding: 0.875rem 2.25rem;
@@ -325,12 +327,12 @@ $radius-lg: 24px;
     border-radius: 3rem;
     cursor: pointer;
     @include ease;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.11);
     animation: pulse-ring 2.5s ease infinite 1.5s;
 
     &:hover {
       transform: translateY(-2px);
-      box-shadow: 0 14px 32px rgba(0, 0, 0, 0.28);
+      box-shadow: 0 14px 32px rgba(15, 23, 42, 0.13);
       color: $indigo;
     }
 
@@ -359,7 +361,7 @@ $radius-lg: 24px;
       height: 380px;
       object-fit: cover;
       border-radius: $radius-lg;
-      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.35);
+      box-shadow: t.$shadow-xl;
       border: 3px solid rgba(255, 255, 255, 0.15);
     }
 
@@ -378,7 +380,7 @@ $radius-lg: 24px;
 
 // ─── Features ──────────────────────────────────────────────────────────────
 .features {
-  background: $white;
+  background: t.$surface;
   border-bottom: 1px solid $border;
   margin-bottom: 3.5rem;
 
@@ -499,7 +501,7 @@ $radius-lg: 24px;
 }
 
 .category-card {
-  background: $white;
+  background: t.$surface;
   border: 1.5px solid $border;
   border-radius: $radius;
   padding: 1.5rem 1rem;
@@ -509,7 +511,7 @@ $radius-lg: 24px;
 
   &:hover {
     border-color: $blue;
-    box-shadow: 0 8px 28px rgba(37, 99, 235, 0.1);
+    box-shadow: 0 8px 28px rgba(t.$primary, 0.1);
     transform: translateY(-4px);
 
     .category-card__icon {
@@ -559,7 +561,7 @@ $radius-lg: 24px;
   margin-bottom: 3.5rem;
 
   > div:first-child {
-    background: linear-gradient(135deg, #fef3c7 0%, #fff7ed 100%);
+    background: linear-gradient(135deg, #fef3c7 0%, t.$warning-soft 100%);
     border: 1.5px solid #fde68a;
     border-radius: $radius-lg;
     padding: clamp(1.25rem, 3vw, 2rem) clamp(1.25rem, 3vw, 2rem);
@@ -599,7 +601,7 @@ $radius-lg: 24px;
 
 // ─── Product Card ──────────────────────────────────────────────────────────
 .product-card {
-  background: $white;
+  background: t.$surface;
   border: 1.5px solid $border;
   border-radius: $radius;
   overflow: hidden;
@@ -609,8 +611,8 @@ $radius-lg: 24px;
   @include ease(0.32s);
 
   &:hover {
-    border-color: rgba(37, 99, 235, 0.3);
-    box-shadow: 0 16px 44px rgba(0, 0, 0, 0.1);
+    border-color: rgba(t.$primary, 0.3);
+    box-shadow: t.$shadow-lg;
     transform: translateY(-6px);
 
     .product-card__image img {
@@ -650,7 +652,7 @@ $radius-lg: 24px;
     background: linear-gradient(
       180deg,
       transparent 50%,
-      rgba(0, 0, 0, 0.12) 100%
+      rgba(15, 23, 42, 0.08) 100%
     );
     opacity: 0;
     @include ease;
@@ -776,7 +778,7 @@ $radius-lg: 24px;
 
 // ─── Newsletter ────────────────────────────────────────────────────────────
 .newsletter {
-  background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 60%, #3b82f6 100%);
+  background: linear-gradient(135deg, t.$brand-900 0%, t.$primary-hover 60%, t.$brand-500 100%);
   padding: clamp(3rem, 6vw, 5rem) clamp(1rem, 4vw, 2rem);
   margin-top: 3rem;
   text-align: center;
@@ -877,12 +879,12 @@ $radius-lg: 24px;
     cursor: pointer;
     white-space: nowrap;
     @include ease;
-    box-shadow: 0 4px 16px rgba(245, 158, 11, 0.4);
+    box-shadow: 0 4px 16px rgba(245, 158, 11, 0.3);
 
     &:hover {
       background: darken($amber, 8%);
       transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(245, 158, 11, 0.5);
+      box-shadow: 0 8px 24px rgba(245, 158, 11, 0.3);
     }
 
     &:active {
@@ -895,11 +897,11 @@ $radius-lg: 24px;
 :global {
   .ant-rate-star-full .ant-rate-star-second,
   .ant-rate-star-half .ant-rate-star-first {
-    color: #f59e0b;
+    color: t.$star;
   }
 
   .ant-rate-star-zero .ant-rate-star-second {
-    color: #e5e7eb;
+    color: t.$border;
   }
 
   .ant-carousel {
@@ -909,6 +911,6 @@ $radius-lg: 24px;
   }
 
   .ant-spin-dot-item {
-    background: #2563eb;
+    background: t.$primary;
   }
 }
